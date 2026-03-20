@@ -1,0 +1,233 @@
+# SCAcademia Sprint Status Tracking
+# Generated: 2026-03-20T14:30:00Z
+# Last Updated: 2026-03-20T14:30:00Z
+# Project: SCAcademia
+# Project Key: SCACAD
+# Tracking System: file-system
+# Story Location: _bmad-output/implementation-artifacts
+
+# ============================================================================
+# STATUS DEFINITIONS
+# ============================================================================
+
+# Epic Status (STATE MACHINE):
+# ├─ backlog: Epic not yet started
+# ├─ in-progress: Epic actively being worked on
+# └─ done: All stories in epic completed
+
+# Epic Status Transitions:
+# ├─ backlog → in-progress: AUTO when first story is created (via create-story)
+# ├─ in-progress → done: MANUAL when all stories reach 'done' status
+# └─ Can only iterate forward (no backward moves)
+
+# Story Status (STATE MACHINE):
+# ├─ backlog: Story only exists in epic file, no dedicated story file yet
+# ├─ ready-for-dev: Story file created in stories folder, ready for developer
+# ├─ in-progress: Developer actively working on implementation
+# ├─ review: Ready for code review (moved here by Dev workflow)
+# └─ done: Story completed & approved
+
+# Story Status Transitions:
+# ├─ backlog → ready-for-dev: AUTO when story file created (1-1-story-title.md)
+# ├─ ready-for-dev → in-progress: Developer starts work
+# ├─ in-progress → review: Developer finishes implementation + tests
+# ├─ review → in-progress: Code review finds issues, back to fix
+# └─ review → done: Code review approved
+
+# Retrospective Status:
+# ├─ optional: Can be completed but not required
+# └─ done: Retrospective has been completed
+
+# ============================================================================
+# WORKFLOW NOTES
+# ============================================================================
+
+# SPRINT MASTER WORKFLOW:
+# 1. Run "sprint-planning" → generates this file with all items in 'backlog'
+# 2. Run "create-story Epic N Story M" → creates story file, shows up in 'ready-for-dev'
+# 3. Run "dev this story [file]" → dev works on it (watches for 'in-progress' status)
+# 4. Dev finishes → story moves to 'review'
+# 5. Run "code-review" → review happens
+# 6. If changes needed → back to 'in-progress', goto step 3
+# 7. If approved → story becomes 'done'
+# 8. Continue with next story in Sprint Plan
+
+# KEY RULES:
+# - Stories typically worked in order within epic (but can parallelize if team capacity)
+# - Never downgrade status (e.g., 'done' → 'in-progress' not allowed)
+# - Preserve existing status if this file is re-generated
+# - Retrospective recommended when epic fully done, but optional
+
+# ============================================================================
+# SPRINT METRICS
+# ============================================================================
+
+# Total Epics: 8
+# Total Stories: 52
+# Total Retrospectives: 8
+# Total Items: 68
+
+# Epic Distribution by Phase:
+# Phase 0 (Foundation): Epic 1 [5 stories]
+# Phase 1 (Sequential): Epic 2,3,4,5 [6+8+8+7 = 29 stories]
+# Phase 2 (Parallel): Epic 6,7,8 [5+5+4 = 14 stories]
+
+# ============================================================================
+# DEVELOPMENT STATUS
+# ============================================================================
+
+development_status:
+  # ======================================
+  # EPIC 1: Foundation — Auth & RBAC [5]
+  # ======================================
+  
+  epic-1: backlog
+  
+  1-1-admin-cria-academia: backlog
+  1-2-registro-usuario: backlog
+  1-3-login-jwt: backlog
+  1-4-recuperacao-senha: backlog
+  1-5-rbac-controle-papel: backlog
+  
+  epic-1-retrospective: optional
+  
+  # ======================================
+  # EPIC 2: Saúde & LGPD [6]
+  # ======================================
+  
+  epic-2: backlog
+  
+  2-1-anamnese-inicial: backlog
+  2-2-consentimento-lgpd: backlog
+  2-3-versionamento-consentimento: backlog
+  2-4-auditoria-lgpd: backlog
+  2-5-direito-esquecimento: backlog
+  2-6-relatorio-lgpd: backlog
+  
+  epic-2-retrospective: optional
+  
+  # ======================================
+  # EPIC 3: Professor Love — Training [8]
+  # ======================================
+  
+  epic-3: backlog
+  
+  3-1-entry-point-conversacional: backlog
+  3-2-marcar-frequencia: backlog
+  3-3-adicionar-tecnicas: backlog
+  3-4-anotacoes-notas: backlog
+  3-5-revisar-confirmar: backlog
+  3-6-sucesso-continuidade: backlog
+  3-7-historico-treinos: backlog
+  3-8-sincronizacao-offline: backlog
+  
+  epic-3-retrospective: optional
+  
+  # ======================================
+  # EPIC 4: Engajamento Aluno [8]
+  # ======================================
+  
+  epic-4: backlog
+  
+  4-1-dashboard-4-cards: backlog
+  4-2-card-1-expandido: backlog
+  4-3-card-2-expandido: backlog
+  4-4-card-3-expandido: backlog
+  4-5-card-4-expandido: backlog
+  4-6-comparacao-mes-mes: backlog
+  4-7-notificacoes-proativas: backlog
+  4-8-historico-faixas: backlog
+  
+  epic-4-retrospective: optional
+  
+  # ======================================
+  # EPIC 5: Controle Admin [7]
+  # ======================================
+  
+  epic-5: backlog
+  
+  5-1-dashboard-admin: backlog
+  5-2-auditoria-lgpd: backlog
+  5-3-relatorio-conformidade: backlog
+  5-4-alertas-tempo-real: backlog
+  5-5-gestao-usuarios: backlog
+  5-6-backup-recovery: backlog
+  5-7-health-monitor: backlog
+  
+  epic-5-retrospective: optional
+  
+  # ======================================
+  # EPIC 6: Offline-First [5]
+  # ======================================
+  
+  epic-6: backlog
+  
+  6-1-deteccao-conectividade: backlog
+  6-2-fila-sincronizacao: backlog
+  6-3-resolucao-conflitos: backlog
+  6-4-logica-retry: backlog
+  6-5-indicadores-offline: backlog
+  
+  epic-6-retrospective: optional
+  
+  # ======================================
+  # EPIC 7: Polish & Accessibility [5]
+  # ======================================
+  
+  epic-7: backlog
+  
+  7-1-performance-benchmarking: backlog
+  7-2-wcag-accessibility: backlog
+  7-3-bundle-optimization: backlog
+  7-4-keyboard-navigation: backlog
+  7-5-produção-readiness: backlog
+  
+  epic-7-retrospective: optional
+  
+  # ======================================
+  # EPIC 8: DevOps & Go-Live [4]
+  # ======================================
+  
+  epic-8: backlog
+  
+  8-1-docker-containerization: backlog
+  8-2-ci-cd-pipeline: backlog
+  8-3-monitoring-alerting: backlog
+  8-4-production-deployment: backlog
+  
+  epic-8-retrospective: optional
+
+# ============================================================================
+# SUMMARY
+# ============================================================================
+
+# TOTAL COUNTS:
+# - Epics: 8
+# - Stories: 52
+# - Retrospectives: 8
+# - Total Items: 68
+
+# STATUS BREAKDOWN (Initial):
+# - backlog: 60 items (52 stories + 8 epics)
+# - optional: 8 items (retrospectives)
+# - ready-for-dev: 0 items
+# - in-progress: 0 items
+# - review: 0 items
+# - done: 0 items
+
+# RECOMMENDED SPRINT SEQUENCE:
+# Sprint 1 (Week 1-2):     Epic 1 (Foundation) [5 stories]
+# Sprint 2 (Week 3-4):     Epic 2 (Health) [6 stories]
+# Sprint 3 (Week 5-6):     Epic 3 (Training) [8 stories]
+# Sprint 4 (Week 7-8):     Epic 4 (Student) [8 stories]
+# Sprint 5 (Week 9-10):    Epic 5 (Admin) [7 stories]
+# Sprint 6+ (Parallel):    Epics 6,7,8 ([5+5+4 stories] - can overlap earlier)
+
+# ESTIMATED TIMELINE:
+# - Sequential Phase (Epics 1-5): 10 weeks
+# - Parallel Phase (Epics 6-8): Can start week 5-6, finish by week 12
+# - Total Project: 12-14 weeks
+
+# Generated by: bmad-sprint-planning
+# Workflow: bmm → 4-implementation → sprint-planning
+# Next Action: Run "create-story Epic 1 Story 1" to begin
