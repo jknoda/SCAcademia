@@ -159,9 +159,7 @@ CREATE TABLE health_records (
   created_by_user_id UUID REFERENCES users(user_id),
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT reference_student CHECK (
-    EXISTS (SELECT 1 FROM users WHERE user_id = health_records.user_id AND role = 'Aluno')
-  ),
+  -- NOTE: role='Aluno' enforced at application level (PostgreSQL does not support subqueries in CHECK)
   CONSTRAINT valid_blood_type CHECK (blood_type IS NULL OR blood_type IN ('O+', 'O-', 'A+', 'A-', 'B+', 'B-', 'AB+', 'AB-'))
 );
 
@@ -181,9 +179,7 @@ CREATE TABLE judo_profile (
   created_by_user_id UUID REFERENCES users(user_id),
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT reference_student CHECK (
-    EXISTS (SELECT 1 FROM users WHERE user_id = judo_profile.student_id AND role = 'Aluno')
-  ),
+  -- NOTE: role='Aluno' enforced at application level (PostgreSQL does not support subqueries in CHECK)
   CONSTRAINT unique_student_judo UNIQUE (student_id)
 );
 
@@ -202,10 +198,8 @@ CREATE TABLE judo_belt_history (
   promoted_by_user_id UUID REFERENCES users(user_id) ON DELETE SET NULL,
   notes TEXT,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT student_must_be_aluno CHECK (
-    EXISTS (SELECT 1 FROM users WHERE user_id = judo_belt_history.student_id AND role = 'Aluno')
-  )
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+  -- NOTE: role='Aluno' enforced at application level (PostgreSQL does not support subqueries in CHECK)
 );
 
 CREATE INDEX idx_judo_belt_history_student ON judo_belt_history(student_id, received_date DESC);
@@ -224,13 +218,7 @@ CREATE TABLE student_guardians (
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT different_users CHECK (student_id != guardian_id),
-  CONSTRAINT student_must_be_aluno CHECK (
-    EXISTS (SELECT 1 FROM users WHERE user_id = student_guardians.student_id AND role = 'Aluno')
-  ),
-  CONSTRAINT guardian_must_be_responsavel CHECK (
-    EXISTS (SELECT 1 FROM users WHERE user_id = student_guardians.guardian_id AND role = 'Responsavel')
-  ),
-  CONSTRAINT unique_primary_guardian UNIQUE (student_id) WHERE is_primary = true,
+  -- NOTE: role checks enforced at application level (PostgreSQL does not support subqueries in CHECK)
   CONSTRAINT unique_guardian_relation UNIQUE (student_id, guardian_id)
 );
 
@@ -238,6 +226,7 @@ CREATE INDEX idx_student_guardians_student ON student_guardians(student_id);
 CREATE INDEX idx_student_guardians_guardian ON student_guardians(guardian_id);
 CREATE INDEX idx_student_guardians_academy ON student_guardians(academy_id);
 CREATE INDEX idx_student_guardians_primary ON student_guardians(academy_id, is_primary) WHERE is_primary = true;
+CREATE UNIQUE INDEX idx_student_guardians_unique_primary ON student_guardians(student_id) WHERE is_primary = true;
 
 -- `consents` (LGPD Digital Signature)
 CREATE TABLE consents (
@@ -314,10 +303,8 @@ CREATE TABLE turma_students (
   status VARCHAR(50) NOT NULL,
   enrolled_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   dropped_at TIMESTAMP,
-  CONSTRAINT unique_enrollment UNIQUE (turma_id, student_id),
-  CONSTRAINT student_is_aluno CHECK (
-    EXISTS (SELECT 1 FROM users WHERE user_id = turma_students.student_id AND role = 'Aluno')
-  )
+  CONSTRAINT unique_enrollment UNIQUE (turma_id, student_id)
+  -- NOTE: role='Aluno' enforced at application level (PostgreSQL does not support subqueries in CHECK)
 );
 
 CREATE INDEX idx_turma_students_turma ON turma_students(turma_id, status);

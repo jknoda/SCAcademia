@@ -1,0 +1,101 @@
+<div class="admin-form-container">
+  <h2>Registrar Primeiro Administrador</h2>
+  <p>Defina as credenciais do primeiro administrador da academia</p>
+
+  <form [formGroup]="adminForm" (ngSubmit)="onSubmit()">
+    <div class="form-group">
+      <label for="fullName">Nome Completo *</label>
+      <input
+        id="fullName"
+        type="text"
+        formControlName="fullName"
+        placeholder="Ex: João Silva"
+        class="form-control"
+      />
+      <div class="error-message" *ngIf="getFieldError('fullName')">
+        {{ getFieldError('fullName') }}
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="email">Email *</label>
+      <input
+        id="email"
+        type="email"
+        formControlName="email"
+        placeholder="Ex: admin@academia.com"
+        class="form-control"
+      />
+      <div class="error-message" *ngIf="getFieldError('email')">
+        {{ getFieldError('email') }}
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="password">Senha *</label>
+      <input
+        id="password"
+        type="password"
+        formControlName="password"
+        placeholder="Digite uma senha"
+        class="form-control"
+        (input)="onPasswordChange()"
+      />
+      <div *ngIf="passwordStrength !== null" class="password-strength-meter">
+        <div class="strength-bar">
+          <div
+            class="strength-fill"
+            [ngClass]="getPasswordStrengthClass()"
+            [style.width.%]="passwordStrength.score"
+          ></div>
+        </div>
+        <span class="strength-text" [ngClass]="getPasswordStrengthClass()">
+          {{ getPasswordStrengthText() }}
+        </span>
+      </div>
+      <div class="password-requirements">
+        <div class="requirement" [class.met]="passwordStrength?.requirements.minLength">
+          <span>✓</span> Mínimo 8 caracteres
+        </div>
+        <div class="requirement" [class.met]="passwordStrength?.requirements.hasUppercase">
+          <span>✓</span> Pelo menos 1 letra maiúscula
+        </div>
+        <div class="requirement" [class.met]="passwordStrength?.requirements.hasNumber">
+          <span>✓</span> Pelo menos 1 número
+        </div>
+        <div class="requirement" [class.met]="passwordStrength?.requirements.hasSpecialChar">
+          <span>✓</span> Pelo menos 1 caractere especial (!@#$%^&*)
+        </div>
+      </div>
+      <div class="error-message" *ngIf="getFieldError('password')">
+        {{ getFieldError('password') }}
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="confirmPassword">Confirmar Senha *</label>
+      <input
+        id="confirmPassword"
+        type="password"
+        formControlName="confirmPassword"
+        placeholder="Confirme a senha"
+        class="form-control"
+      />
+      <div class="error-message" *ngIf="getFieldError('confirmPassword')">
+        {{ getFieldError('confirmPassword') }}
+      </div>
+    </div>
+
+    <div *ngIf="errorMessage" class="error-alert">
+      {{ errorMessage }}
+    </div>
+
+    <button
+      type="submit"
+      [disabled]="!adminForm.valid || isLoading || !isPasswordValid()"
+      class="btn btn-primary"
+    >
+      {{ isLoading ? 'Registrando...' : 'Registrar Admin' }}
+    </button>
+  </form>
+</div>

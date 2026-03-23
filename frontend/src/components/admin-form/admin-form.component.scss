@@ -1,0 +1,151 @@
+.admin-form-container {
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+h2 {
+  margin-bottom: 10px;
+  color: #333;
+}
+
+p {
+  margin-bottom: 20px;
+  color: #666;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 500;
+  color: #333;
+}
+
+.form-control {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: #0052cc;
+  box-shadow: 0 0 5px rgba(0, 82, 204, 0.3);
+}
+
+.password-strength-meter {
+  margin-top: 8px;
+}
+
+.strength-bar {
+  width: 100%;
+  height: 8px;
+  background-color: #e0e0e0;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 5px;
+}
+
+.strength-fill {
+  height: 100%;
+  transition: all 0.3s;
+  background-color: #dc3545;
+}
+
+.strength-fill.weak {
+  background-color: #ffc107;
+}
+
+.strength-fill.medium {
+  background-color: #ff6b35;
+}
+
+.strength-fill.strong {
+  background-color: #28a745;
+}
+
+.strength-text {
+  font-size: 12px;
+  font-weight: 500;
+  color: #dc3545;
+}
+
+.strength-text.weak {
+  color: #ffc107;
+}
+
+.strength-text.medium {
+  color: #ff6b35;
+}
+
+.strength-text.strong {
+  color: #28a745;
+}
+
+.password-requirements {
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  padding: 10px;
+  margin-top: 10px;
+  font-size: 12px;
+}
+
+.requirement {
+  color: #dc3545;
+  margin-bottom: 5px;
+}
+
+.requirement.met {
+  color: #28a745;
+}
+
+.requirement span {
+  margin-right: 5px;
+}
+
+.error-message {
+  color: #dc3545;
+  font-size: 12px;
+  margin-top: 3px;
+}
+
+.error-alert {
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  color: #721c24;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 15px;
+}
+
+.btn {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.btn-primary {
+  background-color: #0052cc;
+  color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: #0041a3;
+}
+
+.btn:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}

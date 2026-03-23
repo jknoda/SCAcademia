@@ -1,0 +1,72 @@
+<div class="setup-wizard-container">
+  <div class="wizard-header">
+    <div class="stepper">
+      <div class="step" [class.active]="currentStep === 1" [class.completed]="currentStep > 1">
+        <div class="step-number">1</div>
+        <div class="step-label">Academia</div>
+      </div>
+      <div class="step-line" [class.active]="currentStep > 1"></div>
+      <div class="step" [class.active]="currentStep === 2" [class.completed]="currentStep > 2">
+        <div class="step-number">2</div>
+        <div class="step-label">Admin</div>
+      </div>
+      <div class="step-line" [class.active]="currentStep > 2"></div>
+      <div class="step" [class.active]="currentStep === 3">
+        <div class="step-number">3</div>
+        <div class="step-label">Login</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="wizard-content">
+    <!-- Step 1: Academy Form -->
+    <div *ngIf="currentStep === 1">
+      <app-academy-form (academyCreated)="onAcademyCreated($event)"></app-academy-form>
+    </div>
+
+    <!-- Step 2: Admin Registration -->
+    <div *ngIf="currentStep === 2">
+      <app-admin-form
+        [academyId]="academyId"
+        (adminCreated)="onAdminCreated($event)"
+      ></app-admin-form>
+    </div>
+
+    <!-- Step 3: Success Summary -->
+    <div *ngIf="currentStep === 3" class="setup-success">
+      <div class="success-icon">&#10003;</div>
+      <h2>Academia inicializada com sucesso!</h2>
+      <p class="success-subtitle">A sua academia está pronta para começar.</p>
+
+      <div class="summary-card">
+        <h3>&#127979; Academia</h3>
+        <div class="summary-row">
+          <span class="summary-label">Nome da Academia:</span>
+          <span class="summary-value">{{ academyName }}</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Email de Contato:</span>
+          <span class="summary-value">{{ academyEmail }}</span>
+        </div>
+      </div>
+
+      <div class="summary-card">
+        <h3>&#128100; Seu Perfil</h3>
+        <div class="summary-row">
+          <span class="summary-label">Nome:</span>
+          <span class="summary-value">{{ adminFullName }}</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Email:</span>
+          <span class="summary-value">{{ adminEmail }}</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Perfil:</span>
+          <span class="summary-value badge-admin">Administrador</span>
+        </div>
+      </div>
+
+      <button class="btn btn-primary" (click)="onLoginSuccess()">Ir para o Login</button>
+    </div>
+  </div>
+</div>

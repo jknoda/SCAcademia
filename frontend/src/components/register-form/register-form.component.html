@@ -1,0 +1,186 @@
+<div class="register-container">
+  <div class="register-card">
+    <div class="register-header">
+      <div class="logo">🥋</div>
+      <h1>Criar Conta</h1>
+      <p>Registre-se na academia como Professor ou Aluno</p>
+    </div>
+
+    <!-- Success Message -->
+    <div class="success-banner" *ngIf="successMessage">
+      <span class="success-icon">✓</span>
+      {{ successMessage }}
+    </div>
+
+    <!-- Consent Required Notice -->
+    <div class="consent-banner" *ngIf="requiresConsent">
+      <span>📧</span>
+      <div>
+        <strong>Aguardando consentimento parental</strong>
+        <p>Um email foi enviado ao responsável para autorizar o acesso.</p>
+      </div>
+    </div>
+
+    <!-- Error Message -->
+    <div class="error-banner" *ngIf="errorMessage">
+      <span>⚠</span>
+      {{ errorMessage }}
+      <div *ngIf="suggestions.length > 0" class="suggestions">
+        <span *ngFor="let s of suggestions">
+          <a *ngIf="s === 'Fazer login'" (click)="goToLogin()" href="#">{{ s }}</a>
+          <span *ngIf="s !== 'Fazer login'">{{ s }}</span>
+        </span>
+      </div>
+    </div>
+
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" *ngIf="!successMessage || requiresConsent">
+
+      <!-- Nome Completo -->
+      <div class="form-group">
+        <label for="fullName">Nome Completo *</label>
+        <input
+          id="fullName"
+          type="text"
+          formControlName="fullName"
+          placeholder="Ex: João Silva"
+          class="form-control"
+          [class.error]="getFieldError('fullName')"
+        />
+        <div class="field-error" *ngIf="getFieldError('fullName')">{{ getFieldError('fullName') }}</div>
+      </div>
+
+      <!-- Email -->
+      <div class="form-group">
+        <label for="email">Email *</label>
+        <input
+          id="email"
+          type="email"
+          formControlName="email"
+          placeholder="Ex: joao@academia.com"
+          class="form-control"
+          [class.error]="getFieldError('email')"
+        />
+        <div class="field-error" *ngIf="getFieldError('email')">{{ getFieldError('email') }}</div>
+      </div>
+
+      <!-- Tipo (Papel) -->
+      <div class="form-group">
+        <label>Tipo de Usuário *</label>
+        <div class="role-selector">
+          <label class="role-option" [class.selected]="registerForm.get('role')?.value === 'Professor'">
+            <input type="radio" formControlName="role" value="Professor" />
+            <span class="role-icon">👨‍🏫</span>
+            <strong>Professor</strong>
+            <small>Registra treinos e monitora alunos</small>
+          </label>
+          <label class="role-option" [class.selected]="registerForm.get('role')?.value === 'Aluno'">
+            <input type="radio" formControlName="role" value="Aluno" />
+            <span class="role-icon">🥋</span>
+            <strong>Aluno</strong>
+            <small>Visualiza progresso e treinos</small>
+          </label>
+        </div>
+        <div class="field-error" *ngIf="getFieldError('role')">{{ getFieldError('role') }}</div>
+      </div>
+
+      <!-- Data de Nascimento (Aluno) -->
+      <div class="form-group" *ngIf="registerForm.get('role')?.value === 'Aluno'">
+        <label for="birthDate">Data de Nascimento</label>
+        <input
+          id="birthDate"
+          type="date"
+          formControlName="birthDate"
+          class="form-control"
+          [max]="today"
+        />
+        <small class="hint" *ngIf="isMinor()">
+          ⚠️ Menor de idade: um email será enviado ao responsável para consentimento.
+        </small>
+      </div>
+
+      <!-- Email do Responsável (menor de idade) -->
+      <div class="form-group" *ngIf="isMinor()">
+        <label for="responsavelEmail">Email do Responsável *</label>
+        <input
+          id="responsavelEmail"
+          type="email"
+          formControlName="responsavelEmail"
+          placeholder="responsavel@email.com"
+          class="form-control"
+          [class.error]="getFieldError('responsavelEmail')"
+        />
+        <div class="field-error" *ngIf="getFieldError('responsavelEmail')">{{ getFieldError('responsavelEmail') }}</div>
+      </div>
+
+      <!-- Senha -->
+      <div class="form-group">
+        <label for="password">Senha *</label>
+        <div class="password-wrapper">
+          <input
+            id="password"
+            [type]="showPassword ? 'text' : 'password'"
+            formControlName="password"
+            placeholder="Mínimo 8 caracteres"
+            class="form-control"
+            [class.error]="getFieldError('password')"
+          />
+          <button type="button" class="toggle-password" (click)="showPassword = !showPassword">
+            {{ showPassword ? '🙈' : '👁' }}
+          </button>
+        </div>
+
+        <!-- Password Strength Meter -->
+        <div class="password-strength" *ngIf="registerForm.get('password')?.value">
+          <div class="strength-bar">
+            <div class="strength-fill" [style.width.%]="passwordStrength.score" [class]="getStrengthClass()"></div>
+          </div>
+          <span class="strength-label" [class]="getStrengthClass()">{{ getStrengthLabel() }}</span>
+          <ul class="requirements">
+            <li [class.met]="passwordStrength.requirements.minLength">
+              {{ passwordStrength.requirements.minLength ? '✓' : '✗' }} Mínimo 8 caracteres
+            </li>
+            <li [class.met]="passwordStrength.requirements.hasUppercase">
+              {{ passwordStrength.requirements.hasUppercase ? '✓' : '✗' }} Letra maiúscula
+            </li>
+            <li [class.met]="passwordStrength.requirements.hasNumber">
+              {{ passwordStrength.requirements.hasNumber ? '✓' : '✗' }} Número
+            </li>
+            <li [class.met]="passwordStrength.requirements.hasSpecialChar">
+              {{ passwordStrength.requirements.hasSpecialChar ? '✓' : '✗' }} Caractere especial (!@#$...)
+            </li>
+          </ul>
+        </div>
+        <div class="field-error" *ngIf="getFieldError('password')">{{ getFieldError('password') }}</div>
+      </div>
+
+      <!-- Confirmar Senha -->
+      <div class="form-group">
+        <label for="confirmPassword">Confirmar Senha *</label>
+        <input
+          id="confirmPassword"
+          [type]="showPassword ? 'text' : 'password'"
+          formControlName="confirmPassword"
+          placeholder="Repita a senha"
+          class="form-control"
+          [class.error]="getFieldError('confirmPassword') || registerForm.errors?.['passwordMismatch']"
+        />
+        <div class="field-error" *ngIf="registerForm.errors?.['passwordMismatch'] && registerForm.get('confirmPassword')?.touched">
+          As senhas não coincidem
+        </div>
+      </div>
+
+      <button type="submit" class="btn-primary" [disabled]="isLoading || registerForm.invalid">
+        <span *ngIf="isLoading" class="spinner">⏳</span>
+        {{ isLoading ? 'Registrando...' : 'Criar Conta' }}
+      </button>
+    </form>
+
+    <div class="redirect-actions" *ngIf="successMessage && !requiresConsent">
+      <p>Redirecionando para o dashboard...</p>
+    </div>
+
+    <div class="login-link">
+      Já tem uma conta? <a (click)="goToLogin()" href="#">Fazer login</a>
+    </div>
+  </div>
+</div>

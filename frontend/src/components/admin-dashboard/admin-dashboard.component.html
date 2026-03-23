@@ -1,0 +1,68 @@
+<div class="dashboard-container" *ngIf="currentUser">
+  <header class="dashboard-header">
+    <div class="header-content">
+      <div class="logo">
+        <h1>🥋 SCAcademia</h1>
+      </div>
+      <div class="header-info">
+        <span class="welcome">Bem-vindo, {{ currentUser.fullName }}</span>
+        <button (click)="logout()" class="btn-logout">Sair</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="dashboard-main">
+    <section class="hero">
+      <h2>✅ Academia inicializada com sucesso!</h2>
+      <p>A sua academia está pronta para começar.</p>
+      <div class="academy-info">
+        <p><strong>Nome da Academia:</strong> {{ currentUser.academy.name }}</p>
+        <p><strong>Email de Contato:</strong> {{ currentUser.email }}</p>
+        <p><strong>Seu Perfil:</strong> {{ currentUser.role }}</p>
+      </div>
+    </section>
+
+    <section class="status-badge-section">
+      <span class="badge success">🟢 Ready</span>
+    </section>
+
+    <section class="actions">
+      <h3>Próximas Ações</h3>
+      <div class="action-buttons">
+        <button class="action-btn" disabled title="Próximas funcionalidades em desenvolvimento">
+          👨‍🏫 Adicionar Professor
+        </button>
+        <button class="action-btn" disabled title="Próximas funcionalidades em desenvolvimento">
+          👨‍🎓 Adicionar Aluno
+        </button>
+        <button class="action-btn" disabled title="Próximas funcionalidades em desenvolvimento">
+          ⚙️ Configurações
+        </button>
+      </div>
+    </section>
+
+    <section class="system-status">
+      <h3>Status do Sistema</h3>
+      <div class="status-item">
+        <span class="status-label">Sistema de Autenticação</span>
+        <span class="status-ok">✓ Operacional</span>
+      </div>
+      <div class="status-item">
+        <span class="status-label">Banco de Dados</span>
+        <span class="status-ok">✓ Operacional</span>
+      </div>
+      <div class="status-item">
+        <span class="status-label">API REST</span>
+        <span class="status-ok">✓ Operacional</span>
+      </div>
+    </section>
+  </main>
+
+  <footer class="dashboard-footer">
+    <p>&copy; 2026 SCAcademia. Sistema de Gerenciamento de Treinamentos com Conformidade LGPD.</p>
+  </footer>
+</div>
+
+<div class="loading" *ngIf="!currentUser">
+  <p>Carregando...</p>
+</div>

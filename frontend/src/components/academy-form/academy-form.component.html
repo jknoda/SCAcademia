@@ -1,0 +1,74 @@
+<div class="academy-form-container">
+  <h2>Criar Nova Academia</h2>
+  <p>Preencha as informações da sua academia para começar</p>
+
+  <form [formGroup]="academyForm" (ngSubmit)="onSubmit()">
+    <div class="form-group">
+      <label for="name">Nome da Academia *</label>
+      <input
+        id="name"
+        type="text"
+        formControlName="name"
+        placeholder="Ex: Academia Judo Rei"
+        class="form-control"
+      />
+      <div class="error-message" *ngIf="getFieldError('name')">
+        {{ getFieldError('name') }}
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="location">Localização *</label>
+      <input
+        id="location"
+        type="text"
+        formControlName="location"
+        placeholder="Ex: São Paulo, SP"
+        class="form-control"
+      />
+      <div class="error-message" *ngIf="getFieldError('location')">
+        {{ getFieldError('location') }}
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="email">Email de Contato *</label>
+      <input
+        id="email"
+        type="email"
+        formControlName="email"
+        placeholder="Ex: admin@academia.com"
+        class="form-control"
+      />
+      <div class="error-message" *ngIf="getFieldError('email')">
+        {{ getFieldError('email') }}
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="phone">Telefone *</label>
+      <input
+        id="phone"
+        type="tel"
+        formControlName="phone"
+        placeholder="Ex: 11999999999"
+        class="form-control"
+      />
+      <div class="error-message" *ngIf="getFieldError('phone')">
+        {{ getFieldError('phone') }}
+      </div>
+    </div>
+
+    <div *ngIf="errorMessage" class="error-alert">
+      {{ errorMessage }}
+    </div>
+
+    <button
+      type="submit"
+      [disabled]="!academyForm.valid || isLoading"
+      class="btn btn-primary"
+    >
+      {{ isLoading ? 'Criando...' : 'Criar Academia' }}
+    </button>
+  </form>
+</div>

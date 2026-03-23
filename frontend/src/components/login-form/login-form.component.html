@@ -1,0 +1,58 @@
+<div class="login-form-container">
+  <h2>Fazer Login</h2>
+  <p>Digite suas credenciais para acessar a academia</p>
+
+  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+    <div class="form-group">
+      <label for="email">Email *</label>
+      <input
+        id="email"
+        type="email"
+        formControlName="email"
+        placeholder="Ex: admin@academia.com"
+        class="form-control"
+      />
+      <div class="error-message" *ngIf="getFieldError('email')">
+        {{ getFieldError('email') }}
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="password">Senha *</label>
+      <input
+        id="password"
+        type="password"
+        formControlName="password"
+        placeholder="Digite sua senha"
+        class="form-control"
+      />
+      <div class="error-message" *ngIf="getFieldError('password')">
+        {{ getFieldError('password') }}
+      </div>
+    </div>
+
+    <div *ngIf="errorMessage" class="error-alert">
+      {{ errorMessage }}
+    </div>
+
+    <button
+      type="submit"
+      [disabled]="!loginForm.valid || isLoading"
+      class="btn btn-primary"
+    >
+      {{ isLoading ? 'Entrando...' : 'Fazer Login' }}
+    </button>
+  </form>
+
+  <p class="success-message" *ngIf="showSuccess">
+    ✓ Dados corretos! Redirecionando para o dashboard...
+  </p>
+
+  <div class="register-link" style="margin-bottom: 8px;">
+    Esqueceu a senha? <a (click)="goToForgotPassword()" href="#" style="color:#0052CC;font-weight:600">Redefinir senha</a>
+  </div>
+
+  <div class="register-link">
+    Não tem conta? <a (click)="goToRegister()" href="#" style="color:#0052CC;font-weight:600">Criar Conta</a>
+  </div>
+</div>
