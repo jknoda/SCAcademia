@@ -80,6 +80,33 @@ describe('Auth login/jwt flow', () => {
     expect(fourthAttempt.body.error).toBe('Email ou senha incorretos');
   });
 
+  it('bloqueia login de aluno menor com consentimento pendente e retorna link', async () => {
+    const email = 'aluno.menor@academia.com';
+    const password = 'AlunoForte1!';
+
+    const register = await request(app).post('/api/auth/register').send({
+      email,
+      password,
+      fullName: 'Aluno Menor',
+      role: 'Aluno',
+      academyId,
+      birthDate: '2012-01-10',
+      responsavelEmail: 'responsavel@familia.com',
+    });
+
+    expect(register.status).toBe(201);
+    expect(register.body.requiresConsent).toBe(true);
+
+    const login = await request(app).post('/api/auth/login').send({
+      email,
+      password,
+    });
+
+    expect(login.status).toBe(403);
+    expect(login.body.consentPending).toBe(true);
+    expect(login.body.consentLink).toMatch(/^http:\/\/localhost:4200\/consent\//);
+  });
+
   it('refresh valido retorna novo accessToken', async () => {
     const login = await request(app).post('/api/auth/login').send({
       email: adminPayload.email,

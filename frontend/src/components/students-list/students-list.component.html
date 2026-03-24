@@ -1,0 +1,107 @@
+<div class="students-list-container">
+  <h2>Alunos</h2>
+  <p>Gerencie cadastro, status e acompanhamento dos alunos da academia.</p>
+
+  <section class="card filters-card">
+    <div *ngIf="isMinorWithoutGuardianFilter" class="warning-text">
+      Filtro LGPD ativo: exibindo apenas menores sem responsavel vinculado.
+    </div>
+
+    <div *ngIf="isWithoutHealthScreeningFilter" class="warning-text">
+      Filtro operacional ativo: exibindo alunos sem anamnese preenchida. Total: {{ specialFilterTotal }}.
+    </div>
+
+    <div class="filters-grid">
+      <div class="form-group">
+        <label for="filterName">Buscar por nome</label>
+        <input
+          id="filterName"
+          type="text"
+          class="form-control"
+          [(ngModel)]="filterName"
+          [disabled]="isMinorWithoutGuardianFilter"
+          placeholder="Digite parte do nome"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="filterStatus">Status</label>
+        <select id="filterStatus" class="form-control" [(ngModel)]="filterStatus" [disabled]="isMinorWithoutGuardianFilter">
+          <option value="all">Todos</option>
+          <option value="active">Ativos</option>
+          <option value="inactive">Inativos</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="actions-row">
+      <button class="btn btn-secondary" (click)="goBack()">Voltar</button>
+      <button class="btn" (click)="loadStudents()" [disabled]="isMinorWithoutGuardianFilter || isWithoutHealthScreeningFilter">Filtrar</button>
+      <button *ngIf="isAdmin && !isMinorWithoutGuardianFilter && !isWithoutHealthScreeningFilter" class="btn" (click)="activateWithoutHealthScreeningFilter()">Sem Anamnese</button>
+      <button *ngIf="isMinorWithoutGuardianFilter || isWithoutHealthScreeningFilter" class="btn" (click)="clearSpecialFilter()">Limpar Filtro Especial</button>
+      <button class="btn btn-primary" (click)="goToNewStudent()">Novo Aluno</button>
+    </div>
+  </section>
+
+  <div *ngIf="errorMessage" class="error-alert">{{ errorMessage }}</div>
+  <div *ngIf="successMessage" class="success-alert">{{ successMessage }}</div>
+
+  <section class="card list-card">
+    <div *ngIf="loading" class="loading">Carregando alunos...</div>
+
+    <table *ngIf="!loading" class="students-table">
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>Idade</th>
+          <th>Faixa</th>
+          <th>Status</th>
+          <th>Menor</th>
+          <th>Prontidao</th>
+          <th>Acoes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let student of students">
+          <td>{{ student.fullName }}</td>
+          <td>{{ student.idade ?? '-' }}</td>
+          <td>{{ student.faixa || '-' }}</td>
+          <td>
+            <span class="status-badge" [class.inactive]="student.isActive === false">
+              {{ student.isActive === false ? 'Inativo' : 'Ativo' }}
+            </span>
+          </td>
+          <td>
+            <span class="minor-badge" [class.minor]="student.isMinor === true">
+              {{ student.isMinor ? 'Sim' : 'Nao' }}
+            </span>
+          </td>
+          <td>
+            <span class="status-badge" [class.inactive]="student.operationalStatus?.isReady === false">
+              {{ getOperationalStatusLabel(student) }}
+            </span>
+            <div class="status-detail">{{ getOperationalMissingText(student) }}</div>
+          </td>
+          <td class="actions-cell">
+            <button class="btn btn-small" (click)="editStudent(student.id)">Editar</button>
+            <button class="btn btn-small" (click)="viewFicha(student.id)">Ficha</button>
+            <button
+              *ngIf="isAdmin && student.operationalStatus?.hasHealthScreening === false"
+              class="btn btn-small btn-primary"
+              (click)="goToHealthScreening(student.id)"
+            >
+              Preencher
+            </button>
+            <button *ngIf="isAdmin" class="btn btn-small" (click)="toggleStatus(student)">
+              {{ student.isActive === false ? 'Ativar' : 'Desativar' }}
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p *ngIf="!loading && students.length === 0" class="empty-state">
+      Nenhum aluno encontrado para os filtros informados.
+    </p>
+  </section>
+</div>

@@ -1,0 +1,96 @@
+.training-card {
+  text-align: left;
+  background: #f8fbff;
+  border: 1px solid #dbeafe;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.training-card h3 {
+  margin-top: 0;
+  color: #0d47a1;
+}
+
+.greeting {
+  margin: 8px 0 12px;
+  color: #0f172a;
+  font-weight: 600;
+}
+
+.class-context p {
+  margin: 6px 0;
+  color: #334155;
+  font-size: 0.92rem;
+}
+
+.actions-row {
+  margin-top: 12px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.btn-primary,
+.btn-secondary {
+  border: none;
+  border-radius: 8px;
+  padding: 10px 14px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.btn-primary {
+  background: #1565c0;
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background: #0d47a1;
+}
+
+.btn-primary:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  background: #eceff1;
+  color: #263238;
+}
+
+.btn-secondary:hover {
+  background: #dfe5e8;
+}
+
+.loading,
+.empty {
+  color: #64748b;
+}
+
+.error {
+  margin: 8px 0;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 0.9rem;
+  background: #ffebee;
+  color: #b71c1c;
+}
+
+.info {
+  margin: 8px 0;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 0.9rem;
+  background: #e8f5e9;
+  color: #1b5e20;
+}
+
+.offline-hint {
+  margin-top: 8px;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 0.88rem;
+  background: #fff8e1;
+  color: #7c5e10;
+}

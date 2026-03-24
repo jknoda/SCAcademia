@@ -1,0 +1,149 @@
+.attendance-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+  display: flex;
+  justify-content: center;
+  padding: 24px;
+}
+
+.attendance-card {
+  width: 100%;
+  max-width: 760px;
+  background: #fff;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 10px 36px rgba(0, 0, 0, 0.2);
+}
+
+h2 {
+  margin: 0 0 6px;
+  color: #1a237e;
+}
+
+.subtitle {
+  margin: 0 0 16px;
+  color: #60708a;
+}
+
+.status-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.totals {
+  font-weight: 700;
+  color: #0d47a1;
+}
+
+.saving {
+  color: #60708a;
+  font-size: 0.9rem;
+}
+
+.message {
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+}
+
+.message.error {
+  background: #ffebee;
+  color: #b71c1c;
+}
+
+.message.info {
+  background: #fff8e1;
+  color: #7c5e10;
+}
+
+.students {
+  margin-top: 6px;
+  border: 1px solid #e4eaf3;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.student-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid #edf1f7;
+}
+
+.student-row:last-child {
+  border-bottom: none;
+}
+
+.student-name {
+  color: #1f2d3d;
+  font-weight: 600;
+}
+
+.status-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.status-btn {
+  min-width: 48px;
+  min-height: 48px;
+  padding: 0 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #fff;
+  color: #1f2d3d;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.status-btn.active {
+  border-color: #1565c0;
+  background: #e8f0fe;
+  color: #0d47a1;
+  font-weight: 600;
+}
+
+.status-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.actions {
+  margin-top: 16px;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.btn {
+  border: none;
+  border-radius: 8px;
+  padding: 10px 16px;
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+
+.btn.primary {
+  background: #1565c0;
+  color: #fff;
+}
+
+.btn.secondary {
+  background: #eceff1;
+  color: #263238;
+}
+
+.btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.loading,
+.empty {
+  padding: 14px;
+  color: #60708a;
+}

@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { User } from '../types';
@@ -52,9 +53,11 @@ export class AuthService {
     if (token) {
       this.api.getCurrentUser().subscribe(
         (user: User | null) => this.currentUserSubject.next(user),
-        (error: any) => {
-          this.api.clearTokens();
-          this.currentUserSubject.next(null);
+        (error: HttpErrorResponse) => {
+          if (error.status === 401 || error.status === 403) {
+            this.api.clearTokens();
+            this.currentUserSubject.next(null);
+          }
           console.error('Error fetching current user:', error);
         }
       );
@@ -67,5 +70,22 @@ export class AuthService {
 
   getCurrentUser(): User | null {
     return this.currentUserSubject.value;
+  }
+
+  setCurrentUser(user: User): void {
+    this.currentUserSubject.next(user);
+  }
+
+  updateCurrentUserProfile(patch: Partial<User>): void {
+    const current = this.currentUserSubject.value;
+    if (!current) {
+      return;
+    }
+
+    this.currentUserSubject.next({
+      ...current,
+      ...patch,
+      academy: current.academy,
+    });
   }
 }

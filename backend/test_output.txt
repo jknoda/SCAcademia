@@ -1,0 +1,3629 @@
+
+> backend@1.0.0 test
+> jest --runInBand
+
+FAIL src/tests/professor-management.test.ts (6.549 s)
+  ÔùÅ Console
+
+    console.log
+      [dotenv@17.3.1] injecting env (7) from .env -- tip: ÔÜÖ´©Å  load multiple .env files with { path: ['.env.local', '.env'] }
+
+      at _log (node_modules/dotenv/lib/main.js:139:11)
+
+    console.log
+      [dotenv@17.3.1] injecting env (0) from .env -- tip: ÔÜÖ´©Å  override existing env vars with { override: true }
+
+      at _log (node_modules/dotenv/lib/main.js:139:11)
+
+    console.error
+      Erro ao registrar admin: error: sintaxe de entrada ├® inv├ílida para tipo uuid: "undefined"
+          at E:\Projetos\SCAcademia\backend\node_modules\pg-pool\index.js:45:11
+          at processTicksAndRejections (node:internal/process/task_queues:103:5)
+          at getAcademyById (E:\Projetos\SCAcademia\backend\src\lib\database.ts:168:15)
+          at initAdminHandler (E:\Projetos\SCAcademia\backend\src\controllers\auth.ts:70:21) {
+        length: 157,
+        severity: 'ERRO',
+        code: '22P02',
+        detail: undefined,
+        hint: undefined,
+        position: undefined,
+        internalPosition: undefined,
+        internalQuery: undefined,
+        where: "par├ómetro de portal sem nome $1 = '...'",
+        schema: undefined,
+        table: undefined,
+        column: undefined,
+        dataType: undefined,
+        constraint: undefined,
+        file: 'uuid.c',
+        line: '177',
+        routine: 'string_to_uuid'
+      }
+
+      105 |     });
+      106 |   } catch (error) {
+    > 107 |     console.error('Erro ao registrar admin:', error);
+          |             ^
+      108 |     res.status(500).json({ error: 'Erro ao registrar admin' });
+      109 |   }
+      110 | };
+
+      at initAdminHandler (src/controllers/auth.ts:107:13)
+
+    console.log
+      [AUDIT] LOGIN_FAILURE - Auth (login) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.error
+      Erro ao registrar admin: error: sintaxe de entrada ├® inv├ílida para tipo uuid: "undefined"
+          at E:\Projetos\SCAcademia\backend\node_modules\pg-pool\index.js:45:11
+          at processTicksAndRejections (node:internal/process/task_queues:103:5)
+          at getAcademyById (E:\Projetos\SCAcademia\backend\src\lib\database.ts:168:15)
+          at initAdminHandler (E:\Projetos\SCAcademia\backend\src\controllers\auth.ts:70:21) {
+        length: 157,
+        severity: 'ERRO',
+        code: '22P02',
+        detail: undefined,
+        hint: undefined,
+        position: undefined,
+        internalPosition: undefined,
+        internalQuery: undefined,
+        where: "par├ómetro de portal sem nome $1 = '...'",
+        schema: undefined,
+        table: undefined,
+        column: undefined,
+        dataType: undefined,
+        constraint: undefined,
+        file: 'uuid.c',
+        line: '177',
+        routine: 'string_to_uuid'
+      }
+
+      105 |     });
+      106 |   } catch (error) {
+    > 107 |     console.error('Erro ao registrar admin:', error);
+          |             ^
+      108 |     res.status(500).json({ error: 'Erro ao registrar admin' });
+      109 |   }
+      110 | };
+
+      at initAdminHandler (src/controllers/auth.ts:107:13)
+
+    console.log
+      [AUDIT] LOGIN_FAILURE - Auth (login) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (5ad51a23-bdf0-4de7-827b-54d3f1de538c) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (eaa24901-200f-4812-9db4-beafdf52325c) by eaa24901-200f-4812-9db4-beafdf52325c
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by eaa24901-200f-4812-9db4-beafdf52325c
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.error
+      Erro ao registrar admin: error: sintaxe de entrada ├® inv├ílida para tipo uuid: "undefined"
+          at E:\Projetos\SCAcademia\backend\node_modules\pg-pool\index.js:45:11
+          at processTicksAndRejections (node:internal/process/task_queues:103:5)
+          at getAcademyById (E:\Projetos\SCAcademia\backend\src\lib\database.ts:168:15)
+          at initAdminHandler (E:\Projetos\SCAcademia\backend\src\controllers\auth.ts:70:21) {
+        length: 157,
+        severity: 'ERRO',
+        code: '22P02',
+        detail: undefined,
+        hint: undefined,
+        position: undefined,
+        internalPosition: undefined,
+        internalQuery: undefined,
+        where: "par├ómetro de portal sem nome $1 = '...'",
+        schema: undefined,
+        table: undefined,
+        column: undefined,
+        dataType: undefined,
+        constraint: undefined,
+        file: 'uuid.c',
+        line: '177',
+        routine: 'string_to_uuid'
+      }
+
+      105 |     });
+      106 |   } catch (error) {
+    > 107 |     console.error('Erro ao registrar admin:', error);
+          |             ^
+      108 |     res.status(500).json({ error: 'Erro ao registrar admin' });
+      109 |   }
+      110 | };
+
+      at initAdminHandler (src/controllers/auth.ts:107:13)
+
+    console.log
+      [AUDIT] LOGIN_FAILURE - Auth (login) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.error
+      Erro ao registrar admin: error: sintaxe de entrada ├® inv├ílida para tipo uuid: "undefined"
+          at E:\Projetos\SCAcademia\backend\node_modules\pg-pool\index.js:45:11
+          at processTicksAndRejections (node:internal/process/task_queues:103:5)
+          at getAcademyById (E:\Projetos\SCAcademia\backend\src\lib\database.ts:168:15)
+          at initAdminHandler (E:\Projetos\SCAcademia\backend\src\controllers\auth.ts:70:21) {
+        length: 157,
+        severity: 'ERRO',
+        code: '22P02',
+        detail: undefined,
+        hint: undefined,
+        position: undefined,
+        internalPosition: undefined,
+        internalQuery: undefined,
+        where: "par├ómetro de portal sem nome $1 = '...'",
+        schema: undefined,
+        table: undefined,
+        column: undefined,
+        dataType: undefined,
+        constraint: undefined,
+        file: 'uuid.c',
+        line: '177',
+        routine: 'string_to_uuid'
+      }
+
+      105 |     });
+      106 |   } catch (error) {
+    > 107 |     console.error('Erro ao registrar admin:', error);
+          |             ^
+      108 |     res.status(500).json({ error: 'Erro ao registrar admin' });
+      109 |   }
+      110 | };
+
+      at initAdminHandler (src/controllers/auth.ts:107:13)
+
+    console.log
+      [AUDIT] LOGIN_FAILURE - Auth (login) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.error
+      Erro ao registrar admin: error: sintaxe de entrada ├® inv├ílida para tipo uuid: "undefined"
+          at E:\Projetos\SCAcademia\backend\node_modules\pg-pool\index.js:45:11
+          at processTicksAndRejections (node:internal/process/task_queues:103:5)
+          at getAcademyById (E:\Projetos\SCAcademia\backend\src\lib\database.ts:168:15)
+          at initAdminHandler (E:\Projetos\SCAcademia\backend\src\controllers\auth.ts:70:21) {
+        length: 157,
+        severity: 'ERRO',
+        code: '22P02',
+        detail: undefined,
+        hint: undefined,
+        position: undefined,
+        internalPosition: undefined,
+        internalQuery: undefined,
+        where: "par├ómetro de portal sem nome $1 = '...'",
+        schema: undefined,
+        table: undefined,
+        column: undefined,
+        dataType: undefined,
+        constraint: undefined,
+        file: 'uuid.c',
+        line: '177',
+        routine: 'string_to_uuid'
+      }
+
+      105 |     });
+      106 |   } catch (error) {
+    > 107 |     console.error('Erro ao registrar admin:', error);
+          |             ^
+      108 |     res.status(500).json({ error: 'Erro ao registrar admin' });
+      109 |   }
+      110 | };
+
+      at initAdminHandler (src/controllers/auth.ts:107:13)
+
+    console.log
+      [AUDIT] LOGIN_FAILURE - Auth (login) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (5f47215a-12f2-4b69-a629-eac7bf18c5aa) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (a99e08fa-d822-41a0-8ec8-afe529e5808f) by a99e08fa-d822-41a0-8ec8-afe529e5808f
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by a99e08fa-d822-41a0-8ec8-afe529e5808f
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.error
+      Erro ao registrar admin: error: sintaxe de entrada ├® inv├ílida para tipo uuid: "undefined"
+          at E:\Projetos\SCAcademia\backend\node_modules\pg-pool\index.js:45:11
+          at processTicksAndRejections (node:internal/process/task_queues:103:5)
+          at getAcademyById (E:\Projetos\SCAcademia\backend\src\lib\database.ts:168:15)
+          at initAdminHandler (E:\Projetos\SCAcademia\backend\src\controllers\auth.ts:70:21) {
+        length: 157,
+        severity: 'ERRO',
+        code: '22P02',
+        detail: undefined,
+        hint: undefined,
+        position: undefined,
+        internalPosition: undefined,
+        internalQuery: undefined,
+        where: "par├ómetro de portal sem nome $1 = '...'",
+        schema: undefined,
+        table: undefined,
+        column: undefined,
+        dataType: undefined,
+        constraint: undefined,
+        file: 'uuid.c',
+        line: '177',
+        routine: 'string_to_uuid'
+      }
+
+      105 |     });
+      106 |   } catch (error) {
+    > 107 |     console.error('Erro ao registrar admin:', error);
+          |             ^
+      108 |     res.status(500).json({ error: 'Erro ao registrar admin' });
+      109 |   }
+      110 | };
+
+      at initAdminHandler (src/controllers/auth.ts:107:13)
+
+    console.log
+      [AUDIT] LOGIN_FAILURE - Auth (login) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (1f2d0c1d-3974-48e3-a549-4750a03131fd) by a99e08fa-d822-41a0-8ec8-afe529e5808f
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_STATUS_UPDATED - User (1f2d0c1d-3974-48e3-a549-4750a03131fd) by a99e08fa-d822-41a0-8ec8-afe529e5808f
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_FAILURE - Auth (login) by 1f2d0c1d-3974-48e3-a549-4750a03131fd
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (f63c68cb-b1cd-4d92-b384-e67a18a2acf7) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.error
+      Erro ao registrar admin: error: inser├º├úo ou atualiza├º├úo em tabela "users" viola restri├º├úo de chave estrangeira "users_academy_id_fkey"
+          at E:\Projetos\SCAcademia\backend\node_modules\pg-pool\index.js:45:11
+          at processTicksAndRejections (node:internal/process/task_queues:103:5)
+          at createUser (E:\Projetos\SCAcademia\backend\src\lib\database.ts:249:15)
+          at initAdminHandler (E:\Projetos\SCAcademia\backend\src\controllers\auth.ts:89:18) {
+        length: 316,
+        severity: 'ERRO',
+        code: '23503',
+        detail: 'Chave (academy_id)=(f63c68cb-b1cd-4d92-b384-e67a18a2acf7) n├úo est├í presente na tabela "academies".',
+        hint: undefined,
+        position: undefined,
+        internalPosition: undefined,
+        internalQuery: undefined,
+        where: undefined,
+        schema: 'public',
+        table: 'users',
+        column: undefined,
+        dataType: undefined,
+        constraint: 'users_academy_id_fkey',
+        file: 'ri_triggers.c',
+        line: '2783',
+        routine: 'ri_ReportViolation'
+      }
+
+      105 |     });
+      106 |   } catch (error) {
+    > 107 |     console.error('Erro ao registrar admin:', error);
+          |             ^
+      108 |     res.status(500).json({ error: 'Erro ao registrar admin' });
+      109 |   }
+      110 | };
+
+      at initAdminHandler (src/controllers/auth.ts:107:13)
+
+    console.log
+      [AUDIT] LOGIN_FAILURE - Auth (login) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (1e44fad2-7f3e-423f-ad08-4cdd5a253588) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (85fd8c73-82cb-4bcf-99ed-4f235cdfcc15) by 85fd8c73-82cb-4bcf-99ed-4f235cdfcc15
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.warn
+      [Seed] Aviso ao criar templates de consentimento: inser├º├úo ou atualiza├º├úo em tabela "consent_templates" viola restri├º├úo de chave estrangeira "consent_templates_academy_id_fkey"
+
+       96 |
+       97 |     await seedDefaultTemplates(academyId).catch(err =>
+    >  98 |       console.warn('[Seed] Aviso ao criar templates de consentimento:', err.message)
+          |               ^
+       99 |     );
+      100 |
+      101 |     res.status(201).json({
+
+      at src/controllers/auth.ts:98:15
+      at initAdminHandler (src/controllers/auth.ts:97:5)
+
+    console.log
+      [AUDIT] LOGIN_FAILURE - Auth (login) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+  ÔùÅ Story 9.3 - Cadastro e Edicao Completa do Professor ÔÇ║ AC1: lista professores com filtros por nome e status
+
+    TypeError: Cannot read properties of undefined (reading 'id')
+
+      79 |
+      80 |     await request(app)
+    > 81 |       .put(`/api/users/professores/${createBruno.body.professor.id}/status`)
+         |                                                                 ^
+      82 |       .set('Authorization', `Bearer ${adminToken}`)
+      83 |       .send({ isActive: false });
+      84 |
+
+      at Object.<anonymous> (src/tests/professor-management.test.ts:81:65)
+
+  ÔùÅ Story 9.3 - Cadastro e Edicao Completa do Professor ÔÇ║ AC3/AC6: cadastra professor e bloqueia email duplicado na mesma academia
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 500
+
+      116 |       });
+      117 |
+    > 118 |     expect(createRes.status).toBe(201);
+          |                              ^
+      119 |     expect(createRes.body.message).toContain('cadastrado com sucesso');
+      120 |     expect(createRes.body.professor.role).toBe('Professor');
+      121 |     expect(createRes.body.temporaryPassword).toBe('ProfSenha1!');
+
+      at Object.<anonymous> (src/tests/professor-management.test.ts:118:30)
+
+  ÔùÅ Story 9.3 - Cadastro e Edicao Completa do Professor ÔÇ║ AC4: edita professor sem permitir alteracao de email e redefine senha
+
+    TypeError: Cannot read properties of undefined (reading 'id')
+
+      155 |       });
+      156 |
+    > 157 |     const professorId = createRes.body.professor.id as string;
+          |                                                  ^
+      158 |
+      159 |     const updateRes = await request(app)
+      160 |       .put(`/api/users/professores/${professorId}`)
+
+      at Object.<anonymous> (src/tests/professor-management.test.ts:157:50)
+
+  ÔùÅ Story 9.3 - Cadastro e Edicao Completa do Professor ÔÇ║ RBAC/multi-tenant: professor nao acessa APIs admin e admin de outra academia nao altera professor
+
+    TypeError: Cannot read properties of undefined (reading 'id')
+
+      235 |       });
+      236 |
+    > 237 |     const professorId = createRes.body.professor.id as string;
+          |                                                  ^
+      238 |
+      239 |     const professorLoginRes = await request(app).post('/api/auth/login').send({
+      240 |       email: 'rbac.prof@test.com',
+
+      at Object.<anonymous> (src/tests/professor-management.test.ts:237:50)
+
+FAIL src/tests/rbac.test.ts (10.746 s)
+  ÔùÅ Console
+
+    console.log
+      [dotenv@17.3.1] injecting env (7) from .env -- tip: ­ƒñû agentic secret storage: https://dotenvx.com/as2
+
+      at _log (node_modules/dotenv/lib/main.js:139:11)
+
+    console.log
+      [dotenv@17.3.1] injecting env (0) from .env -- tip: ­ƒøí´©Å auth for agents: https://vestauth.com
+
+      at _log (node_modules/dotenv/lib/main.js:139:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (7289bb89-6fb9-43c2-9e3d-18a910b6039c) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (d9ad983b-e46f-44e8-a7e6-5515df3bc436) by d9ad983b-e46f-44e8-a7e6-5515df3bc436
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.error
+      Erro ao registrar admin: error: sintaxe de entrada ├® inv├ílida para tipo uuid: "undefined"
+          at E:\Projetos\SCAcademia\backend\node_modules\pg-pool\index.js:45:11
+          at processTicksAndRejections (node:internal/process/task_queues:103:5)
+          at getAcademyById (E:\Projetos\SCAcademia\backend\src\lib\database.ts:168:15)
+          at initAdminHandler (E:\Projetos\SCAcademia\backend\src\controllers\auth.ts:70:21) {
+        length: 157,
+        severity: 'ERRO',
+        code: '22P02',
+        detail: undefined,
+        hint: undefined,
+        position: undefined,
+        internalPosition: undefined,
+        internalQuery: undefined,
+        where: "par├ómetro de portal sem nome $1 = '...'",
+        schema: undefined,
+        table: undefined,
+        column: undefined,
+        dataType: undefined,
+        constraint: undefined,
+        file: 'uuid.c',
+        line: '177',
+        routine: 'string_to_uuid'
+      }
+
+      105 |     });
+      106 |   } catch (error) {
+    > 107 |     console.error('Erro ao registrar admin:', error);
+          |             ^
+      108 |     res.status(500).json({ error: 'Erro ao registrar admin' });
+      109 |   }
+      110 | };
+
+      at initAdminHandler (src/controllers/auth.ts:107:13)
+
+    console.log
+      [AUDIT] LOGIN_FAILURE - Auth (login) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (12950cd5-5ee4-4d06-9f7c-c38b370d58ed) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (627761b5-2949-4652-963f-e86b308039c4) by 627761b5-2949-4652-963f-e86b308039c4
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.error
+      Erro ao registrar admin: error: sintaxe de entrada ├® inv├ílida para tipo uuid: "undefined"
+          at E:\Projetos\SCAcademia\backend\node_modules\pg-pool\index.js:45:11
+          at processTicksAndRejections (node:internal/process/task_queues:103:5)
+          at getAcademyById (E:\Projetos\SCAcademia\backend\src\lib\database.ts:168:15)
+          at initAdminHandler (E:\Projetos\SCAcademia\backend\src\controllers\auth.ts:70:21) {
+        length: 157,
+        severity: 'ERRO',
+        code: '22P02',
+        detail: undefined,
+        hint: undefined,
+        position: undefined,
+        internalPosition: undefined,
+        internalQuery: undefined,
+        where: "par├ómetro de portal sem nome $1 = '...'",
+        schema: undefined,
+        table: undefined,
+        column: undefined,
+        dataType: undefined,
+        constraint: undefined,
+        file: 'uuid.c',
+        line: '177',
+        routine: 'string_to_uuid'
+      }
+
+      105 |     });
+      106 |   } catch (error) {
+    > 107 |     console.error('Erro ao registrar admin:', error);
+          |             ^
+      108 |     res.status(500).json({ error: 'Erro ao registrar admin' });
+      109 |   }
+      110 | };
+
+      at initAdminHandler (src/controllers/auth.ts:107:13)
+
+    console.log
+      [AUDIT] LOGIN_FAILURE - Auth (login) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (be51d858-c5c3-47fe-867e-3d58e3290380) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_FAILURE - Auth (login) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.error
+      Erro ao registrar admin: error: sintaxe de entrada ├® inv├ílida para tipo uuid: "undefined"
+          at E:\Projetos\SCAcademia\backend\node_modules\pg-pool\index.js:45:11
+          at processTicksAndRejections (node:internal/process/task_queues:103:5)
+          at getAcademyById (E:\Projetos\SCAcademia\backend\src\lib\database.ts:168:15)
+          at initAdminHandler (E:\Projetos\SCAcademia\backend\src\controllers\auth.ts:70:21) {
+        length: 157,
+        severity: 'ERRO',
+        code: '22P02',
+        detail: undefined,
+        hint: undefined,
+        position: undefined,
+        internalPosition: undefined,
+        internalQuery: undefined,
+        where: "par├ómetro de portal sem nome $1 = '...'",
+        schema: undefined,
+        table: undefined,
+        column: undefined,
+        dataType: undefined,
+        constraint: undefined,
+        file: 'uuid.c',
+        line: '177',
+        routine: 'string_to_uuid'
+      }
+
+      105 |     });
+      106 |   } catch (error) {
+    > 107 |     console.error('Erro ao registrar admin:', error);
+          |             ^
+      108 |     res.status(500).json({ error: 'Erro ao registrar admin' });
+      109 |   }
+      110 | };
+
+      at initAdminHandler (src/controllers/auth.ts:107:13)
+
+    console.log
+      [AUDIT] LOGIN_FAILURE - Auth (login) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (1e0ecf56-abe0-4ef6-b526-e3e84fb2a692) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (322a6ffa-f37f-4396-9a4b-a257e62a5ad9) by 322a6ffa-f37f-4396-9a4b-a257e62a5ad9
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by 322a6ffa-f37f-4396-9a4b-a257e62a5ad9
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (b9628661-b10b-4459-8037-803dc5026cba) by b9628661-b10b-4459-8037-803dc5026cba
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [EMAIL SIMULADO] Para: prof.rbac@academia.com
+
+      at sendEmail (src/lib/email.ts:66:13)
+
+    console.log
+      [EMAIL SIMULADO] Assunto: Bem-vindo(a) ├á SCAcademia
+
+      at sendEmail (src/lib/email.ts:67:13)
+
+    console.log
+      [EMAIL SIMULADO] Conteudo: Ol├í Professor RBAC,
+      
+      Seu cadastro foi conclu├¡do com sucesso na SCAcademia.
+      Voc├¬ j├í pode acessar a plataforma com seu email e senha.
+
+      at sendEmail (src/lib/email.ts:68:13)
+
+    console.log
+      [AUDIT] WELCOME_EMAIL_SENT - User (b9628661-b10b-4459-8037-803dc5026cba) by b9628661-b10b-4459-8037-803dc5026cba
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.error
+      Erro ao registrar usu├írio: error: inser├º├úo ou atualiza├º├úo em tabela "auth_tokens" viola restri├º├úo de chave estrangeira "auth_tokens_user_id_fkey"
+          at E:\Projetos\SCAcademia\backend\node_modules\pg-pool\index.js:45:11
+          at processTicksAndRejections (node:internal/process/task_queues:103:5)
+          at storeAuthToken (E:\Projetos\SCAcademia\backend\src\lib\database.ts:322:15)
+          at registerUserHandler (E:\Projetos\SCAcademia\backend\src\controllers\auth.ts:412:7) {
+        length: 327,
+        severity: 'ERRO',
+        code: '23503',
+        detail: 'Chave (user_id)=(b9628661-b10b-4459-8037-803dc5026cba) n├úo est├í presente na tabela "users".',
+        hint: undefined,
+        position: undefined,
+        internalPosition: undefined,
+        internalQuery: undefined,
+        where: undefined,
+        schema: 'public',
+        table: 'auth_tokens',
+        column: undefined,
+        dataType: undefined,
+        constraint: 'auth_tokens_user_id_fkey',
+        file: 'ri_triggers.c',
+        line: '2783',
+        routine: 'ri_ReportViolation'
+      }
+
+      451 |   } catch (error) {
+      452 |     const ip = req.ip || req.connection?.remoteAddress || 'unknown';
+    > 453 |     console.error('Erro ao registrar usu├írio:', error);
+          |             ^
+      454 |     logAudit(undefined, 'REGISTER_ERROR', 'User', 'register', req.body?.academyId || 'unknown', undefined, {
+      455 |       error: String(error),
+      456 |       ip,
+
+      at registerUserHandler (src/controllers/auth.ts:453:13)
+
+    console.log
+      [AUDIT] REGISTER_ERROR - User (register) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.error
+      Erro ao registrar admin: error: sintaxe de entrada ├® inv├ílida para tipo uuid: "undefined"
+          at E:\Projetos\SCAcademia\backend\node_modules\pg-pool\index.js:45:11
+          at processTicksAndRejections (node:internal/process/task_queues:103:5)
+          at getAcademyById (E:\Projetos\SCAcademia\backend\src\lib\database.ts:168:15)
+          at initAdminHandler (E:\Projetos\SCAcademia\backend\src\controllers\auth.ts:70:21) {
+        length: 157,
+        severity: 'ERRO',
+        code: '22P02',
+        detail: undefined,
+        hint: undefined,
+        position: undefined,
+        internalPosition: undefined,
+        internalQuery: undefined,
+        where: "par├ómetro de portal sem nome $1 = '...'",
+        schema: undefined,
+        table: undefined,
+        column: undefined,
+        dataType: undefined,
+        constraint: undefined,
+        file: 'uuid.c',
+        line: '177',
+        routine: 'string_to_uuid'
+      }
+
+      105 |     });
+      106 |   } catch (error) {
+    > 107 |     console.error('Erro ao registrar admin:', error);
+          |             ^
+      108 |     res.status(500).json({ error: 'Erro ao registrar admin' });
+      109 |   }
+      110 | };
+
+      at initAdminHandler (src/controllers/auth.ts:107:13)
+
+    console.log
+      [AUDIT] LOGIN_FAILURE - Auth (login) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (7bc20a48-1d53-4c0d-9d9b-8792bee1dc32) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (7a241411-beb0-4d36-8393-d9bcea0ee2fe) by 7a241411-beb0-4d36-8393-d9bcea0ee2fe
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.error
+      Erro ao registrar admin: error: sintaxe de entrada ├® inv├ílida para tipo uuid: "undefined"
+          at E:\Projetos\SCAcademia\backend\node_modules\pg-pool\index.js:45:11
+          at processTicksAndRejections (node:internal/process/task_queues:103:5)
+          at getAcademyById (E:\Projetos\SCAcademia\backend\src\lib\database.ts:168:15)
+          at initAdminHandler (E:\Projetos\SCAcademia\backend\src\controllers\auth.ts:70:21) {
+        length: 157,
+        severity: 'ERRO',
+        code: '22P02',
+        detail: undefined,
+        hint: undefined,
+        position: undefined,
+        internalPosition: undefined,
+        internalQuery: undefined,
+        where: "par├ómetro de portal sem nome $1 = '...'",
+        schema: undefined,
+        table: undefined,
+        column: undefined,
+        dataType: undefined,
+        constraint: undefined,
+        file: 'uuid.c',
+        line: '177',
+        routine: 'string_to_uuid'
+      }
+
+      105 |     });
+      106 |   } catch (error) {
+    > 107 |     console.error('Erro ao registrar admin:', error);
+          |             ^
+      108 |     res.status(500).json({ error: 'Erro ao registrar admin' });
+      109 |   }
+      110 | };
+
+      at initAdminHandler (src/controllers/auth.ts:107:13)
+
+    console.log
+      [AUDIT] LOGIN_FAILURE - Auth (login) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (35d3795b-f55c-4ca4-8547-f07b83db3633) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.error
+      Erro ao registrar admin: error: inser├º├úo ou atualiza├º├úo em tabela "users" viola restri├º├úo de chave estrangeira "users_academy_id_fkey"
+          at E:\Projetos\SCAcademia\backend\node_modules\pg-pool\index.js:45:11
+          at processTicksAndRejections (node:internal/process/task_queues:103:5)
+          at createUser (E:\Projetos\SCAcademia\backend\src\lib\database.ts:249:15)
+          at initAdminHandler (E:\Projetos\SCAcademia\backend\src\controllers\auth.ts:89:18) {
+        length: 316,
+        severity: 'ERRO',
+        code: '23503',
+        detail: 'Chave (academy_id)=(35d3795b-f55c-4ca4-8547-f07b83db3633) n├úo est├í presente na tabela "academies".',
+        hint: undefined,
+        position: undefined,
+        internalPosition: undefined,
+        internalQuery: undefined,
+        where: undefined,
+        schema: 'public',
+        table: 'users',
+        column: undefined,
+        dataType: undefined,
+        constraint: 'users_academy_id_fkey',
+        file: 'ri_triggers.c',
+        line: '2783',
+        routine: 'ri_ReportViolation'
+      }
+
+      105 |     });
+      106 |   } catch (error) {
+    > 107 |     console.error('Erro ao registrar admin:', error);
+          |             ^
+      108 |     res.status(500).json({ error: 'Erro ao registrar admin' });
+      109 |   }
+      110 | };
+
+      at initAdminHandler (src/controllers/auth.ts:107:13)
+
+    console.log
+      [AUDIT] LOGIN_FAILURE - Auth (login) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.error
+      Erro ao registrar admin: error: sintaxe de entrada ├® inv├ílida para tipo uuid: "undefined"
+          at E:\Projetos\SCAcademia\backend\node_modules\pg-pool\index.js:45:11
+          at processTicksAndRejections (node:internal/process/task_queues:103:5)
+          at getAcademyById (E:\Projetos\SCAcademia\backend\src\lib\database.ts:168:15)
+          at initAdminHandler (E:\Projetos\SCAcademia\backend\src\controllers\auth.ts:70:21) {
+        length: 157,
+        severity: 'ERRO',
+        code: '22P02',
+        detail: undefined,
+        hint: undefined,
+        position: undefined,
+        internalPosition: undefined,
+        internalQuery: undefined,
+        where: "par├ómetro de portal sem nome $1 = '...'",
+        schema: undefined,
+        table: undefined,
+        column: undefined,
+        dataType: undefined,
+        constraint: undefined,
+        file: 'uuid.c',
+        line: '177',
+        routine: 'string_to_uuid'
+      }
+
+      105 |     });
+      106 |   } catch (error) {
+    > 107 |     console.error('Erro ao registrar admin:', error);
+          |             ^
+      108 |     res.status(500).json({ error: 'Erro ao registrar admin' });
+      109 |   }
+      110 | };
+
+      at initAdminHandler (src/controllers/auth.ts:107:13)
+
+    console.log
+      [AUDIT] LOGIN_FAILURE - Auth (login) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (d65aa451-8a5d-4697-b8fc-858aff32aeb3) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (f894930e-c345-45b3-9da0-2a5a2951e928) by f894930e-c345-45b3-9da0-2a5a2951e928
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by f894930e-c345-45b3-9da0-2a5a2951e928
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.error
+      Erro ao registrar usu├írio: error: inser├º├úo ou atualiza├º├úo em tabela "users" viola restri├º├úo de chave estrangeira "users_academy_id_fkey"
+          at E:\Projetos\SCAcademia\backend\node_modules\pg-pool\index.js:45:11
+          at processTicksAndRejections (node:internal/process/task_queues:103:5)
+          at createUser (E:\Projetos\SCAcademia\backend\src\lib\database.ts:249:15)
+          at registerUserHandler (E:\Projetos\SCAcademia\backend\src\controllers\auth.ts:370:18) {
+        length: 316,
+        severity: 'ERRO',
+        code: '23503',
+        detail: 'Chave (academy_id)=(d65aa451-8a5d-4697-b8fc-858aff32aeb3) n├úo est├í presente na tabela "academies".',
+        hint: undefined,
+        position: undefined,
+        internalPosition: undefined,
+        internalQuery: undefined,
+        where: undefined,
+        schema: 'public',
+        table: 'users',
+        column: undefined,
+        dataType: undefined,
+        constraint: 'users_academy_id_fkey',
+        file: 'ri_triggers.c',
+        line: '2783',
+        routine: 'ri_ReportViolation'
+      }
+
+      451 |   } catch (error) {
+      452 |     const ip = req.ip || req.connection?.remoteAddress || 'unknown';
+    > 453 |     console.error('Erro ao registrar usu├írio:', error);
+          |             ^
+      454 |     logAudit(undefined, 'REGISTER_ERROR', 'User', 'register', req.body?.academyId || 'unknown', undefined, {
+      455 |       error: String(error),
+      456 |       ip,
+
+      at registerUserHandler (src/controllers/auth.ts:453:13)
+
+    console.log
+      [AUDIT] REGISTER_ERROR - User (register) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+  ÔùÅ RBAC ÔÇö Controle de Acesso por Papel ÔÇ║ AC3: retorna 401 sem token em rota protegida
+
+    expect(received).toBeTruthy()
+
+    Received: undefined
+
+      63 |     // Garantir que o setup foi bem-sucedido
+      64 |     expect(academyId).toBeTruthy();
+    > 65 |     expect(adminToken).toBeTruthy();
+         |                        ^
+      66 |     expect(professorToken).toBeTruthy();
+      67 |     expect(alunoToken).toBeTruthy();
+      68 |   });
+
+      at Object.<anonymous> (src/tests/rbac.test.ts:65:24)
+
+  ÔùÅ RBAC ÔÇö Controle de Acesso por Papel ÔÇ║ AC4: retorna 401 com token inv├ílido
+
+    expect(received).toBeTruthy()
+
+    Received: undefined
+
+      62 |
+      63 |     // Garantir que o setup foi bem-sucedido
+    > 64 |     expect(academyId).toBeTruthy();
+         |                       ^
+      65 |     expect(adminToken).toBeTruthy();
+      66 |     expect(professorToken).toBeTruthy();
+      67 |     expect(alunoToken).toBeTruthy();
+
+      at Object.<anonymous> (src/tests/rbac.test.ts:64:23)
+
+  ÔùÅ RBAC ÔÇö Controle de Acesso por Papel ÔÇ║ AC1: Prof recebe 403 ao acessar rota exclusiva do Admin
+
+    expect(received).toBeTruthy()
+
+    Received: undefined
+
+      63 |     // Garantir que o setup foi bem-sucedido
+      64 |     expect(academyId).toBeTruthy();
+    > 65 |     expect(adminToken).toBeTruthy();
+         |                        ^
+      66 |     expect(professorToken).toBeTruthy();
+      67 |     expect(alunoToken).toBeTruthy();
+      68 |   });
+
+      at Object.<anonymous> (src/tests/rbac.test.ts:65:24)
+
+  ÔùÅ RBAC ÔÇö Controle de Acesso por Papel ÔÇ║ AC1: Aluno recebe 403 ao acessar rota exclusiva do Admin
+
+    expect(received).toBeTruthy()
+
+    Received: undefined
+
+      62 |
+      63 |     // Garantir que o setup foi bem-sucedido
+    > 64 |     expect(academyId).toBeTruthy();
+         |                       ^
+      65 |     expect(adminToken).toBeTruthy();
+      66 |     expect(professorToken).toBeTruthy();
+      67 |     expect(alunoToken).toBeTruthy();
+
+      at Object.<anonymous> (src/tests/rbac.test.ts:64:23)
+
+  ÔùÅ RBAC ÔÇö Controle de Acesso por Papel ÔÇ║ AC2: Admin pode listar usu├írios da pr├│pria academia
+
+    expect(received).toBeTruthy()
+
+    Received: undefined
+
+      63 |     // Garantir que o setup foi bem-sucedido
+      64 |     expect(academyId).toBeTruthy();
+    > 65 |     expect(adminToken).toBeTruthy();
+         |                        ^
+      66 |     expect(professorToken).toBeTruthy();
+      67 |     expect(alunoToken).toBeTruthy();
+      68 |   });
+
+      at Object.<anonymous> (src/tests/rbac.test.ts:65:24)
+
+  ÔùÅ RBAC ÔÇö Controle de Acesso por Papel ÔÇ║ AC8: Admin lista usu├írios filtrados por academyId (isolamento)
+
+    expect(received).toBeTruthy()
+
+    Received: undefined
+
+      62 |
+      63 |     // Garantir que o setup foi bem-sucedido
+    > 64 |     expect(academyId).toBeTruthy();
+         |                       ^
+      65 |     expect(adminToken).toBeTruthy();
+      66 |     expect(professorToken).toBeTruthy();
+      67 |     expect(alunoToken).toBeTruthy();
+
+      at Object.<anonymous> (src/tests/rbac.test.ts:64:23)
+
+  ÔùÅ RBAC ÔÇö Controle de Acesso por Papel ÔÇ║ AC5: Aluno acessa o pr├│prio profile
+
+    expect(received).toBeTruthy()
+
+    Received: undefined
+
+      64 |     expect(academyId).toBeTruthy();
+      65 |     expect(adminToken).toBeTruthy();
+    > 66 |     expect(professorToken).toBeTruthy();
+         |                            ^
+      67 |     expect(alunoToken).toBeTruthy();
+      68 |   });
+      69 |
+
+      at Object.<anonymous> (src/tests/rbac.test.ts:66:28)
+
+  ÔùÅ RBAC ÔÇö Controle de Acesso por Papel ÔÇ║ AC5: Aluno recebe 403 ao acessar profile de outro usu├írio
+
+    expect(received).toBeTruthy()
+
+    Received: undefined
+
+      62 |
+      63 |     // Garantir que o setup foi bem-sucedido
+    > 64 |     expect(academyId).toBeTruthy();
+         |                       ^
+      65 |     expect(adminToken).toBeTruthy();
+      66 |     expect(professorToken).toBeTruthy();
+      67 |     expect(alunoToken).toBeTruthy();
+
+      at Object.<anonymous> (src/tests/rbac.test.ts:64:23)
+
+  ÔùÅ RBAC ÔÇö Controle de Acesso por Papel ÔÇ║ AC5: Admin pode acessar profile de qualquer usu├írio da academia
+
+    expect(received).toBeTruthy()
+
+    Received: undefined
+
+      63 |     // Garantir que o setup foi bem-sucedido
+      64 |     expect(academyId).toBeTruthy();
+    > 65 |     expect(adminToken).toBeTruthy();
+         |                        ^
+      66 |     expect(professorToken).toBeTruthy();
+      67 |     expect(alunoToken).toBeTruthy();
+      68 |   });
+
+      at Object.<anonymous> (src/tests/rbac.test.ts:65:24)
+
+  ÔùÅ RBAC ÔÇö Controle de Acesso por Papel ÔÇ║ AC5/AC8: Admin recebe 404 para userId inexistente na sua academia
+
+    expect(received).toBeTruthy()
+
+    Received: undefined
+
+      62 |
+      63 |     // Garantir que o setup foi bem-sucedido
+    > 64 |     expect(academyId).toBeTruthy();
+         |                       ^
+      65 |     expect(adminToken).toBeTruthy();
+      66 |     expect(professorToken).toBeTruthy();
+      67 |     expect(alunoToken).toBeTruthy();
+
+      at Object.<anonymous> (src/tests/rbac.test.ts:64:23)
+
+  ÔùÅ RBAC ÔÇö Controle de Acesso por Papel ÔÇ║ AC6: Professor acessa rota que aceita Admin ou Professor [multi-role]
+
+    expect(received).toBeTruthy()
+
+    Received: undefined
+
+      63 |     // Garantir que o setup foi bem-sucedido
+      64 |     expect(academyId).toBeTruthy();
+    > 65 |     expect(adminToken).toBeTruthy();
+         |                        ^
+      66 |     expect(professorToken).toBeTruthy();
+      67 |     expect(alunoToken).toBeTruthy();
+      68 |   });
+
+      at Object.<anonymous> (src/tests/rbac.test.ts:65:24)
+
+  ÔùÅ RBAC ÔÇö Controle de Acesso por Papel ÔÇ║ AC6: Admin acessa rota que aceita Admin ou Professor [multi-role]
+
+    expect(received).toBeTruthy()
+
+    Received: undefined
+
+      62 |
+      63 |     // Garantir que o setup foi bem-sucedido
+    > 64 |     expect(academyId).toBeTruthy();
+         |                       ^
+      65 |     expect(adminToken).toBeTruthy();
+      66 |     expect(professorToken).toBeTruthy();
+      67 |     expect(alunoToken).toBeTruthy();
+
+      at Object.<anonymous> (src/tests/rbac.test.ts:64:23)
+
+  ÔùÅ RBAC ÔÇö Controle de Acesso por Papel ÔÇ║ AC6: Aluno recebe 403 em rota que aceita Admin ou Professor [multi-role]
+
+    expect(received).toBeTruthy()
+
+    Received: undefined
+
+      64 |     expect(academyId).toBeTruthy();
+      65 |     expect(adminToken).toBeTruthy();
+    > 66 |     expect(professorToken).toBeTruthy();
+         |                            ^
+      67 |     expect(alunoToken).toBeTruthy();
+      68 |   });
+      69 |
+
+      at Object.<anonymous> (src/tests/rbac.test.ts:66:28)
+
+FAIL src/tests/training-attendance.test.ts (5.117 s)
+  ÔùÅ Console
+
+    console.log
+      [dotenv@17.3.1] injecting env (7) from .env -- tip: ÔÜÖ´©Å  load multiple .env files with { path: ['.env.local', '.env'] }
+
+      at _log (node_modules/dotenv/lib/main.js:139:11)
+
+    console.log
+      [dotenv@17.3.1] injecting env (0) from .env -- tip: ÔÜí´©Å secrets for agents: https://dotenvx.com/as2
+
+      at _log (node_modules/dotenv/lib/main.js:139:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (28e82e2a-2996-43d0-95d3-cc311f409f59) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (e7b63486-1517-43d9-b236-9e7d729bc358) by e7b63486-1517-43d9-b236-9e7d729bc358
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_FAILURE - Auth (login) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.error
+      Erro ao registrar admin: error: sintaxe de entrada ├® inv├ílida para tipo uuid: "undefined"
+          at E:\Projetos\SCAcademia\backend\node_modules\pg-pool\index.js:45:11
+          at processTicksAndRejections (node:internal/process/task_queues:103:5)
+          at getAcademyById (E:\Projetos\SCAcademia\backend\src\lib\database.ts:168:15)
+          at initAdminHandler (E:\Projetos\SCAcademia\backend\src\controllers\auth.ts:70:21) {
+        length: 157,
+        severity: 'ERRO',
+        code: '22P02',
+        detail: undefined,
+        hint: undefined,
+        position: undefined,
+        internalPosition: undefined,
+        internalQuery: undefined,
+        where: "par├ómetro de portal sem nome $1 = '...'",
+        schema: undefined,
+        table: undefined,
+        column: undefined,
+        dataType: undefined,
+        constraint: undefined,
+        file: 'uuid.c',
+        line: '177',
+        routine: 'string_to_uuid'
+      }
+
+      105 |     });
+      106 |   } catch (error) {
+    > 107 |     console.error('Erro ao registrar admin:', error);
+          |             ^
+      108 |     res.status(500).json({ error: 'Erro ao registrar admin' });
+      109 |   }
+      110 | };
+
+      at initAdminHandler (src/controllers/auth.ts:107:13)
+
+    console.log
+      [AUDIT] LOGIN_FAILURE - Auth (login) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (61cbdf34-ab88-4632-8ac8-94fbf41a48e1) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (a44ba2ee-f25a-4500-adad-10544a0f1901) by a44ba2ee-f25a-4500-adad-10544a0f1901
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by a44ba2ee-f25a-4500-adad-10544a0f1901
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.error
+      Erro ao registrar usu├írio: error: inser├º├úo ou atualiza├º├úo em tabela "users" viola restri├º├úo de chave estrangeira "users_academy_id_fkey"
+          at E:\Projetos\SCAcademia\backend\node_modules\pg-pool\index.js:45:11
+          at processTicksAndRejections (node:internal/process/task_queues:103:5)
+          at createUser (E:\Projetos\SCAcademia\backend\src\lib\database.ts:249:15)
+          at registerUserHandler (E:\Projetos\SCAcademia\backend\src\controllers\auth.ts:370:18) {
+        length: 316,
+        severity: 'ERRO',
+        code: '23503',
+        detail: 'Chave (academy_id)=(61cbdf34-ab88-4632-8ac8-94fbf41a48e1) n├úo est├í presente na tabela "academies".',
+        hint: undefined,
+        position: undefined,
+        internalPosition: undefined,
+        internalQuery: undefined,
+        where: undefined,
+        schema: 'public',
+        table: 'users',
+        column: undefined,
+        dataType: undefined,
+        constraint: 'users_academy_id_fkey',
+        file: 'ri_triggers.c',
+        line: '2783',
+        routine: 'ri_ReportViolation'
+      }
+
+      451 |   } catch (error) {
+      452 |     const ip = req.ip || req.connection?.remoteAddress || 'unknown';
+    > 453 |     console.error('Erro ao registrar usu├írio:', error);
+          |             ^
+      454 |     logAudit(undefined, 'REGISTER_ERROR', 'User', 'register', req.body?.academyId || 'unknown', undefined, {
+      455 |       error: String(error),
+      456 |       ip,
+
+      at registerUserHandler (src/controllers/auth.ts:453:13)
+
+    console.log
+      [AUDIT] REGISTER_ERROR - User (register) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.error
+      Erro ao registrar admin: error: sintaxe de entrada ├® inv├ílida para tipo uuid: "undefined"
+          at E:\Projetos\SCAcademia\backend\node_modules\pg-pool\index.js:45:11
+          at processTicksAndRejections (node:internal/process/task_queues:103:5)
+          at getAcademyById (E:\Projetos\SCAcademia\backend\src\lib\database.ts:168:15)
+          at initAdminHandler (E:\Projetos\SCAcademia\backend\src\controllers\auth.ts:70:21) {
+        length: 157,
+        severity: 'ERRO',
+        code: '22P02',
+        detail: undefined,
+        hint: undefined,
+        position: undefined,
+        internalPosition: undefined,
+        internalQuery: undefined,
+        where: "par├ómetro de portal sem nome $1 = '...'",
+        schema: undefined,
+        table: undefined,
+        column: undefined,
+        dataType: undefined,
+        constraint: undefined,
+        file: 'uuid.c',
+        line: '177',
+        routine: 'string_to_uuid'
+      }
+
+      105 |     });
+      106 |   } catch (error) {
+    > 107 |     console.error('Erro ao registrar admin:', error);
+          |             ^
+      108 |     res.status(500).json({ error: 'Erro ao registrar admin' });
+      109 |   }
+      110 | };
+
+      at initAdminHandler (src/controllers/auth.ts:107:13)
+
+    console.log
+      [AUDIT] LOGIN_FAILURE - Auth (login) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (b5698b52-8d97-4d9a-a8d4-5d1427b0c4ac) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (c0fc7e37-4f8b-4b6b-8eb5-9f419fdc95fb) by c0fc7e37-4f8b-4b6b-8eb5-9f419fdc95fb
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.error
+      Erro ao registrar admin: error: sintaxe de entrada ├® inv├ílida para tipo uuid: "undefined"
+          at E:\Projetos\SCAcademia\backend\node_modules\pg-pool\index.js:45:11
+          at processTicksAndRejections (node:internal/process/task_queues:103:5)
+          at getAcademyById (E:\Projetos\SCAcademia\backend\src\lib\database.ts:168:15)
+          at initAdminHandler (E:\Projetos\SCAcademia\backend\src\controllers\auth.ts:70:21) {
+        length: 157,
+        severity: 'ERRO',
+        code: '22P02',
+        detail: undefined,
+        hint: undefined,
+        position: undefined,
+        internalPosition: undefined,
+        internalQuery: undefined,
+        where: "par├ómetro de portal sem nome $1 = '...'",
+        schema: undefined,
+        table: undefined,
+        column: undefined,
+        dataType: undefined,
+        constraint: undefined,
+        file: 'uuid.c',
+        line: '177',
+        routine: 'string_to_uuid'
+      }
+
+      105 |     });
+      106 |   } catch (error) {
+    > 107 |     console.error('Erro ao registrar admin:', error);
+          |             ^
+      108 |     res.status(500).json({ error: 'Erro ao registrar admin' });
+      109 |   }
+      110 | };
+
+      at initAdminHandler (src/controllers/auth.ts:107:13)
+
+    console.log
+      [AUDIT] LOGIN_FAILURE - Auth (login) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.error
+      Erro ao registrar admin: error: sintaxe de entrada ├® inv├ílida para tipo uuid: "undefined"
+          at E:\Projetos\SCAcademia\backend\node_modules\pg-pool\index.js:45:11
+          at processTicksAndRejections (node:internal/process/task_queues:103:5)
+          at getAcademyById (E:\Projetos\SCAcademia\backend\src\lib\database.ts:168:15)
+          at initAdminHandler (E:\Projetos\SCAcademia\backend\src\controllers\auth.ts:70:21) {
+        length: 157,
+        severity: 'ERRO',
+        code: '22P02',
+        detail: undefined,
+        hint: undefined,
+        position: undefined,
+        internalPosition: undefined,
+        internalQuery: undefined,
+        where: "par├ómetro de portal sem nome $1 = '...'",
+        schema: undefined,
+        table: undefined,
+        column: undefined,
+        dataType: undefined,
+        constraint: undefined,
+        file: 'uuid.c',
+        line: '177',
+        routine: 'string_to_uuid'
+      }
+
+      105 |     });
+      106 |   } catch (error) {
+    > 107 |     console.error('Erro ao registrar admin:', error);
+          |             ^
+      108 |     res.status(500).json({ error: 'Erro ao registrar admin' });
+      109 |   }
+      110 | };
+
+      at initAdminHandler (src/controllers/auth.ts:107:13)
+
+    console.log
+      [AUDIT] LOGIN_FAILURE - Auth (login) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+  ÔùÅ Story 3.2 - Marcar Frequ├¬ncia ÔÇ║ carrega a lista de alunos da sess├úo com totais iniciais
+
+    TypeError: Cannot read properties of undefined (reading 'id')
+
+      72 |   });
+      73 |   const professorToken = profReg.body.accessToken as string;
+    > 74 |   const professorId = profReg.body.user.id as string;
+         |                                         ^
+      75 |
+      76 |   const prof2Reg = await request(app).post('/api/auth/register').send({
+      77 |     email: 'prof2.frequencia@academia.com',
+
+      at setupCtx (src/tests/training-attendance.test.ts:74:41)
+      at Object.<anonymous> (src/tests/training-attendance.test.ts:145:11)
+
+  ÔùÅ Story 3.2 - Marcar Frequ├¬ncia ÔÇ║ faz upsert de presen├ºa e reflete no carregamento seguinte
+
+    TypeError: Cannot read properties of undefined (reading 'id')
+
+      72 |   });
+      73 |   const professorToken = profReg.body.accessToken as string;
+    > 74 |   const professorId = profReg.body.user.id as string;
+         |                                         ^
+      75 |
+      76 |   const prof2Reg = await request(app).post('/api/auth/register').send({
+      77 |     email: 'prof2.frequencia@academia.com',
+
+      at setupCtx (src/tests/training-attendance.test.ts:74:41)
+      at Object.<anonymous> (src/tests/training-attendance.test.ts:145:11)
+
+  ÔùÅ Story 3.2 - Marcar Frequ├¬ncia ÔÇ║ atualiza presen├ºa para aus├¬ncia no mesmo aluno sem duplicar
+
+    TypeError: Cannot read properties of undefined (reading 'id')
+
+      72 |   });
+      73 |   const professorToken = profReg.body.accessToken as string;
+    > 74 |   const professorId = profReg.body.user.id as string;
+         |                                         ^
+      75 |
+      76 |   const prof2Reg = await request(app).post('/api/auth/register').send({
+      77 |     email: 'prof2.frequencia@academia.com',
+
+      at setupCtx (src/tests/training-attendance.test.ts:74:41)
+      at Object.<anonymous> (src/tests/training-attendance.test.ts:145:11)
+
+  ÔùÅ Story 3.2 - Marcar Frequ├¬ncia ÔÇ║ aceita status justified e mant├®m valor no carregamento
+
+    TypeError: Cannot read properties of undefined (reading 'id')
+
+      72 |   });
+      73 |   const professorToken = profReg.body.accessToken as string;
+    > 74 |   const professorId = profReg.body.user.id as string;
+         |                                         ^
+      75 |
+      76 |   const prof2Reg = await request(app).post('/api/auth/register').send({
+      77 |     email: 'prof2.frequencia@academia.com',
+
+      at setupCtx (src/tests/training-attendance.test.ts:74:41)
+      at Object.<anonymous> (src/tests/training-attendance.test.ts:145:11)
+
+  ÔùÅ Story 3.2 - Marcar Frequ├¬ncia ÔÇ║ bloqueia acesso sem token e para papel n├úo professor
+
+    TypeError: Cannot read properties of undefined (reading 'id')
+
+      72 |   });
+      73 |   const professorToken = profReg.body.accessToken as string;
+    > 74 |   const professorId = profReg.body.user.id as string;
+         |                                         ^
+      75 |
+      76 |   const prof2Reg = await request(app).post('/api/auth/register').send({
+      77 |     email: 'prof2.frequencia@academia.com',
+
+      at setupCtx (src/tests/training-attendance.test.ts:74:41)
+      at Object.<anonymous> (src/tests/training-attendance.test.ts:145:11)
+
+  ÔùÅ Story 3.2 - Marcar Frequ├¬ncia ÔÇ║ isola sess├úo por professor e academia
+
+    TypeError: Cannot read properties of undefined (reading 'id')
+
+      72 |   });
+      73 |   const professorToken = profReg.body.accessToken as string;
+    > 74 |   const professorId = profReg.body.user.id as string;
+         |                                         ^
+      75 |
+      76 |   const prof2Reg = await request(app).post('/api/auth/register').send({
+      77 |     email: 'prof2.frequencia@academia.com',
+
+      at setupCtx (src/tests/training-attendance.test.ts:74:41)
+      at Object.<anonymous> (src/tests/training-attendance.test.ts:145:11)
+
+  ÔùÅ Story 3.2 - Marcar Frequ├¬ncia ÔÇ║ retorna 400 para payload inv├ílido de status
+
+    TypeError: Cannot read properties of undefined (reading 'id')
+
+      72 |   });
+      73 |   const professorToken = profReg.body.accessToken as string;
+    > 74 |   const professorId = profReg.body.user.id as string;
+         |                                         ^
+      75 |
+      76 |   const prof2Reg = await request(app).post('/api/auth/register').send({
+      77 |     email: 'prof2.frequencia@academia.com',
+
+      at setupCtx (src/tests/training-attendance.test.ts:74:41)
+      at Object.<anonymous> (src/tests/training-attendance.test.ts:145:11)
+
+FAIL src/tests/admin-profile.test.ts
+  ÔùÅ Console
+
+    console.log
+      [dotenv@17.3.1] injecting env (7) from .env -- tip: ÔÜí´©Å secrets for agents: https://dotenvx.com/as2
+
+      at _log (node_modules/dotenv/lib/main.js:139:11)
+
+    console.log
+      [dotenv@17.3.1] injecting env (0) from .env -- tip: ÔÜí´©Å secrets for agents: https://dotenvx.com/as2
+
+      at _log (node_modules/dotenv/lib/main.js:139:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (72c5e43e-54b3-4cf0-8c6d-ff33d2e21a0a) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_FAILURE - Auth (login) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.error
+      Erro ao registrar admin: error: sintaxe de entrada ├® inv├ílida para tipo uuid: "undefined"
+          at E:\Projetos\SCAcademia\backend\node_modules\pg-pool\index.js:45:11
+          at processTicksAndRejections (node:internal/process/task_queues:103:5)
+          at getAcademyById (E:\Projetos\SCAcademia\backend\src\lib\database.ts:168:15)
+          at initAdminHandler (E:\Projetos\SCAcademia\backend\src\controllers\auth.ts:70:21) {
+        length: 157,
+        severity: 'ERRO',
+        code: '22P02',
+        detail: undefined,
+        hint: undefined,
+        position: undefined,
+        internalPosition: undefined,
+        internalQuery: undefined,
+        where: "par├ómetro de portal sem nome $1 = '...'",
+        schema: undefined,
+        table: undefined,
+        column: undefined,
+        dataType: undefined,
+        constraint: undefined,
+        file: 'uuid.c',
+        line: '177',
+        routine: 'string_to_uuid'
+      }
+
+      105 |     });
+      106 |   } catch (error) {
+    > 107 |     console.error('Erro ao registrar admin:', error);
+          |             ^
+      108 |     res.status(500).json({ error: 'Erro ao registrar admin' });
+      109 |   }
+      110 | };
+
+      at initAdminHandler (src/controllers/auth.ts:107:13)
+
+    console.log
+      [AUDIT] LOGIN_FAILURE - Auth (login) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (1762a7c4-bc22-4437-9f68-e012e0bd0349) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (762879d9-c028-417e-b6a4-9bf56fa1976f) by 762879d9-c028-417e-b6a4-9bf56fa1976f
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.error
+      Erro ao registrar admin: error: sintaxe de entrada ├® inv├ílida para tipo uuid: "undefined"
+          at E:\Projetos\SCAcademia\backend\node_modules\pg-pool\index.js:45:11
+          at processTicksAndRejections (node:internal/process/task_queues:103:5)
+          at getAcademyById (E:\Projetos\SCAcademia\backend\src\lib\database.ts:168:15)
+          at initAdminHandler (E:\Projetos\SCAcademia\backend\src\controllers\auth.ts:70:21) {
+        length: 157,
+        severity: 'ERRO',
+        code: '22P02',
+        detail: undefined,
+        hint: undefined,
+        position: undefined,
+        internalPosition: undefined,
+        internalQuery: undefined,
+        where: "par├ómetro de portal sem nome $1 = '...'",
+        schema: undefined,
+        table: undefined,
+        column: undefined,
+        dataType: undefined,
+        constraint: undefined,
+        file: 'uuid.c',
+        line: '177',
+        routine: 'string_to_uuid'
+      }
+
+      105 |     });
+      106 |   } catch (error) {
+    > 107 |     console.error('Erro ao registrar admin:', error);
+          |             ^
+      108 |     res.status(500).json({ error: 'Erro ao registrar admin' });
+      109 |   }
+      110 | };
+
+      at initAdminHandler (src/controllers/auth.ts:107:13)
+
+    console.log
+      [AUDIT] LOGIN_FAILURE - Auth (login) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (cfa2ed8c-4e85-4474-b810-e44a19df87fc) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (a580431f-cd97-4201-bc2a-952956190d9c) by a580431f-cd97-4201-bc2a-952956190d9c
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+  ÔùÅ Story 9.2 - Perfil Completo do Administrador ÔÇ║ AC1: carrega perfil completo do admin logado
+
+    TypeError: Cannot read properties of undefined (reading 'id')
+
+      39 |     });
+      40 |
+    > 41 |     adminId = loginRes.body.user.id as string;
+         |                                  ^
+      42 |     adminToken = loginRes.body.accessToken as string;
+      43 |   });
+      44 |
+
+      at Object.<anonymous> (src/tests/admin-profile.test.ts:41:34)
+
+  ÔùÅ Story 9.2 - Perfil Completo do Administrador ÔÇ║ AC4: atualiza perfil do admin mantendo email inalterado
+
+    TypeError: Cannot read properties of undefined (reading 'id')
+
+      39 |     });
+      40 |
+    > 41 |     adminId = loginRes.body.user.id as string;
+         |                                  ^
+      42 |     adminToken = loginRes.body.accessToken as string;
+      43 |   });
+      44 |
+
+      at Object.<anonymous> (src/tests/admin-profile.test.ts:41:34)
+
+  ÔùÅ Story 9.2 - Perfil Completo do Administrador ÔÇ║ AC5: bloqueia update cross-academy por isolamento de academy_id
+
+    TypeError: Cannot read properties of undefined (reading 'id')
+
+      39 |     });
+      40 |
+    > 41 |     adminId = loginRes.body.user.id as string;
+         |                                  ^
+      42 |     adminToken = loginRes.body.accessToken as string;
+      43 |   });
+      44 |
+
+      at Object.<anonymous> (src/tests/admin-profile.test.ts:41:34)
+
+  ÔùÅ Story 9.2 - Perfil Completo do Administrador ÔÇ║ AC3: altera senha com sucesso e mant├®m sess├úo v├ílida
+
+    TypeError: Cannot read properties of undefined (reading 'id')
+
+      39 |     });
+      40 |
+    > 41 |     adminId = loginRes.body.user.id as string;
+         |                                  ^
+      42 |     adminToken = loginRes.body.accessToken as string;
+      43 |   });
+      44 |
+
+      at Object.<anonymous> (src/tests/admin-profile.test.ts:41:34)
+
+  ÔùÅ Story 9.2 - Perfil Completo do Administrador ÔÇ║ AC3: rejeita troca de senha com senha atual incorreta
+
+    TypeError: Cannot read properties of undefined (reading 'id')
+
+      39 |     });
+      40 |
+    > 41 |     adminId = loginRes.body.user.id as string;
+         |                                  ^
+      42 |     adminToken = loginRes.body.accessToken as string;
+      43 |   });
+      44 |
+
+      at Object.<anonymous> (src/tests/admin-profile.test.ts:41:34)
+
+FAIL src/tests/training-entry-point.test.ts (5.745 s)
+  ÔùÅ Console
+
+    console.log
+      [dotenv@17.3.1] injecting env (7) from .env -- tip: ÔÜÖ´©Å  write to custom object with { processEnv: myObject }
+
+      at _log (node_modules/dotenv/lib/main.js:139:11)
+
+    console.log
+      [dotenv@17.3.1] injecting env (0) from .env -- tip: ­ƒøí´©Å auth for agents: https://vestauth.com
+
+      at _log (node_modules/dotenv/lib/main.js:139:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (63719131-7739-4b7f-bec5-38b421ded63d) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (3cd2a876-5a7b-41ca-8b29-55822e61382e) by 3cd2a876-5a7b-41ca-8b29-55822e61382e
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.warn
+      [Seed] Aviso ao criar templates de consentimento: inser├º├úo ou atualiza├º├úo em tabela "consent_templates" viola restri├º├úo de chave estrangeira "consent_templates_academy_id_fkey"
+
+       96 |
+       97 |     await seedDefaultTemplates(academyId).catch(err =>
+    >  98 |       console.warn('[Seed] Aviso ao criar templates de consentimento:', err.message)
+          |               ^
+       99 |     );
+      100 |
+      101 |     res.status(201).json({
+
+      at src/controllers/auth.ts:98:15
+      at initAdminHandler (src/controllers/auth.ts:97:5)
+
+    console.log
+      [AUDIT] LOGIN_FAILURE - Auth (login) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (d7ed7bff-5021-49b6-adf2-cc0fccd0915e) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (558c4580-a404-44a7-94fc-9329c843f0d8) by 558c4580-a404-44a7-94fc-9329c843f0d8
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (22a49f3e-8779-4431-9e6b-f1edbcdc7887) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (507f4738-20f6-46ed-806c-df65659cfe41) by 507f4738-20f6-46ed-806c-df65659cfe41
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.error
+      Erro ao registrar admin: error: sintaxe de entrada ├® inv├ílida para tipo uuid: "undefined"
+          at E:\Projetos\SCAcademia\backend\node_modules\pg-pool\index.js:45:11
+          at processTicksAndRejections (node:internal/process/task_queues:103:5)
+          at getAcademyById (E:\Projetos\SCAcademia\backend\src\lib\database.ts:168:15)
+          at initAdminHandler (E:\Projetos\SCAcademia\backend\src\controllers\auth.ts:70:21) {
+        length: 157,
+        severity: 'ERRO',
+        code: '22P02',
+        detail: undefined,
+        hint: undefined,
+        position: undefined,
+        internalPosition: undefined,
+        internalQuery: undefined,
+        where: "par├ómetro de portal sem nome $1 = '...'",
+        schema: undefined,
+        table: undefined,
+        column: undefined,
+        dataType: undefined,
+        constraint: undefined,
+        file: 'uuid.c',
+        line: '177',
+        routine: 'string_to_uuid'
+      }
+
+      105 |     });
+      106 |   } catch (error) {
+    > 107 |     console.error('Erro ao registrar admin:', error);
+          |             ^
+      108 |     res.status(500).json({ error: 'Erro ao registrar admin' });
+      109 |   }
+      110 | };
+
+      at initAdminHandler (src/controllers/auth.ts:107:13)
+
+    console.log
+      [AUDIT] LOGIN_FAILURE - Auth (login) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (6bc906f3-0b36-4c6e-85b4-373d48a00c63) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (81bd11b8-6a95-46e6-b6c4-9fd202845d83) by 81bd11b8-6a95-46e6-b6c4-9fd202845d83
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.warn
+      [Seed] Aviso ao criar templates de consentimento: inser├º├úo ou atualiza├º├úo em tabela "consent_templates" viola restri├º├úo de chave estrangeira "consent_templates_academy_id_fkey"
+
+       96 |
+       97 |     await seedDefaultTemplates(academyId).catch(err =>
+    >  98 |       console.warn('[Seed] Aviso ao criar templates de consentimento:', err.message)
+          |               ^
+       99 |     );
+      100 |
+      101 |     res.status(201).json({
+
+      at src/controllers/auth.ts:98:15
+      at initAdminHandler (src/controllers/auth.ts:97:5)
+
+    console.log
+      [AUDIT] LOGIN_FAILURE - Auth (login) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.error
+      Erro ao registrar admin: error: sintaxe de entrada ├® inv├ílida para tipo uuid: "undefined"
+          at E:\Projetos\SCAcademia\backend\node_modules\pg-pool\index.js:45:11
+          at processTicksAndRejections (node:internal/process/task_queues:103:5)
+          at getAcademyById (E:\Projetos\SCAcademia\backend\src\lib\database.ts:168:15)
+          at initAdminHandler (E:\Projetos\SCAcademia\backend\src\controllers\auth.ts:70:21) {
+        length: 157,
+        severity: 'ERRO',
+        code: '22P02',
+        detail: undefined,
+        hint: undefined,
+        position: undefined,
+        internalPosition: undefined,
+        internalQuery: undefined,
+        where: "par├ómetro de portal sem nome $1 = '...'",
+        schema: undefined,
+        table: undefined,
+        column: undefined,
+        dataType: undefined,
+        constraint: undefined,
+        file: 'uuid.c',
+        line: '177',
+        routine: 'string_to_uuid'
+      }
+
+      105 |     });
+      106 |   } catch (error) {
+    > 107 |     console.error('Erro ao registrar admin:', error);
+          |             ^
+      108 |     res.status(500).json({ error: 'Erro ao registrar admin' });
+      109 |   }
+      110 | };
+
+      at initAdminHandler (src/controllers/auth.ts:107:13)
+
+    console.log
+      [AUDIT] LOGIN_FAILURE - Auth (login) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (38d47270-97e5-459a-830d-c714bc912ce5) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (1b6346d9-7a61-4dc4-b4a1-f71c1d7cf153) by 1b6346d9-7a61-4dc4-b4a1-f71c1d7cf153
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by 1b6346d9-7a61-4dc4-b4a1-f71c1d7cf153
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (16ac9026-cf3b-48d0-8fab-d4793624808a) by 16ac9026-cf3b-48d0-8fab-d4793624808a
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [EMAIL SIMULADO] Para: prof.treino31@academia.com
+
+      at sendEmail (src/lib/email.ts:66:13)
+
+    console.log
+      [EMAIL SIMULADO] Assunto: Bem-vindo(a) ├á SCAcademia
+
+      at sendEmail (src/lib/email.ts:67:13)
+
+    console.log
+      [EMAIL SIMULADO] Conteudo: Ol├í Professor Treino Story,
+      
+      Seu cadastro foi conclu├¡do com sucesso na SCAcademia.
+      Voc├¬ j├í pode acessar a plataforma com seu email e senha.
+
+      at sendEmail (src/lib/email.ts:68:13)
+
+    console.log
+      [AUDIT] WELCOME_EMAIL_SENT - User (16ac9026-cf3b-48d0-8fab-d4793624808a) by 16ac9026-cf3b-48d0-8fab-d4793624808a
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (05c16e69-72d3-4058-a1c0-86af45449285) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (c1b60737-b78b-41b2-90dc-7cf765c2d137) by c1b60737-b78b-41b2-90dc-7cf765c2d137
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by c1b60737-b78b-41b2-90dc-7cf765c2d137
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+  ÔùÅ Story 3.1 - Entry Point Conversacional ÔÇ║ retorna contexto com currentOrNextClass nulo quando professor n├úo tem turma ativa
+
+    TypeError: Cannot read properties of undefined (reading 'id')
+
+      48 |     academyId,
+      49 |     professorToken: profReg.body.accessToken as string,
+    > 50 |     professorId: profReg.body.user.id as string,
+         |                                    ^
+      51 |     adminToken,
+      52 |   };
+      53 | };
+
+      at setupCtx (src/tests/training-entry-point.test.ts:50:36)
+      at Object.<anonymous> (src/tests/training-entry-point.test.ts:78:11)
+
+  ÔùÅ Story 3.1 - Entry Point Conversacional ÔÇ║ retorna contexto da turma para o professor logado
+
+    TypeError: Cannot read properties of undefined (reading 'id')
+
+      48 |     academyId,
+      49 |     professorToken: profReg.body.accessToken as string,
+    > 50 |     professorId: profReg.body.user.id as string,
+         |                                    ^
+      51 |     adminToken,
+      52 |   };
+      53 | };
+
+      at setupCtx (src/tests/training-entry-point.test.ts:50:36)
+      at Object.<anonymous> (src/tests/training-entry-point.test.ts:78:11)
+
+  ÔùÅ Story 3.1 - Entry Point Conversacional ÔÇ║ bloqueia acesso ao entry-point sem token
+
+    TypeError: Cannot read properties of undefined (reading 'id')
+
+      48 |     academyId,
+      49 |     professorToken: profReg.body.accessToken as string,
+    > 50 |     professorId: profReg.body.user.id as string,
+         |                                    ^
+      51 |     adminToken,
+      52 |   };
+      53 | };
+
+      at setupCtx (src/tests/training-entry-point.test.ts:50:36)
+      at Object.<anonymous> (src/tests/training-entry-point.test.ts:78:11)
+
+  ÔùÅ Story 3.1 - Entry Point Conversacional ÔÇ║ bloqueia start para papel n├úo professor
+
+    TypeError: Cannot read properties of undefined (reading 'id')
+
+      48 |     academyId,
+      49 |     professorToken: profReg.body.accessToken as string,
+    > 50 |     professorId: profReg.body.user.id as string,
+         |                                    ^
+      51 |     adminToken,
+      52 |   };
+      53 | };
+
+      at setupCtx (src/tests/training-entry-point.test.ts:50:36)
+      at Object.<anonymous> (src/tests/training-entry-point.test.ts:78:11)
+
+  ÔùÅ Story 3.1 - Entry Point Conversacional ÔÇ║ inicia sess├úo e mant├®m idempot├¬ncia no mesmo dia/turma/professor
+
+    TypeError: Cannot read properties of undefined (reading 'id')
+
+      48 |     academyId,
+      49 |     professorToken: profReg.body.accessToken as string,
+    > 50 |     professorId: profReg.body.user.id as string,
+         |                                    ^
+      51 |     adminToken,
+      52 |   };
+      53 | };
+
+      at setupCtx (src/tests/training-entry-point.test.ts:50:36)
+      at Object.<anonymous> (src/tests/training-entry-point.test.ts:78:11)
+
+  ÔùÅ Story 3.1 - Entry Point Conversacional ÔÇ║ mant├®m idempot├¬ncia em chamadas simult├óneas para mesma turma
+
+    TypeError: Cannot read properties of undefined (reading 'id')
+
+      48 |     academyId,
+      49 |     professorToken: profReg.body.accessToken as string,
+    > 50 |     professorId: profReg.body.user.id as string,
+         |                                    ^
+      51 |     adminToken,
+      52 |   };
+      53 | };
+
+      at setupCtx (src/tests/training-entry-point.test.ts:50:36)
+      at Object.<anonymous> (src/tests/training-entry-point.test.ts:78:11)
+
+  ÔùÅ Story 3.1 - Entry Point Conversacional ÔÇ║ retorna 404 quando turma n├úo pertence ao professor atual
+
+    TypeError: Cannot read properties of undefined (reading 'id')
+
+      48 |     academyId,
+      49 |     professorToken: profReg.body.accessToken as string,
+    > 50 |     professorId: profReg.body.user.id as string,
+         |                                    ^
+      51 |     adminToken,
+      52 |   };
+      53 | };
+
+      at setupCtx (src/tests/training-entry-point.test.ts:50:36)
+      at Object.<anonymous> (src/tests/training-entry-point.test.ts:78:11)
+
+FAIL src/tests/consent-versioning.test.ts
+  ÔùÅ Console
+
+    console.log
+      [dotenv@17.3.1] injecting env (7) from .env -- tip: ­ƒöÉ prevent building .env in docker: https://dotenvx.com/prebuild
+
+      at _log (node_modules/dotenv/lib/main.js:139:11)
+
+    console.log
+      [dotenv@17.3.1] injecting env (0) from .env -- tip: ­ƒöÉ prevent committing .env to code: https://dotenvx.com/precommit
+
+      at _log (node_modules/dotenv/lib/main.js:139:11)
+
+    console.error
+      Erro ao registrar admin: error: sintaxe de entrada ├® inv├ílida para tipo uuid: "undefined"
+          at E:\Projetos\SCAcademia\backend\node_modules\pg-pool\index.js:45:11
+          at processTicksAndRejections (node:internal/process/task_queues:103:5)
+          at getAcademyById (E:\Projetos\SCAcademia\backend\src\lib\database.ts:168:15)
+          at initAdminHandler (E:\Projetos\SCAcademia\backend\src\controllers\auth.ts:70:21) {
+        length: 157,
+        severity: 'ERRO',
+        code: '22P02',
+        detail: undefined,
+        hint: undefined,
+        position: undefined,
+        internalPosition: undefined,
+        internalQuery: undefined,
+        where: "par├ómetro de portal sem nome $1 = '...'",
+        schema: undefined,
+        table: undefined,
+        column: undefined,
+        dataType: undefined,
+        constraint: undefined,
+        file: 'uuid.c',
+        line: '177',
+        routine: 'string_to_uuid'
+      }
+
+      105 |     });
+      106 |   } catch (error) {
+    > 107 |     console.error('Erro ao registrar admin:', error);
+          |             ^
+      108 |     res.status(500).json({ error: 'Erro ao registrar admin' });
+      109 |   }
+      110 | };
+
+      at initAdminHandler (src/controllers/auth.ts:107:13)
+
+    console.log
+      [AUDIT] LOGIN_FAILURE - Auth (login) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (af078486-a9f8-4586-9d29-5bc754e8e9de) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (e0d9e785-9189-4fe3-b227-0bea6d407a27) by e0d9e785-9189-4fe3-b227-0bea6d407a27
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.warn
+      [Seed] Aviso ao criar templates de consentimento: inser├º├úo ou atualiza├º├úo em tabela "consent_templates" viola restri├º├úo de chave estrangeira "consent_templates_academy_id_fkey"
+
+       96 |
+       97 |     await seedDefaultTemplates(academyId).catch(err =>
+    >  98 |       console.warn('[Seed] Aviso ao criar templates de consentimento:', err.message)
+          |               ^
+       99 |     );
+      100 |
+      101 |     res.status(201).json({
+
+      at src/controllers/auth.ts:98:15
+      at initAdminHandler (src/controllers/auth.ts:97:5)
+
+    console.log
+      [AUDIT] LOGIN_FAILURE - Auth (login) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.error
+      Erro ao registrar admin: error: sintaxe de entrada ├® inv├ílida para tipo uuid: "undefined"
+          at E:\Projetos\SCAcademia\backend\node_modules\pg-pool\index.js:45:11
+          at processTicksAndRejections (node:internal/process/task_queues:103:5)
+          at getAcademyById (E:\Projetos\SCAcademia\backend\src\lib\database.ts:168:15)
+          at initAdminHandler (E:\Projetos\SCAcademia\backend\src\controllers\auth.ts:70:21) {
+        length: 157,
+        severity: 'ERRO',
+        code: '22P02',
+        detail: undefined,
+        hint: undefined,
+        position: undefined,
+        internalPosition: undefined,
+        internalQuery: undefined,
+        where: "par├ómetro de portal sem nome $1 = '...'",
+        schema: undefined,
+        table: undefined,
+        column: undefined,
+        dataType: undefined,
+        constraint: undefined,
+        file: 'uuid.c',
+        line: '177',
+        routine: 'string_to_uuid'
+      }
+
+      105 |     });
+      106 |   } catch (error) {
+    > 107 |     console.error('Erro ao registrar admin:', error);
+          |             ^
+      108 |     res.status(500).json({ error: 'Erro ao registrar admin' });
+      109 |   }
+      110 | };
+
+      at initAdminHandler (src/controllers/auth.ts:107:13)
+
+    console.log
+      [AUDIT] LOGIN_FAILURE - Auth (login) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (4d1d387a-301e-443f-b5cd-e57aa9400b6e) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (cd16a4ee-e701-441b-bcee-f3a27f6e5aab) by cd16a4ee-e701-441b-bcee-f3a27f6e5aab
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.warn
+      [Seed] Aviso ao criar templates de consentimento: inser├º├úo ou atualiza├º├úo em tabela "consent_templates" viola restri├º├úo de chave estrangeira "consent_templates_academy_id_fkey"
+
+       96 |
+       97 |     await seedDefaultTemplates(academyId).catch(err =>
+    >  98 |       console.warn('[Seed] Aviso ao criar templates de consentimento:', err.message)
+          |               ^
+       99 |     );
+      100 |
+      101 |     res.status(201).json({
+
+      at src/controllers/auth.ts:98:15
+      at initAdminHandler (src/controllers/auth.ts:97:5)
+
+    console.log
+      [AUDIT] LOGIN_FAILURE - Auth (login) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.error
+      Erro ao registrar admin: error: sintaxe de entrada ├® inv├ílida para tipo uuid: "undefined"
+          at E:\Projetos\SCAcademia\backend\node_modules\pg-pool\index.js:45:11
+          at processTicksAndRejections (node:internal/process/task_queues:103:5)
+          at getAcademyById (E:\Projetos\SCAcademia\backend\src\lib\database.ts:168:15)
+          at initAdminHandler (E:\Projetos\SCAcademia\backend\src\controllers\auth.ts:70:21) {
+        length: 157,
+        severity: 'ERRO',
+        code: '22P02',
+        detail: undefined,
+        hint: undefined,
+        position: undefined,
+        internalPosition: undefined,
+        internalQuery: undefined,
+        where: "par├ómetro de portal sem nome $1 = '...'",
+        schema: undefined,
+        table: undefined,
+        column: undefined,
+        dataType: undefined,
+        constraint: undefined,
+        file: 'uuid.c',
+        line: '177',
+        routine: 'string_to_uuid'
+      }
+
+      105 |     });
+      106 |   } catch (error) {
+    > 107 |     console.error('Erro ao registrar admin:', error);
+          |             ^
+      108 |     res.status(500).json({ error: 'Erro ao registrar admin' });
+      109 |   }
+      110 | };
+
+      at initAdminHandler (src/controllers/auth.ts:107:13)
+
+    console.log
+      [AUDIT] LOGIN_FAILURE - Auth (login) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (407c2e7c-cdb4-4240-b2a9-cbbae0ca7148) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (3714bc92-4691-486c-8e23-6c356023db4d) by 3714bc92-4691-486c-8e23-6c356023db4d
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.warn
+      [Seed] Aviso ao criar templates de consentimento: inser├º├úo ou atualiza├º├úo em tabela "consent_templates" viola restri├º├úo de chave estrangeira "consent_templates_academy_id_fkey"
+
+       96 |
+       97 |     await seedDefaultTemplates(academyId).catch(err =>
+    >  98 |       console.warn('[Seed] Aviso ao criar templates de consentimento:', err.message)
+          |               ^
+       99 |     );
+      100 |
+      101 |     res.status(201).json({
+
+      at src/controllers/auth.ts:98:15
+      at initAdminHandler (src/controllers/auth.ts:97:5)
+
+    console.log
+      [AUDIT] LOGIN_FAILURE - Auth (login) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+  ÔùÅ Admin consent template versioning ÔÇ║ lista templates ativos seeded com vers├úo 1.0
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 200
+    Received: 401
+
+      44 |       .set('Authorization', `Bearer ${adminToken}`);
+      45 |
+    > 46 |     expect(res.status).toBe(200);
+         |                        ^
+      47 |     expect(res.body.templates).toHaveLength(3);
+      48 |     expect(res.body.templates.every((template: any) => template.version === '1.0')).toBe(true);
+      49 |   });
+
+      at Object.<anonymous> (src/tests/consent-versioning.test.ts:46:24)
+
+  ÔùÅ Admin consent template versioning ÔÇ║ publica nova vers├úo minor e desativa a anterior
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 401
+
+      60 |       });
+      61 |
+    > 62 |     expect(publishRes.status).toBe(201);
+         |                               ^
+      63 |     expect(publishRes.body.version).toBe('1.1');
+      64 |     expect(publishRes.body.templates).toHaveLength(3);
+      65 |     expect(publishRes.body.templates.every((template: any) => template.version === '1.1')).toBe(true);
+
+      at Object.<anonymous> (src/tests/consent-versioning.test.ts:62:31)
+
+  ÔùÅ Admin consent template versioning ÔÇ║ publica nova vers├úo major a partir da vers├úo atual
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 401
+
+      103 |       });
+      104 |
+    > 105 |     expect(publishRes.status).toBe(201);
+          |                               ^
+      106 |     expect(publishRes.body.version).toBe('2.0');
+      107 |   });
+      108 |
+
+      at Object.<anonymous> (src/tests/consent-versioning.test.ts:105:31)
+
+  ÔùÅ Admin consent template versioning ÔÇ║ gera link de re-consentimento para aluno menor com vers├úo anterior
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 404
+
+      118 |     });
+      119 |
+    > 120 |     expect(studentRes.status).toBe(201);
+          |                               ^
+      121 |     expect(studentRes.body.requiresConsent).toBe(true);
+      122 |
+      123 |     const consentLink: string = studentRes.body.consentLink;
+
+      at Object.<anonymous> (src/tests/consent-versioning.test.ts:120:31)
+
+  ÔùÅ Admin consent template versioning ÔÇ║ detecta re-consentimento no validateToken e retorna vers├Áes
+
+    TypeError: Cannot read properties of undefined (reading 'split')
+
+      162 |
+      163 |     const consentLink: string = studentRes.body.consentLink;
+    > 164 |     const token = consentLink.split('/').pop();
+          |                               ^
+      165 |
+      166 |     // Sign with v1.0
+      167 |     const signatureBase64 = `data:image/png;base64,${'B'.repeat(140)}`;
+
+      at Object.<anonymous> (src/tests/consent-versioning.test.ts:164:31)
+
+  ÔùÅ Admin consent template versioning ÔÇ║ reativa template inativo e evita 404 para health e ethics no wizard
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 404
+
+      208 |     });
+      209 |
+    > 210 |     expect(studentRes.status).toBe(201);
+          |                               ^
+      211 |     expect(studentRes.body.requiresConsent).toBe(true);
+      212 |
+      213 |     const consentLink: string = studentRes.body.consentLink;
+
+      at Object.<anonymous> (src/tests/consent-versioning.test.ts:210:31)
+
+FAIL src/tests/register.test.ts
+  ÔùÅ Console
+
+    console.log
+      [dotenv@17.3.1] injecting env (7) from .env -- tip: ÔÜÖ´©Å  enable debug logging with { debug: true }
+
+      at _log (node_modules/dotenv/lib/main.js:139:11)
+
+    console.log
+      [dotenv@17.3.1] injecting env (0) from .env -- tip: ­ƒøá´©Å  run anywhere with `dotenvx run -- yourcommand`
+
+      at _log (node_modules/dotenv/lib/main.js:139:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (0842ae24-a553-4788-9c02-2349f519bb6d) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (0ffbf7a6-7802-4c7f-a06f-74c060fd24a4) by 0ffbf7a6-7802-4c7f-a06f-74c060fd24a4
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [EMAIL SIMULADO] Para: professor1@academia.com
+
+      at sendEmail (src/lib/email.ts:66:13)
+
+    console.log
+      [EMAIL SIMULADO] Assunto: Bem-vindo(a) ├á SCAcademia
+
+      at sendEmail (src/lib/email.ts:67:13)
+
+    console.log
+      [EMAIL SIMULADO] Conteudo: Ol├í Professor Um,
+      
+      Seu cadastro foi conclu├¡do com sucesso na SCAcademia.
+      Voc├¬ j├í pode acessar a plataforma com seu email e senha.
+
+      at sendEmail (src/lib/email.ts:68:13)
+
+    console.log
+      [AUDIT] WELCOME_EMAIL_SENT - User (0ffbf7a6-7802-4c7f-a06f-74c060fd24a4) by 0ffbf7a6-7802-4c7f-a06f-74c060fd24a4
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (8a8c9eb6-0300-4fd3-a275-ff9aff8f5d2a) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (b8bb1a3a-a634-4848-8f00-c190d03c7f75) by b8bb1a3a-a634-4848-8f00-c190d03c7f75
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (9a304d02-22c3-44c2-8567-25dbfb5de336) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (420fbd5c-9d9c-4a24-8dbb-411bd232a884) by 420fbd5c-9d9c-4a24-8dbb-411bd232a884
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [EMAIL SIMULADO] Para: responsavel@familia.com
+
+      at sendEmail (src/lib/email.ts:66:13)
+
+    console.log
+      [EMAIL SIMULADO] Assunto: Consentimento LGPD para Aluno Menor
+
+      at sendEmail (src/lib/email.ts:67:13)
+
+    console.log
+      [EMAIL SIMULADO] Conteudo: Ol├í,
+      
+      Foi solicitado consentimento para o aluno Aluno Menor.
+      Acesse o link abaixo para assinar:
+      http://localhost:4200/consent/6ba257b5-442c-4117-90af-2951d4762125
+      
+      Se voc├¬ n├úo reconhece esta solicita├º├úo, ignore este email.
+
+      at sendEmail (src/lib/email.ts:68:13)
+
+    console.log
+      [AUDIT] CONSENT_EMAIL_SENT - User (420fbd5c-9d9c-4a24-8dbb-411bd232a884) by 420fbd5c-9d9c-4a24-8dbb-411bd232a884
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (6024cd19-1cec-402f-9722-eb7ca3ea0ca7) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (0fb97cef-4d55-4817-b18e-55c1a4103e56) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+  ÔùÅ POST /api/auth/register ÔÇ║ retorna 409 para email duplicado na mesma academia
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 400
+
+      101 |     });
+      102 |
+    > 103 |     expect(first.status).toBe(201);
+          |                          ^
+      104 |     expect(second.status).toBe(409);
+      105 |     expect(second.body.suggestions).toContain('Fazer login');
+      106 |   });
+
+      at Object.<anonymous> (src/tests/register.test.ts:103:26)
+
+FAIL src/tests/audit-lgpd.test.ts (6.386 s)
+  ÔùÅ Console
+
+    console.log
+      [dotenv@17.3.1] injecting env (7) from .env -- tip: ÔÜÖ´©Å  enable debug logging with { debug: true }
+
+      at _log (node_modules/dotenv/lib/main.js:139:11)
+
+    console.log
+      [dotenv@17.3.1] injecting env (0) from .env -- tip: ­ƒøá´©Å  run anywhere with `dotenvx run -- yourcommand`
+
+      at _log (node_modules/dotenv/lib/main.js:139:11)
+
+    console.error
+      Erro ao registrar admin: error: sintaxe de entrada ├® inv├ílida para tipo uuid: "undefined"
+          at E:\Projetos\SCAcademia\backend\node_modules\pg-pool\index.js:45:11
+          at processTicksAndRejections (node:internal/process/task_queues:103:5)
+          at getAcademyById (E:\Projetos\SCAcademia\backend\src\lib\database.ts:168:15)
+          at initAdminHandler (E:\Projetos\SCAcademia\backend\src\controllers\auth.ts:70:21) {
+        length: 157,
+        severity: 'ERRO',
+        code: '22P02',
+        detail: undefined,
+        hint: undefined,
+        position: undefined,
+        internalPosition: undefined,
+        internalQuery: undefined,
+        where: "par├ómetro de portal sem nome $1 = '...'",
+        schema: undefined,
+        table: undefined,
+        column: undefined,
+        dataType: undefined,
+        constraint: undefined,
+        file: 'uuid.c',
+        line: '177',
+        routine: 'string_to_uuid'
+      }
+
+      105 |     });
+      106 |   } catch (error) {
+    > 107 |     console.error('Erro ao registrar admin:', error);
+          |             ^
+      108 |     res.status(500).json({ error: 'Erro ao registrar admin' });
+      109 |   }
+      110 | };
+
+      at initAdminHandler (src/controllers/auth.ts:107:13)
+
+    console.log
+      [AUDIT] LOGIN_FAILURE - Auth (login) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.error
+      Erro ao registrar admin: error: sintaxe de entrada ├® inv├ílida para tipo uuid: "undefined"
+          at E:\Projetos\SCAcademia\backend\node_modules\pg-pool\index.js:45:11
+          at processTicksAndRejections (node:internal/process/task_queues:103:5)
+          at getAcademyById (E:\Projetos\SCAcademia\backend\src\lib\database.ts:168:15)
+          at initAdminHandler (E:\Projetos\SCAcademia\backend\src\controllers\auth.ts:70:21) {
+        length: 157,
+        severity: 'ERRO',
+        code: '22P02',
+        detail: undefined,
+        hint: undefined,
+        position: undefined,
+        internalPosition: undefined,
+        internalQuery: undefined,
+        where: "par├ómetro de portal sem nome $1 = '...'",
+        schema: undefined,
+        table: undefined,
+        column: undefined,
+        dataType: undefined,
+        constraint: undefined,
+        file: 'uuid.c',
+        line: '177',
+        routine: 'string_to_uuid'
+      }
+
+      105 |     });
+      106 |   } catch (error) {
+    > 107 |     console.error('Erro ao registrar admin:', error);
+          |             ^
+      108 |     res.status(500).json({ error: 'Erro ao registrar admin' });
+      109 |   }
+      110 | };
+
+      at initAdminHandler (src/controllers/auth.ts:107:13)
+
+    console.log
+      [AUDIT] LOGIN_FAILURE - Auth (login) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (8dbe9992-e6a5-430d-ad0d-4c82fdb839fa) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (0f78f58d-1793-4790-80ae-15424c15553d) by 0f78f58d-1793-4790-80ae-15424c15553d
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by 0f78f58d-1793-4790-80ae-15424c15553d
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] AUDIT_LOG_VIEWED - AuditLog (8dbe9992-e6a5-430d-ad0d-4c82fdb839fa) by 0f78f58d-1793-4790-80ae-15424c15553d
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (2bc7e44d-fa54-410c-9483-ab0169394c0c) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (b7336955-0cc0-4b8a-bea7-c09b25fa375e) by b7336955-0cc0-4b8a-bea7-c09b25fa375e
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by b7336955-0cc0-4b8a-bea7-c09b25fa375e
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (ec82068f-34ab-4c95-9e0a-b05d8b1c7ede) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (a4d8e80a-fe38-4d83-a465-7de619954e8e) by a4d8e80a-fe38-4d83-a465-7de619954e8e
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by a4d8e80a-fe38-4d83-a465-7de619954e8e
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by a4d8e80a-fe38-4d83-a465-7de619954e8e
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] AUDIT_LOG_VIEWED - AuditLog (ec82068f-34ab-4c95-9e0a-b05d8b1c7ede) by a4d8e80a-fe38-4d83-a465-7de619954e8e
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] AUDIT_LOG_VIEWED - AuditLog (ec82068f-34ab-4c95-9e0a-b05d8b1c7ede) by a4d8e80a-fe38-4d83-a465-7de619954e8e
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (7a23dbb2-356f-4521-9167-51ff5f11e8e0) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (0c2fc738-7bc9-43d8-b65c-0d3471aef7df) by 0c2fc738-7bc9-43d8-b65c-0d3471aef7df
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by 0c2fc738-7bc9-43d8-b65c-0d3471aef7df
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] AUDIT_LOG_EXPORTED - AuditLog (7a23dbb2-356f-4521-9167-51ff5f11e8e0) by 0c2fc738-7bc9-43d8-b65c-0d3471aef7df
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (ebb45a3c-76d3-4f2c-b79a-5ea3df52f2dd) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (964d5212-a93d-4bdc-8bad-075e53558b82) by 964d5212-a93d-4bdc-8bad-075e53558b82
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by 964d5212-a93d-4bdc-8bad-075e53558b82
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] AUDIT_LOG_VIEWED - AuditLog (ebb45a3c-76d3-4f2c-b79a-5ea3df52f2dd) by 964d5212-a93d-4bdc-8bad-075e53558b82
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] AUDIT_LOG_VIEWED - AuditLog (ebb45a3c-76d3-4f2c-b79a-5ea3df52f2dd) by 964d5212-a93d-4bdc-8bad-075e53558b82
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (f2547a6c-0074-4606-8a4e-a091753b8eeb) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (228663b3-b4cd-4d10-89be-645341c58d3c) by 228663b3-b4cd-4d10-89be-645341c58d3c
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by 228663b3-b4cd-4d10-89be-645341c58d3c
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] AUDIT_LOG_EXPORTED - AuditLog (f2547a6c-0074-4606-8a4e-a091753b8eeb) by 228663b3-b4cd-4d10-89be-645341c58d3c
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] AUDIT_LOG_VIEWED - AuditLog (f2547a6c-0074-4606-8a4e-a091753b8eeb) by 228663b3-b4cd-4d10-89be-645341c58d3c
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+  ÔùÅ Auditoria LGPD ÔÇö GET /api/admin/audit-logs ÔÇ║ retorna lista paginada de logs com status 200
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 200
+    Received: 401
+
+      68 |       .set('Authorization', `Bearer ${adminToken}`);
+      69 |
+    > 70 |     expect(res.status).toBe(200);
+         |                        ^
+      71 |     expect(res.body).toHaveProperty('logs');
+      72 |     expect(res.body).toHaveProperty('total');
+      73 |     expect(res.body).toHaveProperty('page');
+
+      at Object.<anonymous> (src/tests/audit-lgpd.test.ts:70:24)
+
+FAIL src/tests/auth-login.test.ts
+  ÔùÅ Console
+
+    console.log
+      [dotenv@17.3.1] injecting env (7) from .env -- tip: ÔÜí´©Å secrets for agents: https://dotenvx.com/as2
+
+      at _log (node_modules/dotenv/lib/main.js:139:11)
+
+    console.log
+      [dotenv@17.3.1] injecting env (0) from .env -- tip: ÔÜÖ´©Å  write to custom object with { processEnv: myObject }
+
+      at _log (node_modules/dotenv/lib/main.js:139:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (fc97efcd-2899-4e65-9a85-8ee31f251d32) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (4a1f4a74-ad95-4985-ab2d-759cf67b9679) by 4a1f4a74-ad95-4985-ab2d-759cf67b9679
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by 4a1f4a74-ad95-4985-ab2d-759cf67b9679
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (577d0f9e-8a60-4068-8f1d-fd4cf0810d3e) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (771754ce-ba5d-4ec3-9ba7-d4cb07de17c2) by 771754ce-ba5d-4ec3-9ba7-d4cb07de17c2
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_FAILURE - Auth (login) by 771754ce-ba5d-4ec3-9ba7-d4cb07de17c2
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.error
+      Erro ao registrar admin: error: sintaxe de entrada ├® inv├ílida para tipo uuid: "undefined"
+          at E:\Projetos\SCAcademia\backend\node_modules\pg-pool\index.js:45:11
+          at processTicksAndRejections (node:internal/process/task_queues:103:5)
+          at getAcademyById (E:\Projetos\SCAcademia\backend\src\lib\database.ts:168:15)
+          at initAdminHandler (E:\Projetos\SCAcademia\backend\src\controllers\auth.ts:70:21) {
+        length: 157,
+        severity: 'ERRO',
+        code: '22P02',
+        detail: undefined,
+        hint: undefined,
+        position: undefined,
+        internalPosition: undefined,
+        internalQuery: undefined,
+        where: "par├ómetro de portal sem nome $1 = '...'",
+        schema: undefined,
+        table: undefined,
+        column: undefined,
+        dataType: undefined,
+        constraint: undefined,
+        file: 'uuid.c',
+        line: '177',
+        routine: 'string_to_uuid'
+      }
+
+      105 |     });
+      106 |   } catch (error) {
+    > 107 |     console.error('Erro ao registrar admin:', error);
+          |             ^
+      108 |     res.status(500).json({ error: 'Erro ao registrar admin' });
+      109 |   }
+      110 | };
+
+      at initAdminHandler (src/controllers/auth.ts:107:13)
+
+    console.log
+      [AUDIT] LOGIN_FAILURE - Auth (login) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_FAILURE - Auth (login) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_FAILURE - Auth (login) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_FAILURE - Auth (login) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (a421144f-0623-4a9b-9fef-4da75c7a995c) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (3b6bd385-7787-466a-982b-8f9095b8d554) by 3b6bd385-7787-466a-982b-8f9095b8d554
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.warn
+      [Seed] Aviso ao criar templates de consentimento: inser├º├úo ou atualiza├º├úo em tabela "consent_templates" viola restri├º├úo de chave estrangeira "consent_templates_academy_id_fkey"
+
+       96 |
+       97 |     await seedDefaultTemplates(academyId).catch(err =>
+    >  98 |       console.warn('[Seed] Aviso ao criar templates de consentimento:', err.message)
+          |               ^
+       99 |     );
+      100 |
+      101 |     res.status(201).json({
+
+      at src/controllers/auth.ts:98:15
+      at initAdminHandler (src/controllers/auth.ts:97:5)
+
+    console.error
+      Erro ao registrar admin: error: sintaxe de entrada ├® inv├ílida para tipo uuid: "undefined"
+          at E:\Projetos\SCAcademia\backend\node_modules\pg-pool\index.js:45:11
+          at processTicksAndRejections (node:internal/process/task_queues:103:5)
+          at getAcademyById (E:\Projetos\SCAcademia\backend\src\lib\database.ts:168:15)
+          at initAdminHandler (E:\Projetos\SCAcademia\backend\src\controllers\auth.ts:70:21) {
+        length: 157,
+        severity: 'ERRO',
+        code: '22P02',
+        detail: undefined,
+        hint: undefined,
+        position: undefined,
+        internalPosition: undefined,
+        internalQuery: undefined,
+        where: "par├ómetro de portal sem nome $1 = '...'",
+        schema: undefined,
+        table: undefined,
+        column: undefined,
+        dataType: undefined,
+        constraint: undefined,
+        file: 'uuid.c',
+        line: '177',
+        routine: 'string_to_uuid'
+      }
+
+      105 |     });
+      106 |   } catch (error) {
+    > 107 |     console.error('Erro ao registrar admin:', error);
+          |             ^
+      108 |     res.status(500).json({ error: 'Erro ao registrar admin' });
+      109 |   }
+      110 | };
+
+      at initAdminHandler (src/controllers/auth.ts:107:13)
+
+    console.log
+      [AUDIT] LOGIN_FAILURE - Auth (login) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (36b1c59b-c0ff-4620-8c0d-8135790b75e0) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (acaf0161-b1c0-4a96-a7a1-73aeccbfb83a) by acaf0161-b1c0-4a96-a7a1-73aeccbfb83a
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (be7c1955-2994-49e2-af19-ad55a4d895a2) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (91d7ebe5-c713-4b0a-8e96-389dead5c289) by 91d7ebe5-c713-4b0a-8e96-389dead5c289
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+  ÔùÅ Auth login/jwt flow ÔÇ║ bloqueia login de aluno menor com consentimento pendente e retorna link
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 404
+
+       95 |     });
+       96 |
+    >  97 |     expect(register.status).toBe(201);
+          |                             ^
+       98 |     expect(register.body.requiresConsent).toBe(true);
+       99 |
+      100 |     const login = await request(app).post('/api/auth/login').send({
+
+      at Object.<anonymous> (src/tests/auth-login.test.ts:97:29)
+
+  ÔùÅ Auth login/jwt flow ÔÇ║ refresh valido retorna novo accessToken
+
+    expect(received).toBeDefined()
+
+    Received: undefined
+
+      115 |
+      116 |     const cookieHeader = login.headers['set-cookie'];
+    > 117 |     expect(cookieHeader).toBeDefined();
+          |                          ^
+      118 |
+      119 |     const refresh = await request(app)
+      120 |       .post('/api/auth/refresh')
+
+      at Object.<anonymous> (src/tests/auth-login.test.ts:117:26)
+
+  ÔùÅ Auth login/jwt flow ÔÇ║ logout limpa cookie refreshToken
+
+    TypeError: Invalid value "undefined" for header "Cookie"
+
+      at Test.setHeader [as request] (node_modules/superagent/src/node/index.js:830:39)
+      at Test.request [as end] (node_modules/superagent/src/node/index.js:965:8)
+      at Test.end (node_modules/supertest/lib/test.js:136:11)
+      at end (node_modules/superagent/src/request-base.js:283:12)
+      at Test.RequestBase.then (node_modules/superagent/src/request-base.js:265:31)
+
+FAIL src/tests/deletion-lgpd.test.ts
+  ÔùÅ Console
+
+    console.log
+      [dotenv@17.3.1] injecting env (7) from .env -- tip: ÔÜÖ´©Å  write to custom object with { processEnv: myObject }
+
+      at _log (node_modules/dotenv/lib/main.js:139:11)
+
+    console.log
+      [dotenv@17.3.1] injecting env (0) from .env -- tip: ÔÜÖ´©Å  specify custom .env file path with { path: '/custom/path/.env' }
+
+      at _log (node_modules/dotenv/lib/main.js:139:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (0940ed31-0f46-41fe-a0e9-8295111b4bb9) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (53783272-eba2-465c-a56f-64d5f9cf9a96) by 53783272-eba2-465c-a56f-64d5f9cf9a96
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by 53783272-eba2-465c-a56f-64d5f9cf9a96
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by 1a8e3f1a-c4d3-4f04-ba59-aed231d215c0
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.error
+      Erro ao registrar admin: error: sintaxe de entrada ├® inv├ílida para tipo uuid: "undefined"
+          at E:\Projetos\SCAcademia\backend\node_modules\pg-pool\index.js:45:11
+          at processTicksAndRejections (node:internal/process/task_queues:103:5)
+          at getAcademyById (E:\Projetos\SCAcademia\backend\src\lib\database.ts:168:15)
+          at initAdminHandler (E:\Projetos\SCAcademia\backend\src\controllers\auth.ts:70:21) {
+        length: 157,
+        severity: 'ERRO',
+        code: '22P02',
+        detail: undefined,
+        hint: undefined,
+        position: undefined,
+        internalPosition: undefined,
+        internalQuery: undefined,
+        where: "par├ómetro de portal sem nome $1 = '...'",
+        schema: undefined,
+        table: undefined,
+        column: undefined,
+        dataType: undefined,
+        constraint: undefined,
+        file: 'uuid.c',
+        line: '177',
+        routine: 'string_to_uuid'
+      }
+
+      105 |     });
+      106 |   } catch (error) {
+    > 107 |     console.error('Erro ao registrar admin:', error);
+          |             ^
+      108 |     res.status(500).json({ error: 'Erro ao registrar admin' });
+      109 |   }
+      110 | };
+
+      at initAdminHandler (src/controllers/auth.ts:107:13)
+
+    console.log
+      [AUDIT] LOGIN_FAILURE - Auth (login) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (66f4c589-3b45-4599-a438-edb30a4b010b) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (1d9b493e-5b9d-4f7e-a562-e795af262f95) by 1d9b493e-5b9d-4f7e-a562-e795af262f95
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by 1d9b493e-5b9d-4f7e-a562-e795af262f95
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by 59ee16a9-642d-459e-b591-c77a177edb37
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (9a1f7aac-3517-4919-a17f-3c4805f8b5ef) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (fff18880-4c3b-40fd-8502-de7e6d401623) by fff18880-4c3b-40fd-8502-de7e6d401623
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by fff18880-4c3b-40fd-8502-de7e6d401623
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by 0a248cec-9cfc-4be6-be3b-e70704ad339a
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] DATA_DELETION_REQUESTED - User (0514fc4e-5a80-4f0e-b3c9-b7060b3965a5) by 0a248cec-9cfc-4be6-be3b-e70704ad339a
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] DATA_DELETION_CANCELLED - User (0514fc4e-5a80-4f0e-b3c9-b7060b3965a5) by fff18880-4c3b-40fd-8502-de7e6d401623
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (905b3d34-544e-4507-a966-5d19de002c9e) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (db03b7ff-c87b-4fbc-80a6-ce3a2dca990b) by db03b7ff-c87b-4fbc-80a6-ce3a2dca990b
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by db03b7ff-c87b-4fbc-80a6-ce3a2dca990b
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by 4a348aef-6d38-45d0-87f0-8a5a9ae563d9
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] DATA_DELETION_REQUESTED - User (dc292d8c-da70-4017-b07e-e59c98982bc2) by db03b7ff-c87b-4fbc-80a6-ce3a2dca990b
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] DATA_DELETION_PROCESSED - User (dc292d8c-da70-4017-b07e-e59c98982bc2) by db03b7ff-c87b-4fbc-80a6-ce3a2dca990b
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+  ÔùÅ Direito ao Esquecimento (LGPD) ÔÇö Story 2.5 ÔÇ║ lista filhos vinculados para Responsavel
+
+    expect(received).toHaveLength(expected)
+
+    Expected length: 1
+    Received length: 0
+    Received array:  []
+
+      120 |     expect(res.status).toBe(200);
+      121 |     expect(Array.isArray(res.body.students)).toBe(true);
+    > 122 |     expect(res.body.students).toHaveLength(1);
+          |                               ^
+      123 |     expect(res.body.students[0].studentId).toBe(ctx.studentId);
+      124 |     expect(res.body.students[0].studentName).toBe('Aluno Delecao');
+      125 |   });
+
+      at Object.<anonymous> (src/tests/deletion-lgpd.test.ts:122:31)
+
+  ÔùÅ Direito ao Esquecimento (LGPD) ÔÇö Story 2.5 ÔÇ║ retorna 403 quando Admin tenta listar filhos vinculados de Responsavel
+
+    error: o valor nulo na coluna "academy_id" da rela├º├úo "users" viola a restri├º├úo de n├úo-nulo
+
+      247 |   const isMinor = role === 'Aluno' && age !== undefined && age < 18;
+      248 |
+    > 249 |   const res = await pool.query(
+          |               ^
+      250 |     `INSERT INTO users (user_id, academy_id, email, password_hash, full_name, role, birth_date,
+      251 |                         is_minor, minor_consent_signed, is_active, data_entrada, created_at, updated_at)
+      252 |      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, false, true, $9, NOW(), NOW())
+
+      at node_modules/pg-pool/index.js:45:11
+      at createUser (src/lib/database.ts:249:15)
+      at setupDeletionContext (src/tests/deletion-lgpd.test.ts:67:23)
+      at Object.<anonymous> (src/tests/deletion-lgpd.test.ts:108:11)
+
+PASS src/tests/academy-profile.test.ts
+  ÔùÅ Console
+
+    console.log
+      [dotenv@17.3.1] injecting env (7) from .env -- tip: ­ƒöÉ encrypt with Dotenvx: https://dotenvx.com
+
+      at _log (node_modules/dotenv/lib/main.js:139:11)
+
+    console.log
+      [dotenv@17.3.1] injecting env (0) from .env -- tip: ­ƒöÉ prevent building .env in docker: https://dotenvx.com/prebuild
+
+      at _log (node_modules/dotenv/lib/main.js:139:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (1d4db328-032a-4171-b333-32cec48e8a6e) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (85aba8f3-1671-404c-9f0a-03bea4997834) by 85aba8f3-1671-404c-9f0a-03bea4997834
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by 85aba8f3-1671-404c-9f0a-03bea4997834
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (3a186ca7-e57a-4a84-a58f-52789a7887c6) by 3a186ca7-e57a-4a84-a58f-52789a7887c6
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [EMAIL SIMULADO] Para: prof.perfil.1774372794875-6081@academia.com
+
+      at sendEmail (src/lib/email.ts:66:13)
+
+    console.log
+      [EMAIL SIMULADO] Assunto: Bem-vindo(a) ├á SCAcademia
+
+      at sendEmail (src/lib/email.ts:67:13)
+
+    console.log
+      [EMAIL SIMULADO] Conteudo: Ol├í Professor Perfil,
+      
+      Seu cadastro foi conclu├¡do com sucesso na SCAcademia.
+      Voc├¬ j├í pode acessar a plataforma com seu email e senha.
+
+      at sendEmail (src/lib/email.ts:68:13)
+
+    console.log
+      [AUDIT] WELCOME_EMAIL_SENT - User (3a186ca7-e57a-4a84-a58f-52789a7887c6) by 3a186ca7-e57a-4a84-a58f-52789a7887c6
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (ccfe7041-d913-42d8-93da-3a944d4a34ff) by ccfe7041-d913-42d8-93da-3a944d4a34ff
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (d7a0f6e7-7a1e-4ff6-a463-67fb4e6aa8dc) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (09e85788-3a15-49b4-9dd7-6e31ba882c84) by 09e85788-3a15-49b4-9dd7-6e31ba882c84
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by 09e85788-3a15-49b4-9dd7-6e31ba882c84
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (41c58db6-5f03-4de2-af49-2175c1f18fc9) by 41c58db6-5f03-4de2-af49-2175c1f18fc9
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [EMAIL SIMULADO] Para: prof.perfil.1774372795768-68332@academia.com
+
+      at sendEmail (src/lib/email.ts:66:13)
+
+    console.log
+      [EMAIL SIMULADO] Assunto: Bem-vindo(a) ├á SCAcademia
+
+      at sendEmail (src/lib/email.ts:67:13)
+
+    console.log
+      [EMAIL SIMULADO] Conteudo: Ol├í Professor Perfil,
+      
+      Seu cadastro foi conclu├¡do com sucesso na SCAcademia.
+      Voc├¬ j├í pode acessar a plataforma com seu email e senha.
+
+      at sendEmail (src/lib/email.ts:68:13)
+
+    console.log
+      [AUDIT] WELCOME_EMAIL_SENT - User (41c58db6-5f03-4de2-af49-2175c1f18fc9) by 41c58db6-5f03-4de2-af49-2175c1f18fc9
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (eb0ae490-15ed-423d-b409-cf1f201e5977) by eb0ae490-15ed-423d-b409-cf1f201e5977
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (46f27cbd-e201-4eb4-ad2f-ce5da7075159) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (f69b3f12-8ab1-453d-a1b8-f95e05748269) by f69b3f12-8ab1-453d-a1b8-f95e05748269
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by f69b3f12-8ab1-453d-a1b8-f95e05748269
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (73ab70d1-2ac6-4cd0-879c-caa2f4880f19) by 73ab70d1-2ac6-4cd0-879c-caa2f4880f19
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [EMAIL SIMULADO] Para: prof.perfil.1774372796394-5234@academia.com
+
+      at sendEmail (src/lib/email.ts:66:13)
+
+    console.log
+      [EMAIL SIMULADO] Assunto: Bem-vindo(a) ├á SCAcademia
+
+      at sendEmail (src/lib/email.ts:67:13)
+
+    console.log
+      [EMAIL SIMULADO] Conteudo: Ol├í Professor Perfil,
+      
+      Seu cadastro foi conclu├¡do com sucesso na SCAcademia.
+      Voc├¬ j├í pode acessar a plataforma com seu email e senha.
+
+      at sendEmail (src/lib/email.ts:68:13)
+
+    console.log
+      [AUDIT] WELCOME_EMAIL_SENT - User (73ab70d1-2ac6-4cd0-879c-caa2f4880f19) by 73ab70d1-2ac6-4cd0-879c-caa2f4880f19
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (f713c617-23f1-4791-9357-ee5396a13c92) by f713c617-23f1-4791-9357-ee5396a13c92
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (3ddcf34c-2a3c-4092-b2b2-b762463e4d5b) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (36c709b5-5f64-46b8-b494-d1e4eb17e1d1) by 36c709b5-5f64-46b8-b494-d1e4eb17e1d1
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by 36c709b5-5f64-46b8-b494-d1e4eb17e1d1
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (e50fd675-4853-4a6b-872c-c67fd97c3605) by e50fd675-4853-4a6b-872c-c67fd97c3605
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [EMAIL SIMULADO] Para: prof.perfil.1774372797212-63636@academia.com
+
+      at sendEmail (src/lib/email.ts:66:13)
+
+    console.log
+      [EMAIL SIMULADO] Assunto: Bem-vindo(a) ├á SCAcademia
+
+      at sendEmail (src/lib/email.ts:67:13)
+
+    console.log
+      [EMAIL SIMULADO] Conteudo: Ol├í Professor Perfil,
+      
+      Seu cadastro foi conclu├¡do com sucesso na SCAcademia.
+      Voc├¬ j├í pode acessar a plataforma com seu email e senha.
+
+      at sendEmail (src/lib/email.ts:68:13)
+
+    console.log
+      [AUDIT] WELCOME_EMAIL_SENT - User (e50fd675-4853-4a6b-872c-c67fd97c3605) by e50fd675-4853-4a6b-872c-c67fd97c3605
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (9fd7e967-483c-4d56-a8bb-0903d1004c8b) by 9fd7e967-483c-4d56-a8bb-0903d1004c8b
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (f4ab6181-29e6-4987-87ca-48be51217065) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (90fe6530-fa5f-46c8-8692-a0c46fe62450) by 90fe6530-fa5f-46c8-8692-a0c46fe62450
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by 90fe6530-fa5f-46c8-8692-a0c46fe62450
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (5cf038d5-00a2-4a65-9b59-1f0e03076628) by 5cf038d5-00a2-4a65-9b59-1f0e03076628
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [EMAIL SIMULADO] Para: prof.perfil.1774372797762-65341@academia.com
+
+      at sendEmail (src/lib/email.ts:66:13)
+
+    console.log
+      [EMAIL SIMULADO] Assunto: Bem-vindo(a) ├á SCAcademia
+
+      at sendEmail (src/lib/email.ts:67:13)
+
+    console.log
+      [EMAIL SIMULADO] Conteudo: Ol├í Professor Perfil,
+      
+      Seu cadastro foi conclu├¡do com sucesso na SCAcademia.
+      Voc├¬ j├í pode acessar a plataforma com seu email e senha.
+
+      at sendEmail (src/lib/email.ts:68:13)
+
+    console.log
+      [AUDIT] WELCOME_EMAIL_SENT - User (5cf038d5-00a2-4a65-9b59-1f0e03076628) by 5cf038d5-00a2-4a65-9b59-1f0e03076628
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (7610c502-045b-4fff-a16b-bbaa2ee1f7ec) by 7610c502-045b-4fff-a16b-bbaa2ee1f7ec
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+PASS src/tests/password-reset.test.ts
+  ÔùÅ Console
+
+    console.log
+      [dotenv@17.3.1] injecting env (7) from .env -- tip: ÔÜÖ´©Å  load multiple .env files with { path: ['.env.local', '.env'] }
+
+      at _log (node_modules/dotenv/lib/main.js:139:11)
+
+    console.log
+      [dotenv@17.3.1] injecting env (0) from .env -- tip: ÔÜÖ´©Å  specify custom .env file path with { path: '/custom/path/.env' }
+
+      at _log (node_modules/dotenv/lib/main.js:139:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (8f44cf1e-68d6-4933-853c-20ed422ab73a) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (4da62f7a-3110-4309-bba7-3c3a024b451f) by 4da62f7a-3110-4309-bba7-3c3a024b451f
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (63afc4a4-949d-4f42-a66f-89b265e3ab42) by 63afc4a4-949d-4f42-a66f-89b265e3ab42
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [EMAIL SIMULADO] Para: reset.user@academia.com
+
+      at sendEmail (src/lib/email.ts:66:13)
+
+    console.log
+      [EMAIL SIMULADO] Assunto: Bem-vindo(a) ├á SCAcademia
+
+      at sendEmail (src/lib/email.ts:67:13)
+
+    console.log
+      [EMAIL SIMULADO] Conteudo: Ol├í Usuario Reset,
+      
+      Seu cadastro foi conclu├¡do com sucesso na SCAcademia.
+      Voc├¬ j├í pode acessar a plataforma com seu email e senha.
+
+      at sendEmail (src/lib/email.ts:68:13)
+
+    console.log
+      [AUDIT] WELCOME_EMAIL_SENT - User (63afc4a4-949d-4f42-a66f-89b265e3ab42) by 63afc4a4-949d-4f42-a66f-89b265e3ab42
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [EMAIL SIMULADO] Para: reset.user@academia.com
+
+      at sendEmail (src/lib/email.ts:66:13)
+
+    console.log
+      [EMAIL SIMULADO] Assunto: Redefini├º├úo de senha - SCAcademia
+
+      at sendEmail (src/lib/email.ts:67:13)
+
+    console.log
+      [EMAIL SIMULADO] Conteudo: Ol├í,
+      
+      Recebemos uma solicita├º├úo para redefinir sua senha.
+      Use o link abaixo (v├ílido por 1 hora):
+      http://localhost:4200/reset-password?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2M2FmYzRhNC05NDlkLTRmNDItYTY2Zi04OWIyNjVlM2FiNDIiLCJlbWFpbCI6InJlc2V0LnVzZXJAYWNhZGVtaWEuY29tIiwiYWNhZGVteUlkIjoiOGY0NGNmMWUtNjhkNi00OTMzLTg1M2MtMjBlZDQyMmFiNzNhIiwicm9sZSI6IlByb2Zlc3NvciIsImlhdCI6MTc3NDM3Mjc5OSwiZXhwIjoxNzc0Mzc2Mzk5fQ.591TINOx-wQAqsdsC2rcMpYuDZoTbqD0jmlDqomgtN4
+      
+      Se voc├¬ n├úo solicitou este reset, ignore este email.
+
+      at sendEmail (src/lib/email.ts:68:13)
+
+    console.log
+      [AUDIT] PASSWORD_RESET_REQUESTED - Auth (forgot-password) by 63afc4a4-949d-4f42-a66f-89b265e3ab42
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] PASSWORD_RESET_EMAIL_SENT - Auth (forgot-password) by 63afc4a4-949d-4f42-a66f-89b265e3ab42
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] PASSWORD_RESET_REQUESTED - Auth (forgot-password) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (eb549404-d086-43b2-b4e3-d5aa8dca5e7f) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (7917ae0d-32a7-48b9-89ae-e2896050739a) by 7917ae0d-32a7-48b9-89ae-e2896050739a
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (f85f8907-4e59-46fa-be14-90104fe66d30) by f85f8907-4e59-46fa-be14-90104fe66d30
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [EMAIL SIMULADO] Para: reset.user@academia.com
+
+      at sendEmail (src/lib/email.ts:66:13)
+
+    console.log
+      [EMAIL SIMULADO] Assunto: Bem-vindo(a) ├á SCAcademia
+
+      at sendEmail (src/lib/email.ts:67:13)
+
+    console.log
+      [EMAIL SIMULADO] Conteudo: Ol├í Usuario Reset,
+      
+      Seu cadastro foi conclu├¡do com sucesso na SCAcademia.
+      Voc├¬ j├í pode acessar a plataforma com seu email e senha.
+
+      at sendEmail (src/lib/email.ts:68:13)
+
+    console.log
+      [AUDIT] WELCOME_EMAIL_SENT - User (f85f8907-4e59-46fa-be14-90104fe66d30) by f85f8907-4e59-46fa-be14-90104fe66d30
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by f85f8907-4e59-46fa-be14-90104fe66d30
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [EMAIL SIMULADO] Para: reset.user@academia.com
+
+      at sendEmail (src/lib/email.ts:66:13)
+
+    console.log
+      [EMAIL SIMULADO] Assunto: Redefini├º├úo de senha - SCAcademia
+
+      at sendEmail (src/lib/email.ts:67:13)
+
+    console.log
+      [EMAIL SIMULADO] Conteudo: Ol├í,
+      
+      Recebemos uma solicita├º├úo para redefinir sua senha.
+      Use o link abaixo (v├ílido por 1 hora):
+      http://localhost:4200/reset-password?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJmODVmODkwNy00ZTU5LTQ2ZmEtYmUxNC05MDEwNGZlNjZkMzAiLCJlbWFpbCI6InJlc2V0LnVzZXJAYWNhZGVtaWEuY29tIiwiYWNhZGVteUlkIjoiZWI1NDk0MDQtZDA4Ni00M2IyLWI0ZTMtZDVhYThkY2E1ZTdmIiwicm9sZSI6IlByb2Zlc3NvciIsImlhdCI6MTc3NDM3MjgwMCwiZXhwIjoxNzc0Mzc2NDAwfQ.uqDZ2CSulKMLwHsN2l057VltU-bcv84q9Nc0_tn_Kq4
+      
+      Se voc├¬ n├úo solicitou este reset, ignore este email.
+
+      at sendEmail (src/lib/email.ts:68:13)
+
+    console.log
+      [AUDIT] PASSWORD_RESET_REQUESTED - Auth (forgot-password) by f85f8907-4e59-46fa-be14-90104fe66d30
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] PASSWORD_RESET_EMAIL_SENT - Auth (forgot-password) by f85f8907-4e59-46fa-be14-90104fe66d30
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] PASSWORD_RESET_SUCCESS - Auth (reset-password) by f85f8907-4e59-46fa-be14-90104fe66d30
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_FAILURE - Auth (login) by f85f8907-4e59-46fa-be14-90104fe66d30
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by f85f8907-4e59-46fa-be14-90104fe66d30
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (3448d156-733e-4a67-a491-48d457755cbe) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (f34f11f7-ff86-493e-9215-cd91a05cdf0d) by f34f11f7-ff86-493e-9215-cd91a05cdf0d
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (2cf1af54-92bd-47ec-bbde-1dbb5356c26b) by 2cf1af54-92bd-47ec-bbde-1dbb5356c26b
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [EMAIL SIMULADO] Para: reset.user@academia.com
+
+      at sendEmail (src/lib/email.ts:66:13)
+
+    console.log
+      [EMAIL SIMULADO] Assunto: Bem-vindo(a) ├á SCAcademia
+
+      at sendEmail (src/lib/email.ts:67:13)
+
+    console.log
+      [EMAIL SIMULADO] Conteudo: Ol├í Usuario Reset,
+      
+      Seu cadastro foi conclu├¡do com sucesso na SCAcademia.
+      Voc├¬ j├í pode acessar a plataforma com seu email e senha.
+
+      at sendEmail (src/lib/email.ts:68:13)
+
+    console.log
+      [AUDIT] WELCOME_EMAIL_SENT - User (2cf1af54-92bd-47ec-bbde-1dbb5356c26b) by 2cf1af54-92bd-47ec-bbde-1dbb5356c26b
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+PASS src/tests/compliance-lgpd.test.ts
+  ÔùÅ Console
+
+    console.log
+      [dotenv@17.3.1] injecting env (7) from .env -- tip: ­ƒøá´©Å  run anywhere with `dotenvx run -- yourcommand`
+
+      at _log (node_modules/dotenv/lib/main.js:139:11)
+
+    console.log
+      [dotenv@17.3.1] injecting env (0) from .env -- tip: ÔÜÖ´©Å  enable debug logging with { debug: true }
+
+      at _log (node_modules/dotenv/lib/main.js:139:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (d218673c-05a0-4294-9133-9a34ce125e60) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (862b9d5c-5f62-4d1e-9da8-abfa6c1b7af3) by 862b9d5c-5f62-4d1e-9da8-abfa6c1b7af3
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by 862b9d5c-5f62-4d1e-9da8-abfa6c1b7af3
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] COMPLIANCE_REPORT_REQUESTED - ComplianceReport (d218673c-05a0-4294-9133-9a34ce125e60) by 862b9d5c-5f62-4d1e-9da8-abfa6c1b7af3
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] COMPLIANCE_REPORT_REQUESTED - ComplianceReport (d218673c-05a0-4294-9133-9a34ce125e60) by 862b9d5c-5f62-4d1e-9da8-abfa6c1b7af3
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by 2aa0a60a-979f-417e-9b52-cb071a5835ed
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] COMPLIANCE_REPORT_REQUESTED - ComplianceReport (d218673c-05a0-4294-9133-9a34ce125e60) by 862b9d5c-5f62-4d1e-9da8-abfa6c1b7af3
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] COMPLIANCE_REPORT_SCHEDULED - ComplianceReportSchedule (d218673c-05a0-4294-9133-9a34ce125e60) by 862b9d5c-5f62-4d1e-9da8-abfa6c1b7af3
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+
+Test Suites: 10 failed, 3 passed, 13 total
+Tests:       49 failed, 38 passed, 87 total
+Snapshots:   0 total
+Time:        65.406 s, estimated 71 s
+Ran all test suites.
+Jest did not exit one second after the test run has completed.
+
+'This usually means that there are asynchronous operations that weren't stopped in your tests. Consider running Jest with `--detectOpenHandles` to troubleshoot this issue.

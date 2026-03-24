@@ -1,0 +1,163 @@
+<div class="student-form-container">
+  <h2>{{ isEditMode ? 'Editar Aluno' : 'Novo Aluno' }}</h2>
+  <p *ngIf="!isEditMode">Preencha os dados completos para cadastrar um novo aluno.</p>
+  <p *ngIf="isEditMode">Atualize os dados do aluno. O email permanece somente leitura.</p>
+
+  <div class="loading" *ngIf="isLoading">Carregando dados...</div>
+
+  <form [formGroup]="form" (ngSubmit)="save()" class="card" *ngIf="!isLoading">
+    <h3>Acesso</h3>
+    <div class="grid two-columns">
+      <div class="form-group">
+        <label for="email">Email *</label>
+        <input id="email" type="email" formControlName="email" class="form-control" />
+        <div class="error-message" *ngIf="getFieldError('email')">{{ getFieldError('email') }}</div>
+      </div>
+
+      <div class="form-group" *ngIf="!isEditMode">
+        <label for="password">Senha temporaria *</label>
+        <div class="inline-row">
+          <input id="password" type="text" formControlName="password" class="form-control" />
+          <button type="button" class="btn" (click)="generateStrongPassword()">Gerar senha aleatoria</button>
+        </div>
+        <div class="error-message" *ngIf="getFieldError('password')">{{ getFieldError('password') }}</div>
+      </div>
+    </div>
+
+    <h3>Dados pessoais</h3>
+    <div class="grid two-columns">
+      <div class="form-group">
+        <label for="fullName">Nome completo *</label>
+        <input id="fullName" type="text" formControlName="fullName" class="form-control" />
+        <div class="error-message" *ngIf="getFieldError('fullName')">{{ getFieldError('fullName') }}</div>
+      </div>
+
+      <div class="form-group">
+        <label for="birthDate">Data de Nascimento *</label>
+        <input id="birthDate" type="date" formControlName="birthDate" class="form-control" />
+        <div class="error-message" *ngIf="getFieldError('birthDate')">{{ getFieldError('birthDate') }}</div>
+      </div>
+    </div>
+
+    <div class="warning-box" *ngIf="calculatedAge !== null">
+      <p>Idade calculada: <strong>{{ calculatedAge }} anos</strong>.</p>
+      <p *ngIf="isMinorCalculated" class="warning-highlight">
+        Aluno menor de idade - sera necessario vincular responsavel (Story 9.5).
+      </p>
+    </div>
+
+    <div class="grid two-columns">
+      <div class="form-group">
+        <label for="documentId">CPF</label>
+        <input id="documentId" type="text" formControlName="documentId" class="form-control" placeholder="000.000.000-00" />
+        <div class="error-message" *ngIf="getFieldError('documentId')">{{ getFieldError('documentId') }}</div>
+      </div>
+
+      <div class="form-group">
+        <label for="phone">Telefone</label>
+        <input id="phone" type="text" formControlName="phone" class="form-control" />
+      </div>
+    </div>
+
+    <h3>Endereco</h3>
+    <div class="grid two-columns">
+      <div class="form-group">
+        <label for="addressStreet">Logradouro</label>
+        <input id="addressStreet" type="text" formControlName="addressStreet" class="form-control" />
+      </div>
+
+      <div class="form-group">
+        <label for="addressNumber">Numero</label>
+        <input id="addressNumber" type="text" formControlName="addressNumber" class="form-control" />
+      </div>
+    </div>
+
+    <div class="grid two-columns">
+      <div class="form-group">
+        <label for="addressComplement">Complemento</label>
+        <input id="addressComplement" type="text" formControlName="addressComplement" class="form-control" />
+      </div>
+
+      <div class="form-group">
+        <label for="addressNeighborhood">Bairro</label>
+        <input id="addressNeighborhood" type="text" formControlName="addressNeighborhood" class="form-control" />
+      </div>
+    </div>
+
+    <div class="grid three-columns">
+      <div class="form-group">
+        <label for="addressPostalCode">CEP</label>
+        <input
+          id="addressPostalCode"
+          type="text"
+          formControlName="addressPostalCode"
+          class="form-control"
+          placeholder="00000-000"
+          (input)="onPostalCodeInput($event)"
+        />
+        <div class="error-message" *ngIf="getFieldError('addressPostalCode')">{{ getFieldError('addressPostalCode') }}</div>
+      </div>
+
+      <div class="form-group">
+        <label for="addressCity">Cidade</label>
+        <input id="addressCity" type="text" formControlName="addressCity" class="form-control" />
+      </div>
+
+      <div class="form-group">
+        <label for="addressState">UF</label>
+        <input
+          id="addressState"
+          type="text"
+          formControlName="addressState"
+          class="form-control"
+          maxlength="2"
+          (input)="onAddressStateInput($event)"
+        />
+        <div class="error-message" *ngIf="getFieldError('addressState')">{{ getFieldError('addressState') }}</div>
+      </div>
+    </div>
+
+    <h3>Operacional</h3>
+    <div class="grid two-columns">
+      <div class="form-group">
+        <label for="dataEntrada">Data de entrada</label>
+        <input id="dataEntrada" type="date" formControlName="dataEntrada" class="form-control" />
+      </div>
+
+      <div class="form-group" *ngIf="!isEditMode">
+        <label for="turmaId">Turma principal (opcional)</label>
+        <input id="turmaId" type="text" formControlName="turmaId" class="form-control" placeholder="UUID da turma" />
+      </div>
+    </div>
+
+    <div class="grid one-column" *ngIf="isMinorCalculated && !isEditMode">
+      <div class="form-group">
+        <label for="responsavelEmail">Email do responsavel (placeholder Story 9.5)</label>
+        <input id="responsavelEmail" type="email" formControlName="responsavelEmail" class="form-control" />
+      </div>
+    </div>
+
+    <div *ngIf="errorMessage" class="error-alert">{{ errorMessage }}</div>
+    <div *ngIf="successMessage" class="success-alert">{{ successMessage }}</div>
+    <div *ngIf="warningMessage" class="warning-alert">{{ warningMessage }}</div>
+
+    <div class="actions-row">
+      <button type="button" class="btn btn-secondary" (click)="goToList()">Voltar</button>
+      <button type="submit" class="btn btn-primary" [disabled]="isSaving || form.invalid">
+        {{ isSaving ? 'Salvando...' : (isEditMode ? 'Salvar alteracoes' : 'Cadastrar Aluno') }}
+      </button>
+    </div>
+  </form>
+
+  <div class="modal-overlay" *ngIf="generatedPasswordModalOpen">
+    <div class="modal-card">
+      <h3>Senha temporaria</h3>
+      <p>Copie e entregue esta senha ao aluno. Ela sera exibida apenas uma vez.</p>
+      <pre>{{ generatedPassword }}</pre>
+      <div class="actions-row">
+        <button class="btn" (click)="copyGeneratedPassword()">Copiar</button>
+        <button class="btn btn-primary" (click)="closeGeneratedPasswordModal(!isEditMode)">Fechar</button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,128 @@
+<div class="audit-container">
+  <header class="audit-header">
+    <div class="header-content">
+      <div class="header-left">
+        <button class="btn-back" (click)="goBack()">← Voltar</button>
+        <h1>🔍 Log de Auditoria LGPD</h1>
+      </div>
+      <div class="header-right">
+        <button class="btn-export" (click)="exportCsv()" [disabled]="exporting">
+          {{ exporting ? 'Exportando...' : '⬇ Exportar CSV' }}
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="audit-main">
+
+    <!-- Filtros -->
+    <section class="filter-panel">
+      <h3>Filtros</h3>
+      <form [formGroup]="filterForm" (ngSubmit)="applyFilters()">
+        <div class="filter-grid">
+          <div class="filter-field">
+            <label for="action">Ação</label>
+            <select id="action" formControlName="action">
+              <option *ngFor="let opt of actionOptions" [value]="opt.value">{{ opt.label }}</option>
+            </select>
+          </div>
+          <div class="filter-field">
+            <label for="resourceType">Tipo de Recurso</label>
+            <select id="resourceType" formControlName="resourceType">
+              <option *ngFor="let opt of resourceOptions" [value]="opt.value">{{ opt.label }}</option>
+            </select>
+          </div>
+          <div class="filter-field">
+            <label for="userId">Usuário (nome ou UUID)</label>
+            <input id="userId" type="text" formControlName="userId" placeholder="Ex: João Silva ou UUID" />
+          </div>
+          <div class="filter-field">
+            <label for="dateFrom">Data Início</label>
+            <input id="dateFrom" type="date" formControlName="dateFrom" />
+          </div>
+          <div class="filter-field">
+            <label for="dateTo">Data Fim</label>
+            <input id="dateTo" type="date" formControlName="dateTo" />
+          </div>
+        </div>
+        <div class="filter-actions">
+          <button type="submit" class="btn-primary" [disabled]="loading">Filtrar</button>
+          <button type="button" class="btn-secondary" (click)="clearFilters()" [disabled]="loading">Limpar</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Mensagem de erro -->
+    <div class="error-banner" *ngIf="errorMessage">
+      <span>⚠ {{ errorMessage }}</span>
+    </div>
+
+    <!-- Resultados -->
+    <section class="results-panel">
+      <div class="results-header">
+        <span class="results-count" *ngIf="!loading">
+          {{ total }} registro(s) encontrado(s)
+        </span>
+        <span class="loading-text" *ngIf="loading">Carregando...</span>
+      </div>
+
+      <!-- Timeline -->
+      <div class="timeline" *ngIf="!loading && logs.length > 0">
+        <div class="timeline-item" *ngFor="let log of logs">
+          <div class="timeline-dot" [ngClass]="getActionColor(log.action)"></div>
+          <div class="timeline-content">
+            <div class="timeline-row">
+              <span class="action-badge" [ngClass]="getActionColor(log.action)">
+                {{ getActionLabel(log.action) }}
+              </span>
+              <span class="timestamp">{{ formatTimestamp(log.timestamp) }}</span>
+            </div>
+            <div class="timeline-meta">
+              <span class="meta-item" *ngIf="log.actorName">
+                <strong>Usuário:</strong> {{ log.actorName }}
+              </span>
+              <span class="meta-item">
+                <strong>Recurso:</strong> {{ log.resourceType }} / {{ log.resourceId }}
+              </span>
+              <span class="meta-item" *ngIf="log.ipAddress">
+                <strong>IP:</strong> {{ log.ipAddress }}
+              </span>
+            </div>
+            <div class="changes-json" *ngIf="log.changesJson">
+              <details>
+                <summary>Detalhes</summary>
+                <pre>{{ log.changesJson | json }}</pre>
+              </details>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty state -->
+      <div class="empty-state" *ngIf="!loading && logs.length === 0">
+        <p>Nenhum registro de auditoria encontrado para os filtros selecionados.</p>
+      </div>
+
+      <!-- Paginação -->
+      <div class="pagination" *ngIf="totalPages > 1">
+        <button class="page-btn" (click)="goToPage(1)" [disabled]="page === 1">«</button>
+        <button class="page-btn" (click)="goToPage(page - 1)" [disabled]="page === 1">‹</button>
+        <button
+          class="page-btn"
+          *ngFor="let p of pages"
+          (click)="goToPage(p)"
+          [class.active]="p === page"
+        >
+          {{ p }}
+        </button>
+        <button class="page-btn" (click)="goToPage(page + 1)" [disabled]="page === totalPages">›</button>
+        <button class="page-btn" (click)="goToPage(totalPages)" [disabled]="page === totalPages">»</button>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="audit-footer">
+    <p>&copy; 2026 SCAcademia. Sistema de Gerenciamento de Treinamentos com Conformidade LGPD.</p>
+  </footer>
+</div>

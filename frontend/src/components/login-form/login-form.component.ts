@@ -17,6 +17,7 @@ export class LoginFormComponent implements OnInit {
   isLoading = false;
   errorMessage = '';
   showSuccess = false;
+  pendingConsentLink = '';
 
   constructor(
     private fb: FormBuilder,
@@ -40,9 +41,11 @@ export class LoginFormComponent implements OnInit {
       },
       () => { /* ignore error, let user try to login */ }
     );
+
   }
 
-  goToRegister(): void {
+  goToRegister(event?: Event): void {
+    event?.preventDefault();
     const academyId = localStorage.getItem('academyId');
     if (academyId) {
       this.router.navigate(['/register'], { queryParams: { academyId } });
@@ -51,8 +54,15 @@ export class LoginFormComponent implements OnInit {
     this.router.navigate(['/register']);
   }
 
-  goToForgotPassword(): void {
+  goToForgotPassword(event?: Event): void {
+    event?.preventDefault();
     this.router.navigate(['/forgot-password']);
+  }
+
+  openPendingConsent(event?: Event): void {
+    event?.preventDefault();
+    if (!this.pendingConsentLink) return;
+    window.open(this.pendingConsentLink, '_blank', 'noopener,noreferrer');
   }
 
   onSubmit(): void {
@@ -62,23 +72,32 @@ export class LoginFormComponent implements OnInit {
 
     this.isLoading = true;
     this.errorMessage = '';
+    this.pendingConsentLink = '';
 
     const { email, password } = this.loginForm.value;
 
     this.auth.login(email, password).subscribe(
-      () => {
+      (response: any) => {
         this.isLoading = false;
         this.showSuccess = true;
         setTimeout(() => {
           if (this.loginSuccess.observers.length > 0) {
             this.loginSuccess.emit();
           } else {
-            this.router.navigate(['/admin/dashboard']);
+            const role = response?.user?.role ?? this.auth.getCurrentUser()?.role;
+            this.router.navigate([role === 'Admin' ? '/admin/dashboard' : '/home']);
           }
         }, 1500);
       },
       (error: any) => {
         this.isLoading = false;
+
+        if (error?.status === 403 && error?.error?.consentPending && error?.error?.consentLink) {
+          this.pendingConsentLink = error.error.consentLink;
+          this.errorMessage = '';
+          return;
+        }
+
         this.errorMessage = error.error?.error || 'Email ou senha incorretos';
       }
     );

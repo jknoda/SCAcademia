@@ -1,0 +1,139 @@
+<div class="admin-profile-container">
+  <h2>Meu Perfil</h2>
+  <p>Atualize seus dados de contato e segurança de acesso.</p>
+
+  <div class="loading" *ngIf="isLoading">Carregando perfil...</div>
+
+  <form *ngIf="!isLoading" [formGroup]="profileForm" (ngSubmit)="saveProfile()" class="card">
+    <h3>Dados Pessoais</h3>
+
+    <div class="grid two-columns">
+      <div class="form-group">
+        <label for="fullName">Nome Completo *</label>
+        <input id="fullName" type="text" formControlName="fullName" class="form-control" />
+        <div class="error-message" *ngIf="getProfileFieldError('fullName')">{{ getProfileFieldError('fullName') }}</div>
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email (somente leitura)</label>
+        <input id="email" type="email" formControlName="email" class="form-control" />
+      </div>
+    </div>
+
+    <div class="grid three-columns">
+      <div class="form-group">
+        <label for="documentId">CPF</label>
+        <input id="documentId" type="text" formControlName="documentId" class="form-control" placeholder="000.000.000-00" />
+        <div class="error-message" *ngIf="getProfileFieldError('documentId')">{{ getProfileFieldError('documentId') }}</div>
+      </div>
+
+      <div class="form-group">
+        <label for="birthDate">Data de Nascimento</label>
+        <input id="birthDate" type="date" formControlName="birthDate" class="form-control" />
+      </div>
+
+      <div class="form-group">
+        <label for="phone">Telefone</label>
+        <input id="phone" type="text" formControlName="phone" class="form-control" />
+      </div>
+    </div>
+
+    <h3>Endereço</h3>
+
+    <div class="grid two-columns">
+      <div class="form-group">
+        <label for="addressStreet">Logradouro</label>
+        <input id="addressStreet" type="text" formControlName="addressStreet" class="form-control" />
+      </div>
+      <div class="form-group">
+        <label for="addressNumber">Número</label>
+        <input id="addressNumber" type="text" formControlName="addressNumber" class="form-control" />
+      </div>
+    </div>
+
+    <div class="grid two-columns">
+      <div class="form-group">
+        <label for="addressComplement">Complemento</label>
+        <input id="addressComplement" type="text" formControlName="addressComplement" class="form-control" />
+      </div>
+      <div class="form-group">
+        <label for="addressNeighborhood">Bairro</label>
+        <input id="addressNeighborhood" type="text" formControlName="addressNeighborhood" class="form-control" />
+      </div>
+    </div>
+
+    <div class="grid three-columns">
+      <div class="form-group">
+        <label for="addressPostalCode">CEP</label>
+        <input
+          id="addressPostalCode"
+          type="text"
+          formControlName="addressPostalCode"
+          class="form-control"
+          placeholder="00000-000"
+          (input)="onPostalCodeInput($event)"
+        />
+        <div class="error-message" *ngIf="getProfileFieldError('addressPostalCode')">{{ getProfileFieldError('addressPostalCode') }}</div>
+      </div>
+
+      <div class="form-group">
+        <label for="addressCity">Cidade</label>
+        <input id="addressCity" type="text" formControlName="addressCity" class="form-control" />
+      </div>
+
+      <div class="form-group">
+        <label for="addressState">UF</label>
+        <input
+          id="addressState"
+          type="text"
+          maxlength="2"
+          formControlName="addressState"
+          class="form-control"
+          (input)="onAddressStateInput($event)"
+        />
+        <div class="error-message" *ngIf="getProfileFieldError('addressState')">{{ getProfileFieldError('addressState') }}</div>
+      </div>
+    </div>
+
+    <div *ngIf="errorMessage" class="error-alert">{{ errorMessage }}</div>
+    <div *ngIf="successMessage" class="success-alert">{{ successMessage }}</div>
+
+    <div class="actions-row">
+      <button type="button" class="btn btn-secondary" (click)="backToDashboard()">Voltar</button>
+      <button type="submit" [disabled]="isSaving || profileForm.invalid" class="btn btn-primary">
+        {{ isSaving ? 'Salvando...' : 'Salvar Perfil' }}
+      </button>
+    </div>
+  </form>
+
+  <form [formGroup]="passwordForm" (ngSubmit)="changePassword()" class="card">
+    <h3>Trocar Senha</h3>
+
+    <div class="grid two-columns">
+      <div class="form-group">
+        <label for="currentPassword">Senha Atual *</label>
+        <input id="currentPassword" type="password" formControlName="currentPassword" class="form-control" />
+        <div class="error-message" *ngIf="getPasswordFieldError('currentPassword')">{{ getPasswordFieldError('currentPassword') }}</div>
+      </div>
+
+      <div class="form-group">
+        <label for="newPassword">Nova Senha *</label>
+        <input id="newPassword" type="password" formControlName="newPassword" class="form-control" />
+        <div class="error-message" *ngIf="getPasswordFieldError('newPassword')">{{ getPasswordFieldError('newPassword') }}</div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="confirmPassword">Confirmar Nova Senha *</label>
+      <input id="confirmPassword" type="password" formControlName="confirmPassword" class="form-control" />
+      <div class="error-message" *ngIf="getPasswordFieldError('confirmPassword')">{{ getPasswordFieldError('confirmPassword') }}</div>
+    </div>
+
+    <div *ngIf="passwordErrorMessage" class="error-alert">{{ passwordErrorMessage }}</div>
+    <div *ngIf="passwordSuccessMessage" class="success-alert">{{ passwordSuccessMessage }}</div>
+
+    <button type="submit" [disabled]="isChangingPassword || passwordForm.invalid" class="btn btn-primary">
+      {{ isChangingPassword ? 'Alterando...' : 'Alterar Senha' }}
+    </button>
+  </form>
+</div>

@@ -1,0 +1,3700 @@
+
+> backend@1.0.0 test
+> jest --runInBand
+
+PASS src/tests/rbac.test.ts (12.097 s)
+  ÔùÅ Console
+
+    console.log
+      [dotenv@17.3.1] injecting env (7) from .env -- tip: ÔÜÖ´©Å  suppress all logs with { quiet: true }
+
+      at _log (node_modules/dotenv/lib/main.js:139:11)
+
+    console.log
+      [dotenv@17.3.1] injecting env (0) from .env -- tip: ÔÜÖ´©Å  specify custom .env file path with { path: '/custom/path/.env' }
+
+      at _log (node_modules/dotenv/lib/main.js:139:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (9cb4b903-f95a-4fb9-b1cb-f4eabfbb93b5) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [initAdminHandler] params: [Object: null prototype] {
+        academyId: '9cb4b903-f95a-4fb9-b1cb-f4eabfbb93b5'
+      } academyId: 9cb4b903-f95a-4fb9-b1cb-f4eabfbb93b5
+
+      at initAdminHandler (src/controllers/auth.ts:68:13)
+
+    console.log
+      [AUDIT] USER_CREATED - User (94cab4d7-ddc9-46dd-ab5c-0c32c03c1dcc) by 94cab4d7-ddc9-46dd-ab5c-0c32c03c1dcc
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by 94cab4d7-ddc9-46dd-ab5c-0c32c03c1dcc
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (89be0b78-51da-42a2-b3b1-acdbfc0694a4) by 89be0b78-51da-42a2-b3b1-acdbfc0694a4
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [EMAIL SIMULADO] Para: prof.rbac@academia.com
+
+      at sendEmail (src/lib/email.ts:66:13)
+
+    console.log
+      [EMAIL SIMULADO] Assunto: Bem-vindo(a) ├á SCAcademia
+
+      at sendEmail (src/lib/email.ts:67:13)
+
+    console.log
+      [EMAIL SIMULADO] Conteudo: Ol├í Professor RBAC,
+      
+      Seu cadastro foi conclu├¡do com sucesso na SCAcademia.
+      Voc├¬ j├í pode acessar a plataforma com seu email e senha.
+
+      at sendEmail (src/lib/email.ts:68:13)
+
+    console.log
+      [AUDIT] WELCOME_EMAIL_SENT - User (89be0b78-51da-42a2-b3b1-acdbfc0694a4) by 89be0b78-51da-42a2-b3b1-acdbfc0694a4
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (a852a6d7-d99d-4e48-9e41-52e29fbb948c) by a852a6d7-d99d-4e48-9e41-52e29fbb948c
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (abeb69c6-8ac0-4448-a5a4-92c76694d9a4) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [initAdminHandler] params: [Object: null prototype] {
+        academyId: 'abeb69c6-8ac0-4448-a5a4-92c76694d9a4'
+      } academyId: abeb69c6-8ac0-4448-a5a4-92c76694d9a4
+
+      at initAdminHandler (src/controllers/auth.ts:68:13)
+
+    console.log
+      [AUDIT] USER_CREATED - User (2e476517-9f52-4714-9676-08df76c8afc8) by 2e476517-9f52-4714-9676-08df76c8afc8
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by 2e476517-9f52-4714-9676-08df76c8afc8
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (d389b709-8ee9-49c5-8024-31e80bf163e1) by d389b709-8ee9-49c5-8024-31e80bf163e1
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [EMAIL SIMULADO] Para: prof.rbac@academia.com
+
+      at sendEmail (src/lib/email.ts:66:13)
+
+    console.log
+      [EMAIL SIMULADO] Assunto: Bem-vindo(a) ├á SCAcademia
+
+      at sendEmail (src/lib/email.ts:67:13)
+
+    console.log
+      [EMAIL SIMULADO] Conteudo: Ol├í Professor RBAC,
+      
+      Seu cadastro foi conclu├¡do com sucesso na SCAcademia.
+      Voc├¬ j├í pode acessar a plataforma com seu email e senha.
+
+      at sendEmail (src/lib/email.ts:68:13)
+
+    console.log
+      [AUDIT] WELCOME_EMAIL_SENT - User (d389b709-8ee9-49c5-8024-31e80bf163e1) by d389b709-8ee9-49c5-8024-31e80bf163e1
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (03989b76-1341-4ff1-a3d2-02f5ea2e1a19) by 03989b76-1341-4ff1-a3d2-02f5ea2e1a19
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (0fd90c65-7e56-4c59-8698-3e135fde0eb4) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [initAdminHandler] params: [Object: null prototype] {
+        academyId: '0fd90c65-7e56-4c59-8698-3e135fde0eb4'
+      } academyId: 0fd90c65-7e56-4c59-8698-3e135fde0eb4
+
+      at initAdminHandler (src/controllers/auth.ts:68:13)
+
+    console.log
+      [AUDIT] USER_CREATED - User (16ebcce5-aee3-4ee1-9c57-91a77266ef90) by 16ebcce5-aee3-4ee1-9c57-91a77266ef90
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by 16ebcce5-aee3-4ee1-9c57-91a77266ef90
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (8611e5ef-cab3-4ee6-a57e-0cfbc18b2c46) by 8611e5ef-cab3-4ee6-a57e-0cfbc18b2c46
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [EMAIL SIMULADO] Para: prof.rbac@academia.com
+
+      at sendEmail (src/lib/email.ts:66:13)
+
+    console.log
+      [EMAIL SIMULADO] Assunto: Bem-vindo(a) ├á SCAcademia
+
+      at sendEmail (src/lib/email.ts:67:13)
+
+    console.log
+      [EMAIL SIMULADO] Conteudo: Ol├í Professor RBAC,
+      
+      Seu cadastro foi conclu├¡do com sucesso na SCAcademia.
+      Voc├¬ j├í pode acessar a plataforma com seu email e senha.
+
+      at sendEmail (src/lib/email.ts:68:13)
+
+    console.log
+      [AUDIT] WELCOME_EMAIL_SENT - User (8611e5ef-cab3-4ee6-a57e-0cfbc18b2c46) by 8611e5ef-cab3-4ee6-a57e-0cfbc18b2c46
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (81b83698-362d-4d59-b487-def9b5928550) by 81b83698-362d-4d59-b487-def9b5928550
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (fe8d3476-8692-4274-90e1-895133c03dce) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [initAdminHandler] params: [Object: null prototype] {
+        academyId: 'fe8d3476-8692-4274-90e1-895133c03dce'
+      } academyId: fe8d3476-8692-4274-90e1-895133c03dce
+
+      at initAdminHandler (src/controllers/auth.ts:68:13)
+
+    console.log
+      [AUDIT] USER_CREATED - User (bd075d13-58a3-4198-8d56-f982542d16aa) by bd075d13-58a3-4198-8d56-f982542d16aa
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by bd075d13-58a3-4198-8d56-f982542d16aa
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (3e6a9038-5981-4be6-a896-640850aa16f4) by 3e6a9038-5981-4be6-a896-640850aa16f4
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [EMAIL SIMULADO] Para: prof.rbac@academia.com
+
+      at sendEmail (src/lib/email.ts:66:13)
+
+    console.log
+      [EMAIL SIMULADO] Assunto: Bem-vindo(a) ├á SCAcademia
+
+      at sendEmail (src/lib/email.ts:67:13)
+
+    console.log
+      [EMAIL SIMULADO] Conteudo: Ol├í Professor RBAC,
+      
+      Seu cadastro foi conclu├¡do com sucesso na SCAcademia.
+      Voc├¬ j├í pode acessar a plataforma com seu email e senha.
+
+      at sendEmail (src/lib/email.ts:68:13)
+
+    console.log
+      [AUDIT] WELCOME_EMAIL_SENT - User (3e6a9038-5981-4be6-a896-640850aa16f4) by 3e6a9038-5981-4be6-a896-640850aa16f4
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (098e0fb2-a15f-4d21-934b-bb4f98136add) by 098e0fb2-a15f-4d21-934b-bb4f98136add
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (36364c7b-768c-4842-9722-04ec6033637e) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [initAdminHandler] params: [Object: null prototype] {
+        academyId: '36364c7b-768c-4842-9722-04ec6033637e'
+      } academyId: 36364c7b-768c-4842-9722-04ec6033637e
+
+      at initAdminHandler (src/controllers/auth.ts:68:13)
+
+    console.log
+      [AUDIT] USER_CREATED - User (b064ec18-bf2a-4921-8c01-82a8082b55d3) by b064ec18-bf2a-4921-8c01-82a8082b55d3
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by b064ec18-bf2a-4921-8c01-82a8082b55d3
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (15bc54eb-c71d-43ca-98e4-52ea15f3e961) by 15bc54eb-c71d-43ca-98e4-52ea15f3e961
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [EMAIL SIMULADO] Para: prof.rbac@academia.com
+
+      at sendEmail (src/lib/email.ts:66:13)
+
+    console.log
+      [EMAIL SIMULADO] Assunto: Bem-vindo(a) ├á SCAcademia
+
+      at sendEmail (src/lib/email.ts:67:13)
+
+    console.log
+      [EMAIL SIMULADO] Conteudo: Ol├í Professor RBAC,
+      
+      Seu cadastro foi conclu├¡do com sucesso na SCAcademia.
+      Voc├¬ j├í pode acessar a plataforma com seu email e senha.
+
+      at sendEmail (src/lib/email.ts:68:13)
+
+    console.log
+      [AUDIT] WELCOME_EMAIL_SENT - User (15bc54eb-c71d-43ca-98e4-52ea15f3e961) by 15bc54eb-c71d-43ca-98e4-52ea15f3e961
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (1162fb9f-5f53-4d9d-b3fb-36b72e6d3368) by 1162fb9f-5f53-4d9d-b3fb-36b72e6d3368
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (ef748cad-bd55-4075-90db-a79f037de7cd) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [initAdminHandler] params: [Object: null prototype] {
+        academyId: 'ef748cad-bd55-4075-90db-a79f037de7cd'
+      } academyId: ef748cad-bd55-4075-90db-a79f037de7cd
+
+      at initAdminHandler (src/controllers/auth.ts:68:13)
+
+    console.log
+      [AUDIT] USER_CREATED - User (fdecd33c-c493-4002-894d-e656c3174001) by fdecd33c-c493-4002-894d-e656c3174001
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by fdecd33c-c493-4002-894d-e656c3174001
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (ba3a5482-6933-46bc-9903-bdb9072aae22) by ba3a5482-6933-46bc-9903-bdb9072aae22
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [EMAIL SIMULADO] Para: prof.rbac@academia.com
+
+      at sendEmail (src/lib/email.ts:66:13)
+
+    console.log
+      [EMAIL SIMULADO] Assunto: Bem-vindo(a) ├á SCAcademia
+
+      at sendEmail (src/lib/email.ts:67:13)
+
+    console.log
+      [EMAIL SIMULADO] Conteudo: Ol├í Professor RBAC,
+      
+      Seu cadastro foi conclu├¡do com sucesso na SCAcademia.
+      Voc├¬ j├í pode acessar a plataforma com seu email e senha.
+
+      at sendEmail (src/lib/email.ts:68:13)
+
+    console.log
+      [AUDIT] WELCOME_EMAIL_SENT - User (ba3a5482-6933-46bc-9903-bdb9072aae22) by ba3a5482-6933-46bc-9903-bdb9072aae22
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (6b99d09a-91d3-4b2b-85f6-49b38f3eb9b8) by 6b99d09a-91d3-4b2b-85f6-49b38f3eb9b8
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [initAdminHandler] params: [Object: null prototype] { academyId: 'undefined' } academyId: undefined
+
+      at initAdminHandler (src/controllers/auth.ts:68:13)
+
+    console.error
+      Erro ao registrar admin: error: sintaxe de entrada ├® inv├ílida para tipo uuid: "undefined"
+          at E:\Projetos\SCAcademia\backend\node_modules\pg-pool\index.js:45:11
+          at processTicksAndRejections (node:internal/process/task_queues:103:5)
+          at getAcademyById (E:\Projetos\SCAcademia\backend\src\lib\database.ts:168:15)
+          at initAdminHandler (E:\Projetos\SCAcademia\backend\src\controllers\auth.ts:71:21) {
+        length: 157,
+        severity: 'ERRO',
+        code: '22P02',
+        detail: undefined,
+        hint: undefined,
+        position: undefined,
+        internalPosition: undefined,
+        internalQuery: undefined,
+        where: "par├ómetro de portal sem nome $1 = '...'",
+        schema: undefined,
+        table: undefined,
+        column: undefined,
+        dataType: undefined,
+        constraint: undefined,
+        file: 'uuid.c',
+        line: '177',
+        routine: 'string_to_uuid'
+      }
+
+      106 |     });
+      107 |   } catch (error) {
+    > 108 |     console.error('Erro ao registrar admin:', error);
+          |             ^
+      109 |     res.status(500).json({ error: 'Erro ao registrar admin' });
+      110 |   }
+      111 | };
+
+      at initAdminHandler (src/controllers/auth.ts:108:13)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (18b490e2-e26f-44ae-ab77-9234f5a0454c) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [initAdminHandler] params: [Object: null prototype] {
+        academyId: '18b490e2-e26f-44ae-ab77-9234f5a0454c'
+      } academyId: 18b490e2-e26f-44ae-ab77-9234f5a0454c
+
+      at initAdminHandler (src/controllers/auth.ts:68:13)
+
+    console.log
+      [AUDIT] USER_CREATED - User (7945dcd9-c55b-47fe-8051-11d6031c3d57) by 7945dcd9-c55b-47fe-8051-11d6031c3d57
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by 7945dcd9-c55b-47fe-8051-11d6031c3d57
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (b9e2bfd4-3886-4022-8ff7-e13ce69da320) by b9e2bfd4-3886-4022-8ff7-e13ce69da320
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [EMAIL SIMULADO] Para: prof.rbac@academia.com
+
+      at sendEmail (src/lib/email.ts:66:13)
+
+    console.log
+      [EMAIL SIMULADO] Assunto: Bem-vindo(a) ├á SCAcademia
+
+      at sendEmail (src/lib/email.ts:67:13)
+
+    console.log
+      [EMAIL SIMULADO] Conteudo: Ol├í Professor RBAC,
+      
+      Seu cadastro foi conclu├¡do com sucesso na SCAcademia.
+      Voc├¬ j├í pode acessar a plataforma com seu email e senha.
+
+      at sendEmail (src/lib/email.ts:68:13)
+
+    console.log
+      [AUDIT] WELCOME_EMAIL_SENT - User (b9e2bfd4-3886-4022-8ff7-e13ce69da320) by b9e2bfd4-3886-4022-8ff7-e13ce69da320
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (dc15dd6d-0611-49d5-97ed-42d60556d8c1) by dc15dd6d-0611-49d5-97ed-42d60556d8c1
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (b84d298c-1501-4334-a508-b96d740f9f26) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [initAdminHandler] params: [Object: null prototype] {
+        academyId: 'b84d298c-1501-4334-a508-b96d740f9f26'
+      } academyId: b84d298c-1501-4334-a508-b96d740f9f26
+
+      at initAdminHandler (src/controllers/auth.ts:68:13)
+
+    console.log
+      [AUDIT] USER_CREATED - User (6d7ae6b6-23d0-4888-bb86-af8f47f800b2) by 6d7ae6b6-23d0-4888-bb86-af8f47f800b2
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by 6d7ae6b6-23d0-4888-bb86-af8f47f800b2
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (b102056e-a8c5-4114-b288-e178e6719c1d) by b102056e-a8c5-4114-b288-e178e6719c1d
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [EMAIL SIMULADO] Para: prof.rbac@academia.com
+
+      at sendEmail (src/lib/email.ts:66:13)
+
+    console.log
+      [EMAIL SIMULADO] Assunto: Bem-vindo(a) ├á SCAcademia
+
+      at sendEmail (src/lib/email.ts:67:13)
+
+    console.log
+      [EMAIL SIMULADO] Conteudo: Ol├í Professor RBAC,
+      
+      Seu cadastro foi conclu├¡do com sucesso na SCAcademia.
+      Voc├¬ j├í pode acessar a plataforma com seu email e senha.
+
+      at sendEmail (src/lib/email.ts:68:13)
+
+    console.log
+      [AUDIT] WELCOME_EMAIL_SENT - User (b102056e-a8c5-4114-b288-e178e6719c1d) by b102056e-a8c5-4114-b288-e178e6719c1d
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (1443dd20-cb4a-4047-98b9-812ae7dbbbda) by 1443dd20-cb4a-4047-98b9-812ae7dbbbda
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (c3f9de32-ad99-4eee-83d3-b667b9dc3069) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [initAdminHandler] params: [Object: null prototype] {
+        academyId: 'c3f9de32-ad99-4eee-83d3-b667b9dc3069'
+      } academyId: c3f9de32-ad99-4eee-83d3-b667b9dc3069
+
+      at initAdminHandler (src/controllers/auth.ts:68:13)
+
+    console.log
+      [AUDIT] USER_CREATED - User (26a3008a-6eac-432d-91d6-96876bf547b9) by 26a3008a-6eac-432d-91d6-96876bf547b9
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by 26a3008a-6eac-432d-91d6-96876bf547b9
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (4291e4b8-75f2-433a-ac87-fc26b350e292) by 4291e4b8-75f2-433a-ac87-fc26b350e292
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [EMAIL SIMULADO] Para: prof.rbac@academia.com
+
+      at sendEmail (src/lib/email.ts:66:13)
+
+    console.log
+      [EMAIL SIMULADO] Assunto: Bem-vindo(a) ├á SCAcademia
+
+      at sendEmail (src/lib/email.ts:67:13)
+
+    console.log
+      [EMAIL SIMULADO] Conteudo: Ol├í Professor RBAC,
+      
+      Seu cadastro foi conclu├¡do com sucesso na SCAcademia.
+      Voc├¬ j├í pode acessar a plataforma com seu email e senha.
+
+      at sendEmail (src/lib/email.ts:68:13)
+
+    console.log
+      [AUDIT] WELCOME_EMAIL_SENT - User (4291e4b8-75f2-433a-ac87-fc26b350e292) by 4291e4b8-75f2-433a-ac87-fc26b350e292
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (2cd1d3bb-4fd8-4acc-9e94-13d7232f366f) by 2cd1d3bb-4fd8-4acc-9e94-13d7232f366f
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (dbf63d14-4648-4ff8-b9ff-a4d604195f43) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [initAdminHandler] params: [Object: null prototype] {
+        academyId: 'dbf63d14-4648-4ff8-b9ff-a4d604195f43'
+      } academyId: dbf63d14-4648-4ff8-b9ff-a4d604195f43
+
+      at initAdminHandler (src/controllers/auth.ts:68:13)
+
+    console.log
+      [AUDIT] USER_CREATED - User (e8a85b37-ed7e-43d4-aba5-edc55f75ae5c) by e8a85b37-ed7e-43d4-aba5-edc55f75ae5c
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by e8a85b37-ed7e-43d4-aba5-edc55f75ae5c
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (03fd97cd-b38b-473f-8476-29a203cbfcad) by 03fd97cd-b38b-473f-8476-29a203cbfcad
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [EMAIL SIMULADO] Para: prof.rbac@academia.com
+
+      at sendEmail (src/lib/email.ts:66:13)
+
+    console.log
+      [EMAIL SIMULADO] Assunto: Bem-vindo(a) ├á SCAcademia
+
+      at sendEmail (src/lib/email.ts:67:13)
+
+    console.log
+      [EMAIL SIMULADO] Conteudo: Ol├í Professor RBAC,
+      
+      Seu cadastro foi conclu├¡do com sucesso na SCAcademia.
+      Voc├¬ j├í pode acessar a plataforma com seu email e senha.
+
+      at sendEmail (src/lib/email.ts:68:13)
+
+    console.log
+      [AUDIT] WELCOME_EMAIL_SENT - User (03fd97cd-b38b-473f-8476-29a203cbfcad) by 03fd97cd-b38b-473f-8476-29a203cbfcad
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (c243bfd1-b7f8-47b0-a429-ff0251f38a80) by c243bfd1-b7f8-47b0-a429-ff0251f38a80
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (6f171e23-fa40-4d1a-8c9b-64b398d69eee) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [initAdminHandler] params: [Object: null prototype] {
+        academyId: '6f171e23-fa40-4d1a-8c9b-64b398d69eee'
+      } academyId: 6f171e23-fa40-4d1a-8c9b-64b398d69eee
+
+      at initAdminHandler (src/controllers/auth.ts:68:13)
+
+    console.log
+      [AUDIT] USER_CREATED - User (d25f61d7-77a0-44d8-a706-e0d81d6f48d6) by d25f61d7-77a0-44d8-a706-e0d81d6f48d6
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by d25f61d7-77a0-44d8-a706-e0d81d6f48d6
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (1d162cb3-0ea9-4937-9e4e-38ba38af9511) by 1d162cb3-0ea9-4937-9e4e-38ba38af9511
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [EMAIL SIMULADO] Para: prof.rbac@academia.com
+
+      at sendEmail (src/lib/email.ts:66:13)
+
+    console.log
+      [EMAIL SIMULADO] Assunto: Bem-vindo(a) ├á SCAcademia
+
+      at sendEmail (src/lib/email.ts:67:13)
+
+    console.log
+      [EMAIL SIMULADO] Conteudo: Ol├í Professor RBAC,
+      
+      Seu cadastro foi conclu├¡do com sucesso na SCAcademia.
+      Voc├¬ j├í pode acessar a plataforma com seu email e senha.
+
+      at sendEmail (src/lib/email.ts:68:13)
+
+    console.log
+      [AUDIT] WELCOME_EMAIL_SENT - User (1d162cb3-0ea9-4937-9e4e-38ba38af9511) by 1d162cb3-0ea9-4937-9e4e-38ba38af9511
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (b3fb5624-0b8d-47ed-a9ab-a7550e97c68a) by b3fb5624-0b8d-47ed-a9ab-a7550e97c68a
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (ecd46dff-f913-4034-bfa7-aec31d6f00d8) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [initAdminHandler] params: [Object: null prototype] {
+        academyId: 'ecd46dff-f913-4034-bfa7-aec31d6f00d8'
+      } academyId: ecd46dff-f913-4034-bfa7-aec31d6f00d8
+
+      at initAdminHandler (src/controllers/auth.ts:68:13)
+
+    console.log
+      [AUDIT] USER_CREATED - User (2ea24409-75db-4093-b380-b2b03eacead4) by 2ea24409-75db-4093-b380-b2b03eacead4
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by 2ea24409-75db-4093-b380-b2b03eacead4
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (5b4d0e9f-8f7d-450b-a532-ff0d818329b9) by 5b4d0e9f-8f7d-450b-a532-ff0d818329b9
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [EMAIL SIMULADO] Para: prof.rbac@academia.com
+
+      at sendEmail (src/lib/email.ts:66:13)
+
+    console.log
+      [EMAIL SIMULADO] Assunto: Bem-vindo(a) ├á SCAcademia
+
+      at sendEmail (src/lib/email.ts:67:13)
+
+    console.log
+      [EMAIL SIMULADO] Conteudo: Ol├í Professor RBAC,
+      
+      Seu cadastro foi conclu├¡do com sucesso na SCAcademia.
+      Voc├¬ j├í pode acessar a plataforma com seu email e senha.
+
+      at sendEmail (src/lib/email.ts:68:13)
+
+    console.log
+      [AUDIT] WELCOME_EMAIL_SENT - User (5b4d0e9f-8f7d-450b-a532-ff0d818329b9) by 5b4d0e9f-8f7d-450b-a532-ff0d818329b9
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (204e770e-cf32-40b6-9b8a-f0f89f3a2aa5) by 204e770e-cf32-40b6-9b8a-f0f89f3a2aa5
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (d399553d-a773-406d-8d3c-b19eb9503fa7) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [initAdminHandler] params: [Object: null prototype] {
+        academyId: 'd399553d-a773-406d-8d3c-b19eb9503fa7'
+      } academyId: d399553d-a773-406d-8d3c-b19eb9503fa7
+
+      at initAdminHandler (src/controllers/auth.ts:68:13)
+
+    console.log
+      [AUDIT] USER_CREATED - User (2ed9d966-30d1-4b19-9674-606dc64dcfd6) by 2ed9d966-30d1-4b19-9674-606dc64dcfd6
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by 2ed9d966-30d1-4b19-9674-606dc64dcfd6
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (caa5516e-67ad-40c9-9bea-e0cc2ba93da6) by caa5516e-67ad-40c9-9bea-e0cc2ba93da6
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [EMAIL SIMULADO] Para: prof.rbac@academia.com
+
+      at sendEmail (src/lib/email.ts:66:13)
+
+    console.log
+      [EMAIL SIMULADO] Assunto: Bem-vindo(a) ├á SCAcademia
+
+      at sendEmail (src/lib/email.ts:67:13)
+
+    console.log
+      [EMAIL SIMULADO] Conteudo: Ol├í Professor RBAC,
+      
+      Seu cadastro foi conclu├¡do com sucesso na SCAcademia.
+      Voc├¬ j├í pode acessar a plataforma com seu email e senha.
+
+      at sendEmail (src/lib/email.ts:68:13)
+
+    console.log
+      [AUDIT] WELCOME_EMAIL_SENT - User (caa5516e-67ad-40c9-9bea-e0cc2ba93da6) by caa5516e-67ad-40c9-9bea-e0cc2ba93da6
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (835a9b6d-2ca2-4bf7-ae42-a0e5986302ee) by 835a9b6d-2ca2-4bf7-ae42-a0e5986302ee
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+PASS src/tests/audit-lgpd.test.ts (6.852 s)
+  ÔùÅ Console
+
+    console.log
+      [dotenv@17.3.1] injecting env (7) from .env -- tip: ÔÜÖ´©Å  suppress all logs with { quiet: true }
+
+      at _log (node_modules/dotenv/lib/main.js:139:11)
+
+    console.log
+      [dotenv@17.3.1] injecting env (0) from .env -- tip: ­ƒöÉ encrypt with Dotenvx: https://dotenvx.com
+
+      at _log (node_modules/dotenv/lib/main.js:139:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (5604178e-5ae1-46a6-9aa3-caba30014f72) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [initAdminHandler] params: [Object: null prototype] {
+        academyId: '5604178e-5ae1-46a6-9aa3-caba30014f72'
+      } academyId: 5604178e-5ae1-46a6-9aa3-caba30014f72
+
+      at initAdminHandler (src/controllers/auth.ts:68:13)
+
+    console.log
+      [AUDIT] USER_CREATED - User (c596184b-6d32-4a81-b0ac-c2623f0b449d) by c596184b-6d32-4a81-b0ac-c2623f0b449d
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by c596184b-6d32-4a81-b0ac-c2623f0b449d
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (ae16df56-20b2-4c6a-b234-451f87906233) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [initAdminHandler] params: [Object: null prototype] {
+        academyId: 'ae16df56-20b2-4c6a-b234-451f87906233'
+      } academyId: ae16df56-20b2-4c6a-b234-451f87906233
+
+      at initAdminHandler (src/controllers/auth.ts:68:13)
+
+    console.log
+      [AUDIT] USER_CREATED - User (f02ff380-7233-47b3-96ec-0747830c2016) by f02ff380-7233-47b3-96ec-0747830c2016
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by f02ff380-7233-47b3-96ec-0747830c2016
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] AUDIT_LOG_VIEWED - AuditLog (ae16df56-20b2-4c6a-b234-451f87906233) by f02ff380-7233-47b3-96ec-0747830c2016
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (308a30ab-5f55-49c3-b177-590562311867) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [initAdminHandler] params: [Object: null prototype] {
+        academyId: '308a30ab-5f55-49c3-b177-590562311867'
+      } academyId: 308a30ab-5f55-49c3-b177-590562311867
+
+      at initAdminHandler (src/controllers/auth.ts:68:13)
+
+    console.log
+      [AUDIT] USER_CREATED - User (a38c6fb0-bb15-4bd9-96f0-fa1ec4b1a1ae) by a38c6fb0-bb15-4bd9-96f0-fa1ec4b1a1ae
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by a38c6fb0-bb15-4bd9-96f0-fa1ec4b1a1ae
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] AUDIT_LOG_VIEWED - AuditLog (308a30ab-5f55-49c3-b177-590562311867) by a38c6fb0-bb15-4bd9-96f0-fa1ec4b1a1ae
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (a2af4990-8724-4828-ad77-1fb729a95a69) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [initAdminHandler] params: [Object: null prototype] {
+        academyId: 'a2af4990-8724-4828-ad77-1fb729a95a69'
+      } academyId: a2af4990-8724-4828-ad77-1fb729a95a69
+
+      at initAdminHandler (src/controllers/auth.ts:68:13)
+
+    console.log
+      [AUDIT] USER_CREATED - User (90f1e637-8bff-43ee-aa8f-ae099fbf8bad) by 90f1e637-8bff-43ee-aa8f-ae099fbf8bad
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by 90f1e637-8bff-43ee-aa8f-ae099fbf8bad
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (ee1ba7cd-99f4-41ee-8d58-a5bd0a1f04e5) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [initAdminHandler] params: [Object: null prototype] {
+        academyId: 'ee1ba7cd-99f4-41ee-8d58-a5bd0a1f04e5'
+      } academyId: ee1ba7cd-99f4-41ee-8d58-a5bd0a1f04e5
+
+      at initAdminHandler (src/controllers/auth.ts:68:13)
+
+    console.log
+      [AUDIT] USER_CREATED - User (5091269b-9770-45d9-8e81-4de0cfeec360) by 5091269b-9770-45d9-8e81-4de0cfeec360
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by 5091269b-9770-45d9-8e81-4de0cfeec360
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by 5091269b-9770-45d9-8e81-4de0cfeec360
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] AUDIT_LOG_VIEWED - AuditLog (ee1ba7cd-99f4-41ee-8d58-a5bd0a1f04e5) by 5091269b-9770-45d9-8e81-4de0cfeec360
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] AUDIT_LOG_VIEWED - AuditLog (ee1ba7cd-99f4-41ee-8d58-a5bd0a1f04e5) by 5091269b-9770-45d9-8e81-4de0cfeec360
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (851a2631-5a9f-452c-bd2a-ce0c41871dff) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [initAdminHandler] params: [Object: null prototype] {
+        academyId: '851a2631-5a9f-452c-bd2a-ce0c41871dff'
+      } academyId: 851a2631-5a9f-452c-bd2a-ce0c41871dff
+
+      at initAdminHandler (src/controllers/auth.ts:68:13)
+
+    console.log
+      [AUDIT] USER_CREATED - User (5506056f-913b-4eee-9298-203cb9ed6cc4) by 5506056f-913b-4eee-9298-203cb9ed6cc4
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by 5506056f-913b-4eee-9298-203cb9ed6cc4
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] AUDIT_LOG_EXPORTED - AuditLog (851a2631-5a9f-452c-bd2a-ce0c41871dff) by 5506056f-913b-4eee-9298-203cb9ed6cc4
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (8beb0930-18b4-42e2-9377-aff6e604430a) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [initAdminHandler] params: [Object: null prototype] {
+        academyId: '8beb0930-18b4-42e2-9377-aff6e604430a'
+      } academyId: 8beb0930-18b4-42e2-9377-aff6e604430a
+
+      at initAdminHandler (src/controllers/auth.ts:68:13)
+
+    console.log
+      [AUDIT] USER_CREATED - User (716a55ee-ac44-4ba6-ba28-e050a427cbac) by 716a55ee-ac44-4ba6-ba28-e050a427cbac
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by 716a55ee-ac44-4ba6-ba28-e050a427cbac
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] AUDIT_LOG_VIEWED - AuditLog (8beb0930-18b4-42e2-9377-aff6e604430a) by 716a55ee-ac44-4ba6-ba28-e050a427cbac
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] AUDIT_LOG_VIEWED - AuditLog (8beb0930-18b4-42e2-9377-aff6e604430a) by 716a55ee-ac44-4ba6-ba28-e050a427cbac
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (ebe1ef74-e35c-4329-b907-40c26e763a30) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [initAdminHandler] params: [Object: null prototype] {
+        academyId: 'ebe1ef74-e35c-4329-b907-40c26e763a30'
+      } academyId: ebe1ef74-e35c-4329-b907-40c26e763a30
+
+      at initAdminHandler (src/controllers/auth.ts:68:13)
+
+    console.log
+      [AUDIT] USER_CREATED - User (f651eaab-8669-415b-ab69-f83e04c44ff1) by f651eaab-8669-415b-ab69-f83e04c44ff1
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by f651eaab-8669-415b-ab69-f83e04c44ff1
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] AUDIT_LOG_EXPORTED - AuditLog (ebe1ef74-e35c-4329-b907-40c26e763a30) by f651eaab-8669-415b-ab69-f83e04c44ff1
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] AUDIT_LOG_VIEWED - AuditLog (ebe1ef74-e35c-4329-b907-40c26e763a30) by f651eaab-8669-415b-ab69-f83e04c44ff1
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+PASS src/tests/training-entry-point.test.ts (6.347 s)
+  ÔùÅ Console
+
+    console.log
+      [dotenv@17.3.1] injecting env (7) from .env -- tip: ­ƒøá´©Å  run anywhere with `dotenvx run -- yourcommand`
+
+      at _log (node_modules/dotenv/lib/main.js:139:11)
+
+    console.log
+      [dotenv@17.3.1] injecting env (0) from .env -- tip: ­ƒöÉ prevent building .env in docker: https://dotenvx.com/prebuild
+
+      at _log (node_modules/dotenv/lib/main.js:139:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (838fd4fa-bff3-4440-b2e9-62cd6f3549bb) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [initAdminHandler] params: [Object: null prototype] {
+        academyId: '838fd4fa-bff3-4440-b2e9-62cd6f3549bb'
+      } academyId: 838fd4fa-bff3-4440-b2e9-62cd6f3549bb
+
+      at initAdminHandler (src/controllers/auth.ts:68:13)
+
+    console.log
+      [AUDIT] USER_CREATED - User (af301ca0-4520-4226-b65e-ff595978ffde) by af301ca0-4520-4226-b65e-ff595978ffde
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by af301ca0-4520-4226-b65e-ff595978ffde
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (fb30901f-64a8-43fd-b0ea-5feea99dece8) by fb30901f-64a8-43fd-b0ea-5feea99dece8
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [EMAIL SIMULADO] Para: prof.treino31@academia.com
+
+      at sendEmail (src/lib/email.ts:66:13)
+
+    console.log
+      [EMAIL SIMULADO] Assunto: Bem-vindo(a) ├á SCAcademia
+
+      at sendEmail (src/lib/email.ts:67:13)
+
+    console.log
+      [EMAIL SIMULADO] Conteudo: Ol├í Professor Treino Story,
+      
+      Seu cadastro foi conclu├¡do com sucesso na SCAcademia.
+      Voc├¬ j├í pode acessar a plataforma com seu email e senha.
+
+      at sendEmail (src/lib/email.ts:68:13)
+
+    console.log
+      [AUDIT] WELCOME_EMAIL_SENT - User (fb30901f-64a8-43fd-b0ea-5feea99dece8) by fb30901f-64a8-43fd-b0ea-5feea99dece8
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] TRAINING_ENTRYPOINT_VIEWED - TrainingEntryPoint (838fd4fa-bff3-4440-b2e9-62cd6f3549bb) by fb30901f-64a8-43fd-b0ea-5feea99dece8
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (48a41b04-e5c7-47d5-8f74-448153198107) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [initAdminHandler] params: [Object: null prototype] {
+        academyId: '48a41b04-e5c7-47d5-8f74-448153198107'
+      } academyId: 48a41b04-e5c7-47d5-8f74-448153198107
+
+      at initAdminHandler (src/controllers/auth.ts:68:13)
+
+    console.log
+      [AUDIT] USER_CREATED - User (4b478272-1296-4bf3-8518-f013454e79ff) by 4b478272-1296-4bf3-8518-f013454e79ff
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by 4b478272-1296-4bf3-8518-f013454e79ff
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (51cdd066-5cdd-40df-a18e-2badae447f22) by 51cdd066-5cdd-40df-a18e-2badae447f22
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [EMAIL SIMULADO] Para: prof.treino31@academia.com
+
+      at sendEmail (src/lib/email.ts:66:13)
+
+    console.log
+      [EMAIL SIMULADO] Assunto: Bem-vindo(a) ├á SCAcademia
+
+      at sendEmail (src/lib/email.ts:67:13)
+
+    console.log
+      [EMAIL SIMULADO] Conteudo: Ol├í Professor Treino Story,
+      
+      Seu cadastro foi conclu├¡do com sucesso na SCAcademia.
+      Voc├¬ j├í pode acessar a plataforma com seu email e senha.
+
+      at sendEmail (src/lib/email.ts:68:13)
+
+    console.log
+      [AUDIT] WELCOME_EMAIL_SENT - User (51cdd066-5cdd-40df-a18e-2badae447f22) by 51cdd066-5cdd-40df-a18e-2badae447f22
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] TRAINING_ENTRYPOINT_VIEWED - TrainingEntryPoint (f6b4e3ee-346b-4563-abb4-425318a41c40) by 51cdd066-5cdd-40df-a18e-2badae447f22
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (7d359d0a-c005-430f-a841-566505dd6d74) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [initAdminHandler] params: [Object: null prototype] {
+        academyId: '7d359d0a-c005-430f-a841-566505dd6d74'
+      } academyId: 7d359d0a-c005-430f-a841-566505dd6d74
+
+      at initAdminHandler (src/controllers/auth.ts:68:13)
+
+    console.log
+      [AUDIT] USER_CREATED - User (4411397e-4292-4f22-ba7f-bdd5804fee1e) by 4411397e-4292-4f22-ba7f-bdd5804fee1e
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by 4411397e-4292-4f22-ba7f-bdd5804fee1e
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (3bb65a13-db35-4551-97d0-4e620014a0f3) by 3bb65a13-db35-4551-97d0-4e620014a0f3
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [EMAIL SIMULADO] Para: prof.treino31@academia.com
+
+      at sendEmail (src/lib/email.ts:66:13)
+
+    console.log
+      [EMAIL SIMULADO] Assunto: Bem-vindo(a) ├á SCAcademia
+
+      at sendEmail (src/lib/email.ts:67:13)
+
+    console.log
+      [EMAIL SIMULADO] Conteudo: Ol├í Professor Treino Story,
+      
+      Seu cadastro foi conclu├¡do com sucesso na SCAcademia.
+      Voc├¬ j├í pode acessar a plataforma com seu email e senha.
+
+      at sendEmail (src/lib/email.ts:68:13)
+
+    console.log
+      [AUDIT] WELCOME_EMAIL_SENT - User (3bb65a13-db35-4551-97d0-4e620014a0f3) by 3bb65a13-db35-4551-97d0-4e620014a0f3
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (7c6b65d4-3f57-44d3-8f4e-f32cdeb3c69a) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [initAdminHandler] params: [Object: null prototype] {
+        academyId: '7c6b65d4-3f57-44d3-8f4e-f32cdeb3c69a'
+      } academyId: 7c6b65d4-3f57-44d3-8f4e-f32cdeb3c69a
+
+      at initAdminHandler (src/controllers/auth.ts:68:13)
+
+    console.log
+      [AUDIT] USER_CREATED - User (d1841ab3-a45f-4cc9-bee5-ce6c855d79d8) by d1841ab3-a45f-4cc9-bee5-ce6c855d79d8
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by d1841ab3-a45f-4cc9-bee5-ce6c855d79d8
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (ad913a48-1785-49ae-a56b-61b3f8eb6663) by ad913a48-1785-49ae-a56b-61b3f8eb6663
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [EMAIL SIMULADO] Para: prof.treino31@academia.com
+
+      at sendEmail (src/lib/email.ts:66:13)
+
+    console.log
+      [EMAIL SIMULADO] Assunto: Bem-vindo(a) ├á SCAcademia
+
+      at sendEmail (src/lib/email.ts:67:13)
+
+    console.log
+      [EMAIL SIMULADO] Conteudo: Ol├í Professor Treino Story,
+      
+      Seu cadastro foi conclu├¡do com sucesso na SCAcademia.
+      Voc├¬ j├í pode acessar a plataforma com seu email e senha.
+
+      at sendEmail (src/lib/email.ts:68:13)
+
+    console.log
+      [AUDIT] WELCOME_EMAIL_SENT - User (ad913a48-1785-49ae-a56b-61b3f8eb6663) by ad913a48-1785-49ae-a56b-61b3f8eb6663
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (44c39caf-a647-42d4-ab95-4d1a60ed5bf7) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [initAdminHandler] params: [Object: null prototype] {
+        academyId: '44c39caf-a647-42d4-ab95-4d1a60ed5bf7'
+      } academyId: 44c39caf-a647-42d4-ab95-4d1a60ed5bf7
+
+      at initAdminHandler (src/controllers/auth.ts:68:13)
+
+    console.log
+      [AUDIT] USER_CREATED - User (55aab1bc-3061-4e64-9f7d-f6480698b3a6) by 55aab1bc-3061-4e64-9f7d-f6480698b3a6
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by 55aab1bc-3061-4e64-9f7d-f6480698b3a6
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (213d13b8-100f-4f75-827b-c1c090944304) by 213d13b8-100f-4f75-827b-c1c090944304
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [EMAIL SIMULADO] Para: prof.treino31@academia.com
+
+      at sendEmail (src/lib/email.ts:66:13)
+
+    console.log
+      [EMAIL SIMULADO] Assunto: Bem-vindo(a) ├á SCAcademia
+
+      at sendEmail (src/lib/email.ts:67:13)
+
+    console.log
+      [EMAIL SIMULADO] Conteudo: Ol├í Professor Treino Story,
+      
+      Seu cadastro foi conclu├¡do com sucesso na SCAcademia.
+      Voc├¬ j├í pode acessar a plataforma com seu email e senha.
+
+      at sendEmail (src/lib/email.ts:68:13)
+
+    console.log
+      [AUDIT] WELCOME_EMAIL_SENT - User (213d13b8-100f-4f75-827b-c1c090944304) by 213d13b8-100f-4f75-827b-c1c090944304
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] TRAINING_SESSION_STARTED - TrainingSession (61b40bd5-864a-40ba-9c95-2437e82d2e4f) by 213d13b8-100f-4f75-827b-c1c090944304
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] TRAINING_SESSION_STARTED - TrainingSession (61b40bd5-864a-40ba-9c95-2437e82d2e4f) by 213d13b8-100f-4f75-827b-c1c090944304
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (b9de998a-3d4c-4703-9010-61b063a30f3e) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [initAdminHandler] params: [Object: null prototype] {
+        academyId: 'b9de998a-3d4c-4703-9010-61b063a30f3e'
+      } academyId: b9de998a-3d4c-4703-9010-61b063a30f3e
+
+      at initAdminHandler (src/controllers/auth.ts:68:13)
+
+    console.log
+      [AUDIT] USER_CREATED - User (09dbb696-92bf-4f62-a961-6753c0168412) by 09dbb696-92bf-4f62-a961-6753c0168412
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by 09dbb696-92bf-4f62-a961-6753c0168412
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (3c32eaf0-f71d-4a1b-a200-2e61aee671a1) by 3c32eaf0-f71d-4a1b-a200-2e61aee671a1
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [EMAIL SIMULADO] Para: prof.treino31@academia.com
+
+      at sendEmail (src/lib/email.ts:66:13)
+
+    console.log
+      [EMAIL SIMULADO] Assunto: Bem-vindo(a) ├á SCAcademia
+
+      at sendEmail (src/lib/email.ts:67:13)
+
+    console.log
+      [EMAIL SIMULADO] Conteudo: Ol├í Professor Treino Story,
+      
+      Seu cadastro foi conclu├¡do com sucesso na SCAcademia.
+      Voc├¬ j├í pode acessar a plataforma com seu email e senha.
+
+      at sendEmail (src/lib/email.ts:68:13)
+
+    console.log
+      [AUDIT] WELCOME_EMAIL_SENT - User (3c32eaf0-f71d-4a1b-a200-2e61aee671a1) by 3c32eaf0-f71d-4a1b-a200-2e61aee671a1
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] TRAINING_SESSION_STARTED - TrainingSession (52f17925-0337-45ca-b472-7c82a7cade80) by 3c32eaf0-f71d-4a1b-a200-2e61aee671a1
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] TRAINING_SESSION_STARTED - TrainingSession (52f17925-0337-45ca-b472-7c82a7cade80) by 3c32eaf0-f71d-4a1b-a200-2e61aee671a1
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (6bb570e5-c25a-4a51-8494-fd1e4566cc2d) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [initAdminHandler] params: [Object: null prototype] {
+        academyId: '6bb570e5-c25a-4a51-8494-fd1e4566cc2d'
+      } academyId: 6bb570e5-c25a-4a51-8494-fd1e4566cc2d
+
+      at initAdminHandler (src/controllers/auth.ts:68:13)
+
+    console.log
+      [AUDIT] USER_CREATED - User (a41b89a9-a6dd-4a8f-871f-5b23202078de) by a41b89a9-a6dd-4a8f-871f-5b23202078de
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by a41b89a9-a6dd-4a8f-871f-5b23202078de
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (13fe75cc-996f-4046-80b6-d5ba652565a3) by 13fe75cc-996f-4046-80b6-d5ba652565a3
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [EMAIL SIMULADO] Para: prof.treino31@academia.com
+
+      at sendEmail (src/lib/email.ts:66:13)
+
+    console.log
+      [EMAIL SIMULADO] Assunto: Bem-vindo(a) ├á SCAcademia
+
+      at sendEmail (src/lib/email.ts:67:13)
+
+    console.log
+      [EMAIL SIMULADO] Conteudo: Ol├í Professor Treino Story,
+      
+      Seu cadastro foi conclu├¡do com sucesso na SCAcademia.
+      Voc├¬ j├í pode acessar a plataforma com seu email e senha.
+
+      at sendEmail (src/lib/email.ts:68:13)
+
+    console.log
+      [AUDIT] WELCOME_EMAIL_SENT - User (13fe75cc-996f-4046-80b6-d5ba652565a3) by 13fe75cc-996f-4046-80b6-d5ba652565a3
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (15c4dd1d-e3bf-4e7d-b441-b09012f1d6d8) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [initAdminHandler] params: [Object: null prototype] {
+        academyId: '15c4dd1d-e3bf-4e7d-b441-b09012f1d6d8'
+      } academyId: 15c4dd1d-e3bf-4e7d-b441-b09012f1d6d8
+
+      at initAdminHandler (src/controllers/auth.ts:68:13)
+
+    console.log
+      [AUDIT] USER_CREATED - User (f8ae3dae-a490-43e0-a823-fae7b02c430d) by f8ae3dae-a490-43e0-a823-fae7b02c430d
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by f8ae3dae-a490-43e0-a823-fae7b02c430d
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (fb5d8e7a-d067-427c-8fd0-65d9d73380ab) by fb5d8e7a-d067-427c-8fd0-65d9d73380ab
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [EMAIL SIMULADO] Para: prof.treino31@academia.com
+
+      at sendEmail (src/lib/email.ts:66:13)
+
+    console.log
+      [EMAIL SIMULADO] Assunto: Bem-vindo(a) ├á SCAcademia
+
+      at sendEmail (src/lib/email.ts:67:13)
+
+    console.log
+      [EMAIL SIMULADO] Conteudo: Ol├í Professor Treino Story,
+      
+      Seu cadastro foi conclu├¡do com sucesso na SCAcademia.
+      Voc├¬ j├í pode acessar a plataforma com seu email e senha.
+
+      at sendEmail (src/lib/email.ts:68:13)
+
+    console.log
+      [AUDIT] WELCOME_EMAIL_SENT - User (fb5d8e7a-d067-427c-8fd0-65d9d73380ab) by fb5d8e7a-d067-427c-8fd0-65d9d73380ab
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+PASS src/tests/training-attendance.test.ts (6.901 s)
+  ÔùÅ Console
+
+    console.log
+      [dotenv@17.3.1] injecting env (7) from .env -- tip: ÔÜí´©Å secrets for agents: https://dotenvx.com/as2
+
+      at _log (node_modules/dotenv/lib/main.js:139:11)
+
+    console.log
+      [dotenv@17.3.1] injecting env (0) from .env -- tip: ÔÜí´©Å secrets for agents: https://dotenvx.com/as2
+
+      at _log (node_modules/dotenv/lib/main.js:139:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (294abc6d-9ec6-4659-b421-f4642bf3fea7) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [initAdminHandler] params: [Object: null prototype] {
+        academyId: '294abc6d-9ec6-4659-b421-f4642bf3fea7'
+      } academyId: 294abc6d-9ec6-4659-b421-f4642bf3fea7
+
+      at initAdminHandler (src/controllers/auth.ts:68:13)
+
+    console.log
+      [AUDIT] USER_CREATED - User (6b6440b2-d0c8-4350-a5f9-6db429545226) by 6b6440b2-d0c8-4350-a5f9-6db429545226
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by 6b6440b2-d0c8-4350-a5f9-6db429545226
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (eee5b4ad-758e-43f7-aad9-a7e69112bada) by eee5b4ad-758e-43f7-aad9-a7e69112bada
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [EMAIL SIMULADO] Para: prof.frequencia@academia.com
+
+      at sendEmail (src/lib/email.ts:66:13)
+
+    console.log
+      [EMAIL SIMULADO] Assunto: Bem-vindo(a) ├á SCAcademia
+
+      at sendEmail (src/lib/email.ts:67:13)
+
+    console.log
+      [EMAIL SIMULADO] Conteudo: Ol├í Professor Frequ├¬ncia,
+      
+      Seu cadastro foi conclu├¡do com sucesso na SCAcademia.
+      Voc├¬ j├í pode acessar a plataforma com seu email e senha.
+
+      at sendEmail (src/lib/email.ts:68:13)
+
+    console.log
+      [AUDIT] WELCOME_EMAIL_SENT - User (eee5b4ad-758e-43f7-aad9-a7e69112bada) by eee5b4ad-758e-43f7-aad9-a7e69112bada
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (1f2cacce-0bf5-4fd8-adde-9bb579f38f54) by 1f2cacce-0bf5-4fd8-adde-9bb579f38f54
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [EMAIL SIMULADO] Para: prof2.frequencia@academia.com
+
+      at sendEmail (src/lib/email.ts:66:13)
+
+    console.log
+      [EMAIL SIMULADO] Assunto: Bem-vindo(a) ├á SCAcademia
+
+      at sendEmail (src/lib/email.ts:67:13)
+
+    console.log
+      [EMAIL SIMULADO] Conteudo: Ol├í Professor Frequ├¬ncia 2,
+      
+      Seu cadastro foi conclu├¡do com sucesso na SCAcademia.
+      Voc├¬ j├í pode acessar a plataforma com seu email e senha.
+
+      at sendEmail (src/lib/email.ts:68:13)
+
+    console.log
+      [AUDIT] WELCOME_EMAIL_SENT - User (1f2cacce-0bf5-4fd8-adde-9bb579f38f54) by 1f2cacce-0bf5-4fd8-adde-9bb579f38f54
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] TRAINING_SESSION_STARTED - TrainingSession (915f5c09-fcaf-4479-b757-7b6ab2ff91e5) by eee5b4ad-758e-43f7-aad9-a7e69112bada
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] TRAINING_ATTENDANCE_VIEWED - TrainingAttendance (915f5c09-fcaf-4479-b757-7b6ab2ff91e5) by eee5b4ad-758e-43f7-aad9-a7e69112bada
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (6794da85-a0e3-4867-92b0-3971e58dd364) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [initAdminHandler] params: [Object: null prototype] {
+        academyId: '6794da85-a0e3-4867-92b0-3971e58dd364'
+      } academyId: 6794da85-a0e3-4867-92b0-3971e58dd364
+
+      at initAdminHandler (src/controllers/auth.ts:68:13)
+
+    console.log
+      [AUDIT] USER_CREATED - User (c631dcd5-c6ad-434a-8f59-33767c313d5b) by c631dcd5-c6ad-434a-8f59-33767c313d5b
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by c631dcd5-c6ad-434a-8f59-33767c313d5b
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (324ee13c-c998-44b1-bfc4-745d18ba8e9b) by 324ee13c-c998-44b1-bfc4-745d18ba8e9b
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [EMAIL SIMULADO] Para: prof.frequencia@academia.com
+
+      at sendEmail (src/lib/email.ts:66:13)
+
+    console.log
+      [EMAIL SIMULADO] Assunto: Bem-vindo(a) ├á SCAcademia
+
+      at sendEmail (src/lib/email.ts:67:13)
+
+    console.log
+      [EMAIL SIMULADO] Conteudo: Ol├í Professor Frequ├¬ncia,
+      
+      Seu cadastro foi conclu├¡do com sucesso na SCAcademia.
+      Voc├¬ j├í pode acessar a plataforma com seu email e senha.
+
+      at sendEmail (src/lib/email.ts:68:13)
+
+    console.log
+      [AUDIT] WELCOME_EMAIL_SENT - User (324ee13c-c998-44b1-bfc4-745d18ba8e9b) by 324ee13c-c998-44b1-bfc4-745d18ba8e9b
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (56f62cf0-793c-4dde-a9ee-160bd5aaf0d1) by 56f62cf0-793c-4dde-a9ee-160bd5aaf0d1
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [EMAIL SIMULADO] Para: prof2.frequencia@academia.com
+
+      at sendEmail (src/lib/email.ts:66:13)
+
+    console.log
+      [EMAIL SIMULADO] Assunto: Bem-vindo(a) ├á SCAcademia
+
+      at sendEmail (src/lib/email.ts:67:13)
+
+    console.log
+      [EMAIL SIMULADO] Conteudo: Ol├í Professor Frequ├¬ncia 2,
+      
+      Seu cadastro foi conclu├¡do com sucesso na SCAcademia.
+      Voc├¬ j├í pode acessar a plataforma com seu email e senha.
+
+      at sendEmail (src/lib/email.ts:68:13)
+
+    console.log
+      [AUDIT] WELCOME_EMAIL_SENT - User (56f62cf0-793c-4dde-a9ee-160bd5aaf0d1) by 56f62cf0-793c-4dde-a9ee-160bd5aaf0d1
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] TRAINING_SESSION_STARTED - TrainingSession (5292180b-e5f5-4d47-be36-6a13a01d0059) by 324ee13c-c998-44b1-bfc4-745d18ba8e9b
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] TRAINING_ATTENDANCE_MARKED - TrainingAttendance (5292180b-e5f5-4d47-be36-6a13a01d0059) by 324ee13c-c998-44b1-bfc4-745d18ba8e9b
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] TRAINING_ATTENDANCE_VIEWED - TrainingAttendance (5292180b-e5f5-4d47-be36-6a13a01d0059) by 324ee13c-c998-44b1-bfc4-745d18ba8e9b
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (34937e19-23c3-4aea-a1ee-14049bd7654d) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [initAdminHandler] params: [Object: null prototype] {
+        academyId: '34937e19-23c3-4aea-a1ee-14049bd7654d'
+      } academyId: 34937e19-23c3-4aea-a1ee-14049bd7654d
+
+      at initAdminHandler (src/controllers/auth.ts:68:13)
+
+    console.log
+      [AUDIT] USER_CREATED - User (b7c80ddc-34de-4d02-80ae-40bec6c3858f) by b7c80ddc-34de-4d02-80ae-40bec6c3858f
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by b7c80ddc-34de-4d02-80ae-40bec6c3858f
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (9f8d1797-ef7b-4da2-9b4f-1ed866901003) by 9f8d1797-ef7b-4da2-9b4f-1ed866901003
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [EMAIL SIMULADO] Para: prof.frequencia@academia.com
+
+      at sendEmail (src/lib/email.ts:66:13)
+
+    console.log
+      [EMAIL SIMULADO] Assunto: Bem-vindo(a) ├á SCAcademia
+
+      at sendEmail (src/lib/email.ts:67:13)
+
+    console.log
+      [EMAIL SIMULADO] Conteudo: Ol├í Professor Frequ├¬ncia,
+      
+      Seu cadastro foi conclu├¡do com sucesso na SCAcademia.
+      Voc├¬ j├í pode acessar a plataforma com seu email e senha.
+
+      at sendEmail (src/lib/email.ts:68:13)
+
+    console.log
+      [AUDIT] WELCOME_EMAIL_SENT - User (9f8d1797-ef7b-4da2-9b4f-1ed866901003) by 9f8d1797-ef7b-4da2-9b4f-1ed866901003
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (a24331f9-26f3-4fc1-8b53-7a20f713ffef) by a24331f9-26f3-4fc1-8b53-7a20f713ffef
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [EMAIL SIMULADO] Para: prof2.frequencia@academia.com
+
+      at sendEmail (src/lib/email.ts:66:13)
+
+    console.log
+      [EMAIL SIMULADO] Assunto: Bem-vindo(a) ├á SCAcademia
+
+      at sendEmail (src/lib/email.ts:67:13)
+
+    console.log
+      [EMAIL SIMULADO] Conteudo: Ol├í Professor Frequ├¬ncia 2,
+      
+      Seu cadastro foi conclu├¡do com sucesso na SCAcademia.
+      Voc├¬ j├í pode acessar a plataforma com seu email e senha.
+
+      at sendEmail (src/lib/email.ts:68:13)
+
+    console.log
+      [AUDIT] WELCOME_EMAIL_SENT - User (a24331f9-26f3-4fc1-8b53-7a20f713ffef) by a24331f9-26f3-4fc1-8b53-7a20f713ffef
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] TRAINING_SESSION_STARTED - TrainingSession (78beb917-a4aa-47d0-bce2-cfa980a14e08) by 9f8d1797-ef7b-4da2-9b4f-1ed866901003
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] TRAINING_ATTENDANCE_MARKED - TrainingAttendance (78beb917-a4aa-47d0-bce2-cfa980a14e08) by 9f8d1797-ef7b-4da2-9b4f-1ed866901003
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] TRAINING_ATTENDANCE_MARKED - TrainingAttendance (78beb917-a4aa-47d0-bce2-cfa980a14e08) by 9f8d1797-ef7b-4da2-9b4f-1ed866901003
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (6b2301b7-b86e-4f73-a9bb-a65b38dde0d7) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [initAdminHandler] params: [Object: null prototype] {
+        academyId: '6b2301b7-b86e-4f73-a9bb-a65b38dde0d7'
+      } academyId: 6b2301b7-b86e-4f73-a9bb-a65b38dde0d7
+
+      at initAdminHandler (src/controllers/auth.ts:68:13)
+
+    console.log
+      [AUDIT] USER_CREATED - User (1c413c8b-7f57-4682-91d9-6d6d401cb94e) by 1c413c8b-7f57-4682-91d9-6d6d401cb94e
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by 1c413c8b-7f57-4682-91d9-6d6d401cb94e
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (61bc52f8-3766-4272-bde3-cd3720338f01) by 61bc52f8-3766-4272-bde3-cd3720338f01
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [EMAIL SIMULADO] Para: prof.frequencia@academia.com
+
+      at sendEmail (src/lib/email.ts:66:13)
+
+    console.log
+      [EMAIL SIMULADO] Assunto: Bem-vindo(a) ├á SCAcademia
+
+      at sendEmail (src/lib/email.ts:67:13)
+
+    console.log
+      [EMAIL SIMULADO] Conteudo: Ol├í Professor Frequ├¬ncia,
+      
+      Seu cadastro foi conclu├¡do com sucesso na SCAcademia.
+      Voc├¬ j├í pode acessar a plataforma com seu email e senha.
+
+      at sendEmail (src/lib/email.ts:68:13)
+
+    console.log
+      [AUDIT] WELCOME_EMAIL_SENT - User (61bc52f8-3766-4272-bde3-cd3720338f01) by 61bc52f8-3766-4272-bde3-cd3720338f01
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (b49cbbc8-2853-4ddb-9284-d576ba5d4600) by b49cbbc8-2853-4ddb-9284-d576ba5d4600
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [EMAIL SIMULADO] Para: prof2.frequencia@academia.com
+
+      at sendEmail (src/lib/email.ts:66:13)
+
+    console.log
+      [EMAIL SIMULADO] Assunto: Bem-vindo(a) ├á SCAcademia
+
+      at sendEmail (src/lib/email.ts:67:13)
+
+    console.log
+      [EMAIL SIMULADO] Conteudo: Ol├í Professor Frequ├¬ncia 2,
+      
+      Seu cadastro foi conclu├¡do com sucesso na SCAcademia.
+      Voc├¬ j├í pode acessar a plataforma com seu email e senha.
+
+      at sendEmail (src/lib/email.ts:68:13)
+
+    console.log
+      [AUDIT] WELCOME_EMAIL_SENT - User (b49cbbc8-2853-4ddb-9284-d576ba5d4600) by b49cbbc8-2853-4ddb-9284-d576ba5d4600
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] TRAINING_SESSION_STARTED - TrainingSession (90b6a125-2b71-49a5-8080-4be706749026) by 61bc52f8-3766-4272-bde3-cd3720338f01
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] TRAINING_ATTENDANCE_MARKED - TrainingAttendance (90b6a125-2b71-49a5-8080-4be706749026) by 61bc52f8-3766-4272-bde3-cd3720338f01
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] TRAINING_ATTENDANCE_VIEWED - TrainingAttendance (90b6a125-2b71-49a5-8080-4be706749026) by 61bc52f8-3766-4272-bde3-cd3720338f01
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (09e6b6e8-95a9-4a0e-b0d8-40ae33d51762) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [initAdminHandler] params: [Object: null prototype] {
+        academyId: '09e6b6e8-95a9-4a0e-b0d8-40ae33d51762'
+      } academyId: 09e6b6e8-95a9-4a0e-b0d8-40ae33d51762
+
+      at initAdminHandler (src/controllers/auth.ts:68:13)
+
+    console.log
+      [AUDIT] USER_CREATED - User (89da4424-6aec-4d5f-ade1-5b1ea434f8a5) by 89da4424-6aec-4d5f-ade1-5b1ea434f8a5
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by 89da4424-6aec-4d5f-ade1-5b1ea434f8a5
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (b1f4ecdb-1319-49f9-9c51-459e014ed52d) by b1f4ecdb-1319-49f9-9c51-459e014ed52d
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [EMAIL SIMULADO] Para: prof.frequencia@academia.com
+
+      at sendEmail (src/lib/email.ts:66:13)
+
+    console.log
+      [EMAIL SIMULADO] Assunto: Bem-vindo(a) ├á SCAcademia
+
+      at sendEmail (src/lib/email.ts:67:13)
+
+    console.log
+      [EMAIL SIMULADO] Conteudo: Ol├í Professor Frequ├¬ncia,
+      
+      Seu cadastro foi conclu├¡do com sucesso na SCAcademia.
+      Voc├¬ j├í pode acessar a plataforma com seu email e senha.
+
+      at sendEmail (src/lib/email.ts:68:13)
+
+    console.log
+      [AUDIT] WELCOME_EMAIL_SENT - User (b1f4ecdb-1319-49f9-9c51-459e014ed52d) by b1f4ecdb-1319-49f9-9c51-459e014ed52d
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (78dfcbc6-bfbc-4fe1-9b7d-d82a4bb39992) by 78dfcbc6-bfbc-4fe1-9b7d-d82a4bb39992
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [EMAIL SIMULADO] Para: prof2.frequencia@academia.com
+
+      at sendEmail (src/lib/email.ts:66:13)
+
+    console.log
+      [EMAIL SIMULADO] Assunto: Bem-vindo(a) ├á SCAcademia
+
+      at sendEmail (src/lib/email.ts:67:13)
+
+    console.log
+      [EMAIL SIMULADO] Conteudo: Ol├í Professor Frequ├¬ncia 2,
+      
+      Seu cadastro foi conclu├¡do com sucesso na SCAcademia.
+      Voc├¬ j├í pode acessar a plataforma com seu email e senha.
+
+      at sendEmail (src/lib/email.ts:68:13)
+
+    console.log
+      [AUDIT] WELCOME_EMAIL_SENT - User (78dfcbc6-bfbc-4fe1-9b7d-d82a4bb39992) by 78dfcbc6-bfbc-4fe1-9b7d-d82a4bb39992
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] TRAINING_SESSION_STARTED - TrainingSession (f3760fd5-4380-46b7-a6b3-02f3cabc407c) by b1f4ecdb-1319-49f9-9c51-459e014ed52d
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (3fca2a12-c1c6-411b-b010-467c5a32aacf) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [initAdminHandler] params: [Object: null prototype] {
+        academyId: '3fca2a12-c1c6-411b-b010-467c5a32aacf'
+      } academyId: 3fca2a12-c1c6-411b-b010-467c5a32aacf
+
+      at initAdminHandler (src/controllers/auth.ts:68:13)
+
+    console.log
+      [AUDIT] USER_CREATED - User (11a46aca-c1c9-4d04-8da6-bf69fd08d4e6) by 11a46aca-c1c9-4d04-8da6-bf69fd08d4e6
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by 11a46aca-c1c9-4d04-8da6-bf69fd08d4e6
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (6c67add4-0e3f-42a0-b224-6d089aff3c80) by 6c67add4-0e3f-42a0-b224-6d089aff3c80
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [EMAIL SIMULADO] Para: prof.frequencia@academia.com
+
+      at sendEmail (src/lib/email.ts:66:13)
+
+    console.log
+      [EMAIL SIMULADO] Assunto: Bem-vindo(a) ├á SCAcademia
+
+      at sendEmail (src/lib/email.ts:67:13)
+
+    console.log
+      [EMAIL SIMULADO] Conteudo: Ol├í Professor Frequ├¬ncia,
+      
+      Seu cadastro foi conclu├¡do com sucesso na SCAcademia.
+      Voc├¬ j├í pode acessar a plataforma com seu email e senha.
+
+      at sendEmail (src/lib/email.ts:68:13)
+
+    console.log
+      [AUDIT] WELCOME_EMAIL_SENT - User (6c67add4-0e3f-42a0-b224-6d089aff3c80) by 6c67add4-0e3f-42a0-b224-6d089aff3c80
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (b0855554-bb38-4573-aae0-ca4a48b6309c) by b0855554-bb38-4573-aae0-ca4a48b6309c
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [EMAIL SIMULADO] Para: prof2.frequencia@academia.com
+
+      at sendEmail (src/lib/email.ts:66:13)
+
+    console.log
+      [EMAIL SIMULADO] Assunto: Bem-vindo(a) ├á SCAcademia
+
+      at sendEmail (src/lib/email.ts:67:13)
+
+    console.log
+      [EMAIL SIMULADO] Conteudo: Ol├í Professor Frequ├¬ncia 2,
+      
+      Seu cadastro foi conclu├¡do com sucesso na SCAcademia.
+      Voc├¬ j├í pode acessar a plataforma com seu email e senha.
+
+      at sendEmail (src/lib/email.ts:68:13)
+
+    console.log
+      [AUDIT] WELCOME_EMAIL_SENT - User (b0855554-bb38-4573-aae0-ca4a48b6309c) by b0855554-bb38-4573-aae0-ca4a48b6309c
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] TRAINING_SESSION_STARTED - TrainingSession (1926ceab-dd57-4551-8613-2e00378ed69e) by 6c67add4-0e3f-42a0-b224-6d089aff3c80
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (6b9c6de9-21a7-4647-b6ff-bf89d213457b) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [initAdminHandler] params: [Object: null prototype] {
+        academyId: '6b9c6de9-21a7-4647-b6ff-bf89d213457b'
+      } academyId: 6b9c6de9-21a7-4647-b6ff-bf89d213457b
+
+      at initAdminHandler (src/controllers/auth.ts:68:13)
+
+    console.log
+      [AUDIT] USER_CREATED - User (0de73a71-6950-4662-8c63-8b177708f485) by 0de73a71-6950-4662-8c63-8b177708f485
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by 0de73a71-6950-4662-8c63-8b177708f485
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (901ac015-0380-47e3-b665-5043fb42290c) by 901ac015-0380-47e3-b665-5043fb42290c
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [EMAIL SIMULADO] Para: prof.frequencia@academia.com
+
+      at sendEmail (src/lib/email.ts:66:13)
+
+    console.log
+      [EMAIL SIMULADO] Assunto: Bem-vindo(a) ├á SCAcademia
+
+      at sendEmail (src/lib/email.ts:67:13)
+
+    console.log
+      [EMAIL SIMULADO] Conteudo: Ol├í Professor Frequ├¬ncia,
+      
+      Seu cadastro foi conclu├¡do com sucesso na SCAcademia.
+      Voc├¬ j├í pode acessar a plataforma com seu email e senha.
+
+      at sendEmail (src/lib/email.ts:68:13)
+
+    console.log
+      [AUDIT] WELCOME_EMAIL_SENT - User (901ac015-0380-47e3-b665-5043fb42290c) by 901ac015-0380-47e3-b665-5043fb42290c
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (fad36c80-4feb-49b2-a6f0-b73109a50900) by fad36c80-4feb-49b2-a6f0-b73109a50900
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [EMAIL SIMULADO] Para: prof2.frequencia@academia.com
+
+      at sendEmail (src/lib/email.ts:66:13)
+
+    console.log
+      [EMAIL SIMULADO] Assunto: Bem-vindo(a) ├á SCAcademia
+
+      at sendEmail (src/lib/email.ts:67:13)
+
+    console.log
+      [EMAIL SIMULADO] Conteudo: Ol├í Professor Frequ├¬ncia 2,
+      
+      Seu cadastro foi conclu├¡do com sucesso na SCAcademia.
+      Voc├¬ j├í pode acessar a plataforma com seu email e senha.
+
+      at sendEmail (src/lib/email.ts:68:13)
+
+    console.log
+      [AUDIT] WELCOME_EMAIL_SENT - User (fad36c80-4feb-49b2-a6f0-b73109a50900) by fad36c80-4feb-49b2-a6f0-b73109a50900
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] TRAINING_SESSION_STARTED - TrainingSession (446a407c-d646-4707-af89-52a4f3b5c7d4) by 901ac015-0380-47e3-b665-5043fb42290c
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+PASS src/tests/auth-login.test.ts (9.267 s)
+  ÔùÅ Console
+
+    console.log
+      [dotenv@17.3.1] injecting env (7) from .env -- tip: ÔÜí´©Å secrets for agents: https://dotenvx.com/as2
+
+      at _log (node_modules/dotenv/lib/main.js:139:11)
+
+    console.log
+      [dotenv@17.3.1] injecting env (0) from .env -- tip: ­ƒöÉ prevent building .env in docker: https://dotenvx.com/prebuild
+
+      at _log (node_modules/dotenv/lib/main.js:139:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (04972a4b-3fc7-44fd-a41e-e3a9b1b8347f) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [initAdminHandler] params: [Object: null prototype] {
+        academyId: '04972a4b-3fc7-44fd-a41e-e3a9b1b8347f'
+      } academyId: 04972a4b-3fc7-44fd-a41e-e3a9b1b8347f
+
+      at initAdminHandler (src/controllers/auth.ts:65:14)
+
+    console.log
+      [AUDIT] USER_CREATED - User (32ef9df0-1aea-4666-9a4d-3d4957babc16) by 32ef9df0-1aea-4666-9a4d-3d4957babc16
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by 32ef9df0-1aea-4666-9a4d-3d4957babc16
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (7ec87db9-45ee-4872-a06b-4c7936cc9349) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [initAdminHandler] params: [Object: null prototype] {
+        academyId: '7ec87db9-45ee-4872-a06b-4c7936cc9349'
+      } academyId: 7ec87db9-45ee-4872-a06b-4c7936cc9349
+
+      at initAdminHandler (src/controllers/auth.ts:65:14)
+
+    console.log
+      [AUDIT] USER_CREATED - User (db575ef5-dfda-4021-8c6d-5ed9b34b28d3) by db575ef5-dfda-4021-8c6d-5ed9b34b28d3
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_FAILURE - Auth (login) by db575ef5-dfda-4021-8c6d-5ed9b34b28d3
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (6c1860de-b360-4241-bd8c-fe3429c4bfb7) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [initAdminHandler] params: [Object: null prototype] {
+        academyId: '6c1860de-b360-4241-bd8c-fe3429c4bfb7'
+      } academyId: 6c1860de-b360-4241-bd8c-fe3429c4bfb7
+
+      at initAdminHandler (src/controllers/auth.ts:65:14)
+
+    console.log
+      [AUDIT] USER_CREATED - User (12602f73-9399-444c-8d1a-0f27303dfc6f) by 12602f73-9399-444c-8d1a-0f27303dfc6f
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (d3fa6ecf-097c-4dc4-83ac-53d413da8bd3) by d3fa6ecf-097c-4dc4-83ac-53d413da8bd3
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [EMAIL SIMULADO] Para: rate.limit@academia.com
+
+      at sendEmail (src/lib/email.ts:66:13)
+
+    console.log
+      [EMAIL SIMULADO] Assunto: Bem-vindo(a) ├á SCAcademia
+
+      at sendEmail (src/lib/email.ts:67:13)
+
+    console.log
+      [EMAIL SIMULADO] Conteudo: Ol├í Professor Rate Limit,
+      
+      Seu cadastro foi conclu├¡do com sucesso na SCAcademia.
+      Voc├¬ j├í pode acessar a plataforma com seu email e senha.
+
+      at sendEmail (src/lib/email.ts:68:13)
+
+    console.log
+      [AUDIT] WELCOME_EMAIL_SENT - User (d3fa6ecf-097c-4dc4-83ac-53d413da8bd3) by d3fa6ecf-097c-4dc4-83ac-53d413da8bd3
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_FAILURE - Auth (login) by d3fa6ecf-097c-4dc4-83ac-53d413da8bd3
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_FAILURE - Auth (login) by d3fa6ecf-097c-4dc4-83ac-53d413da8bd3
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_FAILURE - Auth (login) by d3fa6ecf-097c-4dc4-83ac-53d413da8bd3
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_FAILURE - Auth (login) by d3fa6ecf-097c-4dc4-83ac-53d413da8bd3
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (fd7be738-c746-4feb-9d93-226c64b6b0fe) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [initAdminHandler] params: [Object: null prototype] {
+        academyId: 'fd7be738-c746-4feb-9d93-226c64b6b0fe'
+      } academyId: fd7be738-c746-4feb-9d93-226c64b6b0fe
+
+      at initAdminHandler (src/controllers/auth.ts:65:14)
+
+    console.log
+      [AUDIT] USER_CREATED - User (3831fdd0-de6b-40cb-90cf-ecb8f52ddbb8) by 3831fdd0-de6b-40cb-90cf-ecb8f52ddbb8
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (e8d2d0af-e6f8-41d7-8d66-2344a84261d5) by e8d2d0af-e6f8-41d7-8d66-2344a84261d5
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [EMAIL SIMULADO] Para: responsavel@familia.com
+
+      at sendEmail (src/lib/email.ts:66:13)
+
+    console.log
+      [EMAIL SIMULADO] Assunto: Consentimento LGPD para Aluno Menor
+
+      at sendEmail (src/lib/email.ts:67:13)
+
+    console.log
+      [EMAIL SIMULADO] Conteudo: Ol├í,
+      
+      Foi solicitado consentimento para o aluno Aluno Menor.
+      Acesse o link abaixo para assinar:
+      http://localhost:4200/consent/96a73bd7-39be-42d1-a097-d9fc7afb5e99
+      
+      Se voc├¬ n├úo reconhece esta solicita├º├úo, ignore este email.
+
+      at sendEmail (src/lib/email.ts:68:13)
+
+    console.log
+      [AUDIT] CONSENT_EMAIL_SENT - User (e8d2d0af-e6f8-41d7-8d66-2344a84261d5) by e8d2d0af-e6f8-41d7-8d66-2344a84261d5
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_FAILURE - Auth (login) by e8d2d0af-e6f8-41d7-8d66-2344a84261d5
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (a7341b26-656e-488b-a072-cf1bd1750897) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [initAdminHandler] params: [Object: null prototype] {
+        academyId: 'a7341b26-656e-488b-a072-cf1bd1750897'
+      } academyId: a7341b26-656e-488b-a072-cf1bd1750897
+
+      at initAdminHandler (src/controllers/auth.ts:65:14)
+
+    console.log
+      [AUDIT] USER_CREATED - User (b09ebe64-a1be-427a-bbe8-a3ead6676015) by b09ebe64-a1be-427a-bbe8-a3ead6676015
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by b09ebe64-a1be-427a-bbe8-a3ead6676015
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (94c2201f-1107-4e52-bf81-c1407de1fc4f) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [initAdminHandler] params: [Object: null prototype] {
+        academyId: '94c2201f-1107-4e52-bf81-c1407de1fc4f'
+      } academyId: 94c2201f-1107-4e52-bf81-c1407de1fc4f
+
+      at initAdminHandler (src/controllers/auth.ts:65:14)
+
+    console.log
+      [AUDIT] USER_CREATED - User (1cf9d8b9-c30c-4469-9011-68ec0e54499b) by 1cf9d8b9-c30c-4469-9011-68ec0e54499b
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (76d365e9-0ff2-44e4-b1d5-39e20cde076b) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [initAdminHandler] params: [Object: null prototype] {
+        academyId: '76d365e9-0ff2-44e4-b1d5-39e20cde076b'
+      } academyId: 76d365e9-0ff2-44e4-b1d5-39e20cde076b
+
+      at initAdminHandler (src/controllers/auth.ts:65:14)
+
+    console.log
+      [AUDIT] USER_CREATED - User (73420d9f-7128-4357-af3d-dc3e8754c8f8) by 73420d9f-7128-4357-af3d-dc3e8754c8f8
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by 73420d9f-7128-4357-af3d-dc3e8754c8f8
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGOUT_SUCCESS - Auth (logout) by 73420d9f-7128-4357-af3d-dc3e8754c8f8
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+PASS src/tests/deletion-lgpd.test.ts (7.874 s)
+  ÔùÅ Console
+
+    console.log
+      [dotenv@17.3.1] injecting env (7) from .env -- tip: ÔÜÖ´©Å  write to custom object with { processEnv: myObject }
+
+      at _log (node_modules/dotenv/lib/main.js:139:11)
+
+    console.log
+      [dotenv@17.3.1] injecting env (0) from .env -- tip: ­ƒøá´©Å  run anywhere with `dotenvx run -- yourcommand`
+
+      at _log (node_modules/dotenv/lib/main.js:139:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (e5061ab8-1291-445e-839e-b4470cf78605) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (81ec699a-81bf-41f8-8bfd-98d0fb5bccb0) by 81ec699a-81bf-41f8-8bfd-98d0fb5bccb0
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by 81ec699a-81bf-41f8-8bfd-98d0fb5bccb0
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by 9993fbc0-9536-4259-8a22-0eeac6cda1c8
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (30ebe7e5-e539-4508-a4c9-4d14f3fb842a) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (f763a433-3ef4-4140-8c29-397b84ce7fd9) by f763a433-3ef4-4140-8c29-397b84ce7fd9
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by f763a433-3ef4-4140-8c29-397b84ce7fd9
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by 0cf2a53d-3f49-4b08-ab92-ecb4eb0cc311
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (9f3532d8-9714-4426-aaf4-84ce5f7e2f71) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (cfad67ad-74d0-410c-8804-8fe9b578651f) by cfad67ad-74d0-410c-8804-8fe9b578651f
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by cfad67ad-74d0-410c-8804-8fe9b578651f
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by deaa7edc-abdb-435a-99f7-510a8cead243
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (6ddef41d-a79b-444e-ba77-36240ad61b92) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (58dfa5ca-9888-479a-a457-1ad204443c5d) by 58dfa5ca-9888-479a-a457-1ad204443c5d
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by 58dfa5ca-9888-479a-a457-1ad204443c5d
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by a49da3e8-4a1f-4145-b747-dc914b8cb34b
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] DATA_DELETION_REQUESTED - User (ffe4590c-a5fa-418f-988f-b34fb0f8d298) by a49da3e8-4a1f-4145-b747-dc914b8cb34b
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] DATA_DELETION_CANCELLED - User (ffe4590c-a5fa-418f-988f-b34fb0f8d298) by 58dfa5ca-9888-479a-a457-1ad204443c5d
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (72115ffe-e791-4474-b5f6-3682460eafa1) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (f3eb7d07-3269-4dee-a513-a7e1e78860c7) by f3eb7d07-3269-4dee-a513-a7e1e78860c7
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by f3eb7d07-3269-4dee-a513-a7e1e78860c7
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by 7e39cc92-37c8-4c52-8576-f965d485f232
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] DATA_DELETION_REQUESTED - User (bcc9f598-96ed-40b4-bcfa-1d6480ee31ce) by f3eb7d07-3269-4dee-a513-a7e1e78860c7
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] DATA_DELETION_PROCESSED - User (bcc9f598-96ed-40b4-bcfa-1d6480ee31ce) by f3eb7d07-3269-4dee-a513-a7e1e78860c7
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+PASS src/tests/consent-versioning.test.ts
+  ÔùÅ Console
+
+    console.log
+      [dotenv@17.3.1] injecting env (7) from .env -- tip: ÔÜÖ´©Å  load multiple .env files with { path: ['.env.local', '.env'] }
+
+      at _log (node_modules/dotenv/lib/main.js:139:11)
+
+    console.log
+      [dotenv@17.3.1] injecting env (0) from .env -- tip: ­ƒöÉ prevent committing .env to code: https://dotenvx.com/precommit
+
+      at _log (node_modules/dotenv/lib/main.js:139:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (14da2f1e-03fe-47fe-b4ee-0302425dce2a) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (4709e02c-d0d6-4119-8fc0-23b02b82fc4c) by 4709e02c-d0d6-4119-8fc0-23b02b82fc4c
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by 4709e02c-d0d6-4119-8fc0-23b02b82fc4c
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (bb4625d9-e766-402a-a72d-ac88aa624223) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (a10d92f7-2837-4684-b42a-f3da50f330ff) by a10d92f7-2837-4684-b42a-f3da50f330ff
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by a10d92f7-2837-4684-b42a-f3da50f330ff
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] CONSENT_TEMPLATE_PUBLISHED - ConsentTemplate (bb4625d9-e766-402a-a72d-ac88aa624223) by a10d92f7-2837-4684-b42a-f3da50f330ff
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (03b6d149-6a7f-4af4-9460-7eb51cfb11ad) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (d8fb1bec-a311-4b47-a812-647dd9740876) by d8fb1bec-a311-4b47-a812-647dd9740876
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by d8fb1bec-a311-4b47-a812-647dd9740876
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] CONSENT_TEMPLATE_PUBLISHED - ConsentTemplate (03b6d149-6a7f-4af4-9460-7eb51cfb11ad) by d8fb1bec-a311-4b47-a812-647dd9740876
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] CONSENT_TEMPLATE_PUBLISHED - ConsentTemplate (03b6d149-6a7f-4af4-9460-7eb51cfb11ad) by d8fb1bec-a311-4b47-a812-647dd9740876
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (a6d5422b-9746-4583-bbde-e8641f81ed3d) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (c33f4743-d63b-4eed-93be-e873ceab5941) by c33f4743-d63b-4eed-93be-e873ceab5941
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by c33f4743-d63b-4eed-93be-e873ceab5941
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (ba16ad1f-f04b-42b0-8035-eee41f1b60bf) by ba16ad1f-f04b-42b0-8035-eee41f1b60bf
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [EMAIL SIMULADO] Para: responsavel@familia.com
+
+      at sendEmail (src/lib/email.ts:66:13)
+
+    console.log
+      [EMAIL SIMULADO] Assunto: Consentimento LGPD para Aluno Menor Reconsent
+
+      at sendEmail (src/lib/email.ts:67:13)
+
+    console.log
+      [EMAIL SIMULADO] Conteudo: Ol├í,
+      
+      Foi solicitado consentimento para o aluno Aluno Menor Reconsent.
+      Acesse o link abaixo para assinar:
+      http://localhost:4200/consent/dacd1834-deae-4fa8-970d-57b95a4e80c8
+      
+      Se voc├¬ n├úo reconhece esta solicita├º├úo, ignore este email.
+
+      at sendEmail (src/lib/email.ts:68:13)
+
+    console.log
+      [AUDIT] CONSENT_EMAIL_SENT - User (ba16ad1f-f04b-42b0-8035-eee41f1b60bf) by ba16ad1f-f04b-42b0-8035-eee41f1b60bf
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] CONSENT_SIGNED - Consent (ba16ad1f-f04b-42b0-8035-eee41f1b60bf) by ba16ad1f-f04b-42b0-8035-eee41f1b60bf
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] CONSENT_TEMPLATE_PUBLISHED - ConsentTemplate (a6d5422b-9746-4583-bbde-e8641f81ed3d) by c33f4743-d63b-4eed-93be-e873ceab5941
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] RECONSENT_NO_EMAIL - ConsentEmail (ba16ad1f-f04b-42b0-8035-eee41f1b60bf) by c33f4743-d63b-4eed-93be-e873ceab5941
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (b0ef9767-12d3-490d-a47c-de0d2b2989ee) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (1676b49e-07ea-4f18-850a-1d920e5e7d00) by 1676b49e-07ea-4f18-850a-1d920e5e7d00
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by 1676b49e-07ea-4f18-850a-1d920e5e7d00
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (3e99c1df-99a4-4c19-88b3-378e40807a46) by 3e99c1df-99a4-4c19-88b3-378e40807a46
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [EMAIL SIMULADO] Para: responsavel2@familia.com
+
+      at sendEmail (src/lib/email.ts:66:13)
+
+    console.log
+      [EMAIL SIMULADO] Assunto: Consentimento LGPD para Aluno Detecta Reconsent
+
+      at sendEmail (src/lib/email.ts:67:13)
+
+    console.log
+      [EMAIL SIMULADO] Conteudo: Ol├í,
+      
+      Foi solicitado consentimento para o aluno Aluno Detecta Reconsent.
+      Acesse o link abaixo para assinar:
+      http://localhost:4200/consent/57288926-83fe-441b-b0db-07e27a6367b8
+      
+      Se voc├¬ n├úo reconhece esta solicita├º├úo, ignore este email.
+
+      at sendEmail (src/lib/email.ts:68:13)
+
+    console.log
+      [AUDIT] CONSENT_EMAIL_SENT - User (3e99c1df-99a4-4c19-88b3-378e40807a46) by 3e99c1df-99a4-4c19-88b3-378e40807a46
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] CONSENT_SIGNED - Consent (3e99c1df-99a4-4c19-88b3-378e40807a46) by 3e99c1df-99a4-4c19-88b3-378e40807a46
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] CONSENT_TEMPLATE_PUBLISHED - ConsentTemplate (b0ef9767-12d3-490d-a47c-de0d2b2989ee) by 1676b49e-07ea-4f18-850a-1d920e5e7d00
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] RECONSENT_NO_EMAIL - ConsentEmail (3e99c1df-99a4-4c19-88b3-378e40807a46) by 1676b49e-07ea-4f18-850a-1d920e5e7d00
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (e631a03a-8244-40d2-aba4-ccab23e4ae40) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (d75b033e-2dec-40ef-a148-1211f7e8aac7) by d75b033e-2dec-40ef-a148-1211f7e8aac7
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by d75b033e-2dec-40ef-a148-1211f7e8aac7
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (54a8a525-89b5-4805-98eb-64eb11ee479c) by 54a8a525-89b5-4805-98eb-64eb11ee479c
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [EMAIL SIMULADO] Para: responsavel3@familia.com
+
+      at sendEmail (src/lib/email.ts:66:13)
+
+    console.log
+      [EMAIL SIMULADO] Assunto: Consentimento LGPD para Aluno Template Inativo
+
+      at sendEmail (src/lib/email.ts:67:13)
+
+    console.log
+      [EMAIL SIMULADO] Conteudo: Ol├í,
+      
+      Foi solicitado consentimento para o aluno Aluno Template Inativo.
+      Acesse o link abaixo para assinar:
+      http://localhost:4200/consent/01cd81f6-f896-43af-9cfb-91013348dd3b
+      
+      Se voc├¬ n├úo reconhece esta solicita├º├úo, ignore este email.
+
+      at sendEmail (src/lib/email.ts:68:13)
+
+    console.log
+      [AUDIT] CONSENT_EMAIL_SENT - User (54a8a525-89b5-4805-98eb-64eb11ee479c) by 54a8a525-89b5-4805-98eb-64eb11ee479c
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+PASS src/tests/register.test.ts
+  ÔùÅ Console
+
+    console.log
+      [dotenv@17.3.1] injecting env (7) from .env -- tip: ÔÜÖ´©Å  enable debug logging with { debug: true }
+
+      at _log (node_modules/dotenv/lib/main.js:139:11)
+
+    console.log
+      [dotenv@17.3.1] injecting env (0) from .env -- tip: ­ƒøí´©Å auth for agents: https://vestauth.com
+
+      at _log (node_modules/dotenv/lib/main.js:139:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (5c4e9184-be4b-4b4a-8d58-a8f356823749) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (44e44037-1732-4dce-b7f7-bb2de1b86dd8) by 44e44037-1732-4dce-b7f7-bb2de1b86dd8
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [EMAIL SIMULADO] Para: professor1@academia.com
+
+      at sendEmail (src/lib/email.ts:66:13)
+
+    console.log
+      [EMAIL SIMULADO] Assunto: Bem-vindo(a) ├á SCAcademia
+
+      at sendEmail (src/lib/email.ts:67:13)
+
+    console.log
+      [EMAIL SIMULADO] Conteudo: Ol├í Professor Um,
+      
+      Seu cadastro foi conclu├¡do com sucesso na SCAcademia.
+      Voc├¬ j├í pode acessar a plataforma com seu email e senha.
+
+      at sendEmail (src/lib/email.ts:68:13)
+
+    console.log
+      [AUDIT] WELCOME_EMAIL_SENT - User (44e44037-1732-4dce-b7f7-bb2de1b86dd8) by 44e44037-1732-4dce-b7f7-bb2de1b86dd8
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (36b68df3-8cd1-4f2c-82f8-3618f46e02e8) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (f1df77f7-106a-4d08-8a18-289d10170a6d) by f1df77f7-106a-4d08-8a18-289d10170a6d
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (301feb7b-f963-4797-af9c-48bbbc143bf8) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (fb91566d-da51-4310-b696-777fc1d06ede) by fb91566d-da51-4310-b696-777fc1d06ede
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [EMAIL SIMULADO] Para: responsavel@familia.com
+
+      at sendEmail (src/lib/email.ts:66:13)
+
+    console.log
+      [EMAIL SIMULADO] Assunto: Consentimento LGPD para Aluno Menor
+
+      at sendEmail (src/lib/email.ts:67:13)
+
+    console.log
+      [EMAIL SIMULADO] Conteudo: Ol├í,
+      
+      Foi solicitado consentimento para o aluno Aluno Menor.
+      Acesse o link abaixo para assinar:
+      http://localhost:4200/consent/85752362-4bc6-4ad0-bf49-fb72240f1730
+      
+      Se voc├¬ n├úo reconhece esta solicita├º├úo, ignore este email.
+
+      at sendEmail (src/lib/email.ts:68:13)
+
+    console.log
+      [AUDIT] CONSENT_EMAIL_SENT - User (fb91566d-da51-4310-b696-777fc1d06ede) by fb91566d-da51-4310-b696-777fc1d06ede
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (33f203a5-cd7f-46e5-8a7f-57c55df3e506) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (dcb61267-e45d-47ad-b333-ad74cdef309c) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (218b96d5-478d-4bcc-adcd-fcc50434979c) by 218b96d5-478d-4bcc-adcd-fcc50434979c
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [EMAIL SIMULADO] Para: duplicado@academia.com
+
+      at sendEmail (src/lib/email.ts:66:13)
+
+    console.log
+      [EMAIL SIMULADO] Assunto: Bem-vindo(a) ├á SCAcademia
+
+      at sendEmail (src/lib/email.ts:67:13)
+
+    console.log
+      [EMAIL SIMULADO] Conteudo: Ol├í Primeiro Usuario,
+      
+      Seu cadastro foi conclu├¡do com sucesso na SCAcademia.
+      Voc├¬ j├í pode acessar a plataforma com seu email e senha.
+
+      at sendEmail (src/lib/email.ts:68:13)
+
+    console.log
+      [AUDIT] WELCOME_EMAIL_SENT - User (218b96d5-478d-4bcc-adcd-fcc50434979c) by 218b96d5-478d-4bcc-adcd-fcc50434979c
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (c10bd5a7-4252-43f1-abdc-afbeba1a8523) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+PASS src/tests/admin-profile.test.ts
+  ÔùÅ Console
+
+    console.log
+      [dotenv@17.3.1] injecting env (7) from .env -- tip: ­ƒöÉ prevent building .env in docker: https://dotenvx.com/prebuild
+
+      at _log (node_modules/dotenv/lib/main.js:139:11)
+
+    console.log
+      [dotenv@17.3.1] injecting env (0) from .env -- tip: ÔÜÖ´©Å  write to custom object with { processEnv: myObject }
+
+      at _log (node_modules/dotenv/lib/main.js:139:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (6f60f61c-f8c6-47a4-b3d2-24ebee45dee3) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (92776404-e7ad-46ec-b702-2a624ba04ceb) by 92776404-e7ad-46ec-b702-2a624ba04ceb
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by 92776404-e7ad-46ec-b702-2a624ba04ceb
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (c5139ccb-84d5-4f26-a2ce-ea22f10040c0) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (2b310d5e-a51a-4589-98a2-e04df128a20f) by 2b310d5e-a51a-4589-98a2-e04df128a20f
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by 2b310d5e-a51a-4589-98a2-e04df128a20f
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (7216e993-d744-43fa-a78d-e9d4722866f0) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (0e05c9a2-8564-4993-a424-63cd9ef3d005) by 0e05c9a2-8564-4993-a424-63cd9ef3d005
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by 0e05c9a2-8564-4993-a424-63cd9ef3d005
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (d783e877-b2d7-4110-b135-dd28347c85c8) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (ec195ba7-205c-43f0-bf49-ea6d339a398b) by ec195ba7-205c-43f0-bf49-ea6d339a398b
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by ec195ba7-205c-43f0-bf49-ea6d339a398b
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] PASSWORD_CHANGED - Auth (change-password) by ec195ba7-205c-43f0-bf49-ea6d339a398b
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_FAILURE - Auth (login) by ec195ba7-205c-43f0-bf49-ea6d339a398b
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by ec195ba7-205c-43f0-bf49-ea6d339a398b
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (a177300f-046b-4cd0-8f5d-532c4724f838) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (d2e25d9d-9962-46e1-9c87-5733aea7ff6b) by d2e25d9d-9962-46e1-9c87-5733aea7ff6b
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by d2e25d9d-9962-46e1-9c87-5733aea7ff6b
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+PASS src/tests/professor-management.test.ts
+  ÔùÅ Console
+
+    console.log
+      [dotenv@17.3.1] injecting env (7) from .env -- tip: ÔÜÖ´©Å  suppress all logs with { quiet: true }
+
+      at _log (node_modules/dotenv/lib/main.js:139:11)
+
+    console.log
+      [dotenv@17.3.1] injecting env (0) from .env -- tip: ­ƒöÉ prevent building .env in docker: https://dotenvx.com/prebuild
+
+      at _log (node_modules/dotenv/lib/main.js:139:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (43608d7d-18bb-443b-878d-845a411be4b4) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (9886bb93-6580-4660-92ef-0c3039e72707) by 9886bb93-6580-4660-92ef-0c3039e72707
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by 9886bb93-6580-4660-92ef-0c3039e72707
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (195df782-1405-48dd-af31-7755b6577088) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (a9f0f3c2-3b09-4ac9-8694-46e2b5c02b62) by a9f0f3c2-3b09-4ac9-8694-46e2b5c02b62
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by a9f0f3c2-3b09-4ac9-8694-46e2b5c02b62
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (017a64fa-915a-4080-8a3a-5cc146b73e5e) by 9886bb93-6580-4660-92ef-0c3039e72707
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (0aef9d0b-9386-4de1-ade2-44de46723678) by 9886bb93-6580-4660-92ef-0c3039e72707
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_STATUS_UPDATED - User (0aef9d0b-9386-4de1-ade2-44de46723678) by 9886bb93-6580-4660-92ef-0c3039e72707
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (4b8567a7-6124-4ac5-91a1-1f1a80a79c0e) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (651922ae-3cb0-4590-a02a-0f7f01354e9c) by 651922ae-3cb0-4590-a02a-0f7f01354e9c
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by 651922ae-3cb0-4590-a02a-0f7f01354e9c
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (c05f0e6f-6316-47ed-960e-790c7c520578) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (ff1a3f26-6306-406f-8a25-14055bae8225) by ff1a3f26-6306-406f-8a25-14055bae8225
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by ff1a3f26-6306-406f-8a25-14055bae8225
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (bd1ef2fc-2fca-48d0-bf46-55ca9dd86525) by 651922ae-3cb0-4590-a02a-0f7f01354e9c
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (643bb7ef-39ba-41f6-925c-ab12f25791ef) by ff1a3f26-6306-406f-8a25-14055bae8225
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (d893759a-a416-44db-889d-e517937b476c) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (6a9afc35-2c14-4e79-a6a2-f729e91d9bd9) by 6a9afc35-2c14-4e79-a6a2-f729e91d9bd9
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by 6a9afc35-2c14-4e79-a6a2-f729e91d9bd9
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (3832cd80-4ed7-450d-bed6-3fb992cd82e0) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (6d51710e-81e0-4f89-8fa1-03ac38400e3f) by 6d51710e-81e0-4f89-8fa1-03ac38400e3f
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by 6d51710e-81e0-4f89-8fa1-03ac38400e3f
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (5c3959bc-e326-4447-a6cc-ac9b6b3ddc68) by 6a9afc35-2c14-4e79-a6a2-f729e91d9bd9
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_UPDATED - User (5c3959bc-e326-4447-a6cc-ac9b6b3ddc68) by 6a9afc35-2c14-4e79-a6a2-f729e91d9bd9
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_PASSWORD_RESET - User (5c3959bc-e326-4447-a6cc-ac9b6b3ddc68) by 6a9afc35-2c14-4e79-a6a2-f729e91d9bd9
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_FAILURE - Auth (login) by 5c3959bc-e326-4447-a6cc-ac9b6b3ddc68
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by 5c3959bc-e326-4447-a6cc-ac9b6b3ddc68
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (ee3493b2-ae3d-4884-8f24-2ce8f4d64dda) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (3fda9c18-3692-4217-b492-d8ef9c13d67d) by 3fda9c18-3692-4217-b492-d8ef9c13d67d
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by 3fda9c18-3692-4217-b492-d8ef9c13d67d
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (4d810bd2-dced-47c5-9e82-faf7d87ebc7f) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (6de51038-e703-40fd-8a75-958b686abcff) by 6de51038-e703-40fd-8a75-958b686abcff
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by 6de51038-e703-40fd-8a75-958b686abcff
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (18ce3586-9b8e-4f5e-b703-b6cef542fef7) by 3fda9c18-3692-4217-b492-d8ef9c13d67d
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_STATUS_UPDATED - User (18ce3586-9b8e-4f5e-b703-b6cef542fef7) by 3fda9c18-3692-4217-b492-d8ef9c13d67d
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_FAILURE - Auth (login) by 18ce3586-9b8e-4f5e-b703-b6cef542fef7
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (39508509-4b42-419a-9144-7a12db0c4572) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (7ba30d81-9958-4a38-8cae-e08e71f78568) by 7ba30d81-9958-4a38-8cae-e08e71f78568
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by 7ba30d81-9958-4a38-8cae-e08e71f78568
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (32f59ffd-551b-4f3e-96f5-4c684bb716d8) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (5bfd755c-65ba-462f-9a42-d8a13a039a00) by 5bfd755c-65ba-462f-9a42-d8a13a039a00
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by 5bfd755c-65ba-462f-9a42-d8a13a039a00
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (c5b830db-1eb5-43d4-ae16-c46512164a7e) by 7ba30d81-9958-4a38-8cae-e08e71f78568
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by c5b830db-1eb5-43d4-ae16-c46512164a7e
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+PASS src/tests/compliance-lgpd.test.ts
+  ÔùÅ Console
+
+    console.log
+      [dotenv@17.3.1] injecting env (7) from .env -- tip: ­ƒöÉ encrypt with Dotenvx: https://dotenvx.com
+
+      at _log (node_modules/dotenv/lib/main.js:139:11)
+
+    console.log
+      [dotenv@17.3.1] injecting env (0) from .env -- tip: ­ƒöÉ prevent committing .env to code: https://dotenvx.com/precommit
+
+      at _log (node_modules/dotenv/lib/main.js:139:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (5a3412c0-1856-4e28-a97d-b4cce0a7c645) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (60812581-5e90-40f8-9b4c-2b579b63669a) by 60812581-5e90-40f8-9b4c-2b579b63669a
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by 60812581-5e90-40f8-9b4c-2b579b63669a
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] COMPLIANCE_REPORT_REQUESTED - ComplianceReport (5a3412c0-1856-4e28-a97d-b4cce0a7c645) by 60812581-5e90-40f8-9b4c-2b579b63669a
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] COMPLIANCE_REPORT_REQUESTED - ComplianceReport (5a3412c0-1856-4e28-a97d-b4cce0a7c645) by 60812581-5e90-40f8-9b4c-2b579b63669a
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by 758d253e-2a90-4120-bb03-1908e7b261d0
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] COMPLIANCE_REPORT_REQUESTED - ComplianceReport (5a3412c0-1856-4e28-a97d-b4cce0a7c645) by 60812581-5e90-40f8-9b4c-2b579b63669a
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] COMPLIANCE_REPORT_SCHEDULED - ComplianceReportSchedule (5a3412c0-1856-4e28-a97d-b4cce0a7c645) by 60812581-5e90-40f8-9b4c-2b579b63669a
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+PASS src/tests/academy-profile.test.ts (6.658 s)
+  ÔùÅ Console
+
+    console.log
+      [dotenv@17.3.1] injecting env (7) from .env -- tip: ­ƒøá´©Å  run anywhere with `dotenvx run -- yourcommand`
+
+      at _log (node_modules/dotenv/lib/main.js:139:11)
+
+    console.log
+      [dotenv@17.3.1] injecting env (0) from .env -- tip: ­ƒöÉ encrypt with Dotenvx: https://dotenvx.com
+
+      at _log (node_modules/dotenv/lib/main.js:139:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (c92f4dad-50c9-48df-9f4d-369ef5efed46) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (61d6003e-4136-46a7-8cc1-ba06df35c2ca) by 61d6003e-4136-46a7-8cc1-ba06df35c2ca
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by 61d6003e-4136-46a7-8cc1-ba06df35c2ca
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (2daf9301-8796-4a2b-a026-30c9b4d7ecdc) by 2daf9301-8796-4a2b-a026-30c9b4d7ecdc
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [EMAIL SIMULADO] Para: prof.perfil.1774373050379-58445@academia.com
+
+      at sendEmail (src/lib/email.ts:66:13)
+
+    console.log
+      [EMAIL SIMULADO] Assunto: Bem-vindo(a) ├á SCAcademia
+
+      at sendEmail (src/lib/email.ts:67:13)
+
+    console.log
+      [EMAIL SIMULADO] Conteudo: Ol├í Professor Perfil,
+      
+      Seu cadastro foi conclu├¡do com sucesso na SCAcademia.
+      Voc├¬ j├í pode acessar a plataforma com seu email e senha.
+
+      at sendEmail (src/lib/email.ts:68:13)
+
+    console.log
+      [AUDIT] WELCOME_EMAIL_SENT - User (2daf9301-8796-4a2b-a026-30c9b4d7ecdc) by 2daf9301-8796-4a2b-a026-30c9b4d7ecdc
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (e3396ddd-ef51-47fa-8f23-604720d4abf1) by e3396ddd-ef51-47fa-8f23-604720d4abf1
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (3bfb3ab3-fdf9-4eec-bf27-e18081c1f7c3) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (510b90d0-b5e1-44a7-b9c8-1d1974c4dffc) by 510b90d0-b5e1-44a7-b9c8-1d1974c4dffc
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by 510b90d0-b5e1-44a7-b9c8-1d1974c4dffc
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (b26c5bd3-29c0-4736-8e55-994f3ab11590) by b26c5bd3-29c0-4736-8e55-994f3ab11590
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [EMAIL SIMULADO] Para: prof.perfil.1774373051676-72658@academia.com
+
+      at sendEmail (src/lib/email.ts:66:13)
+
+    console.log
+      [EMAIL SIMULADO] Assunto: Bem-vindo(a) ├á SCAcademia
+
+      at sendEmail (src/lib/email.ts:67:13)
+
+    console.log
+      [EMAIL SIMULADO] Conteudo: Ol├í Professor Perfil,
+      
+      Seu cadastro foi conclu├¡do com sucesso na SCAcademia.
+      Voc├¬ j├í pode acessar a plataforma com seu email e senha.
+
+      at sendEmail (src/lib/email.ts:68:13)
+
+    console.log
+      [AUDIT] WELCOME_EMAIL_SENT - User (b26c5bd3-29c0-4736-8e55-994f3ab11590) by b26c5bd3-29c0-4736-8e55-994f3ab11590
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (63b215e8-d98c-40d3-a80d-04903e08c293) by 63b215e8-d98c-40d3-a80d-04903e08c293
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (635db2bb-ef43-4c80-b001-771997235b80) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (994ce16c-4ad2-4e82-a2ad-e9dec6175c0b) by 994ce16c-4ad2-4e82-a2ad-e9dec6175c0b
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by 994ce16c-4ad2-4e82-a2ad-e9dec6175c0b
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (96695287-3ad0-43c4-8fe5-6744191fade3) by 96695287-3ad0-43c4-8fe5-6744191fade3
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [EMAIL SIMULADO] Para: prof.perfil.1774373052891-87247@academia.com
+
+      at sendEmail (src/lib/email.ts:66:13)
+
+    console.log
+      [EMAIL SIMULADO] Assunto: Bem-vindo(a) ├á SCAcademia
+
+      at sendEmail (src/lib/email.ts:67:13)
+
+    console.log
+      [EMAIL SIMULADO] Conteudo: Ol├í Professor Perfil,
+      
+      Seu cadastro foi conclu├¡do com sucesso na SCAcademia.
+      Voc├¬ j├í pode acessar a plataforma com seu email e senha.
+
+      at sendEmail (src/lib/email.ts:68:13)
+
+    console.log
+      [AUDIT] WELCOME_EMAIL_SENT - User (96695287-3ad0-43c4-8fe5-6744191fade3) by 96695287-3ad0-43c4-8fe5-6744191fade3
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (f5f56200-dc55-4e17-bdfc-f77bfab11d64) by f5f56200-dc55-4e17-bdfc-f77bfab11d64
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (26dcbe30-6ffb-4cbc-9c43-dfe8b1defce3) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (34732853-28f5-4669-be57-0711930c9f1a) by 34732853-28f5-4669-be57-0711930c9f1a
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by 34732853-28f5-4669-be57-0711930c9f1a
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (35009870-c010-4d24-a7c8-87fe9ccea91b) by 35009870-c010-4d24-a7c8-87fe9ccea91b
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [EMAIL SIMULADO] Para: prof.perfil.1774373053925-66304@academia.com
+
+      at sendEmail (src/lib/email.ts:66:13)
+
+    console.log
+      [EMAIL SIMULADO] Assunto: Bem-vindo(a) ├á SCAcademia
+
+      at sendEmail (src/lib/email.ts:67:13)
+
+    console.log
+      [EMAIL SIMULADO] Conteudo: Ol├í Professor Perfil,
+      
+      Seu cadastro foi conclu├¡do com sucesso na SCAcademia.
+      Voc├¬ j├í pode acessar a plataforma com seu email e senha.
+
+      at sendEmail (src/lib/email.ts:68:13)
+
+    console.log
+      [AUDIT] WELCOME_EMAIL_SENT - User (35009870-c010-4d24-a7c8-87fe9ccea91b) by 35009870-c010-4d24-a7c8-87fe9ccea91b
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (cb626a99-f836-413d-954e-62eff7d4cb5c) by cb626a99-f836-413d-954e-62eff7d4cb5c
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (07c67e40-1790-4e9d-9931-b1b2a66adfe5) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (bb56ed4b-11e1-42c6-9f5e-d077d4f75c7a) by bb56ed4b-11e1-42c6-9f5e-d077d4f75c7a
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by bb56ed4b-11e1-42c6-9f5e-d077d4f75c7a
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (071903a9-573b-488b-bc70-9e5fcbe3153d) by 071903a9-573b-488b-bc70-9e5fcbe3153d
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [EMAIL SIMULADO] Para: prof.perfil.1774373055591-1804@academia.com
+
+      at sendEmail (src/lib/email.ts:66:13)
+
+    console.log
+      [EMAIL SIMULADO] Assunto: Bem-vindo(a) ├á SCAcademia
+
+      at sendEmail (src/lib/email.ts:67:13)
+
+    console.log
+      [EMAIL SIMULADO] Conteudo: Ol├í Professor Perfil,
+      
+      Seu cadastro foi conclu├¡do com sucesso na SCAcademia.
+      Voc├¬ j├í pode acessar a plataforma com seu email e senha.
+
+      at sendEmail (src/lib/email.ts:68:13)
+
+    console.log
+      [AUDIT] WELCOME_EMAIL_SENT - User (071903a9-573b-488b-bc70-9e5fcbe3153d) by 071903a9-573b-488b-bc70-9e5fcbe3153d
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (501c689d-0d1e-4c02-846a-6ce1ef1722fa) by 501c689d-0d1e-4c02-846a-6ce1ef1722fa
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+PASS src/tests/password-reset.test.ts
+  ÔùÅ Console
+
+    console.log
+      [dotenv@17.3.1] injecting env (7) from .env -- tip: ­ƒøá´©Å  run anywhere with `dotenvx run -- yourcommand`
+
+      at _log (node_modules/dotenv/lib/main.js:139:11)
+
+    console.log
+      [dotenv@17.3.1] injecting env (0) from .env -- tip: ­ƒöÉ encrypt with Dotenvx: https://dotenvx.com
+
+      at _log (node_modules/dotenv/lib/main.js:139:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (120ed64c-5f68-4fa1-b755-bb7b75d4c389) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (fd729407-d121-4a52-9cd1-9d9b94cb76a8) by fd729407-d121-4a52-9cd1-9d9b94cb76a8
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (7cd52e27-e6e7-4418-a568-82d417e6c448) by 7cd52e27-e6e7-4418-a568-82d417e6c448
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [EMAIL SIMULADO] Para: reset.user@academia.com
+
+      at sendEmail (src/lib/email.ts:66:13)
+
+    console.log
+      [EMAIL SIMULADO] Assunto: Bem-vindo(a) ├á SCAcademia
+
+      at sendEmail (src/lib/email.ts:67:13)
+
+    console.log
+      [EMAIL SIMULADO] Conteudo: Ol├í Usuario Reset,
+      
+      Seu cadastro foi conclu├¡do com sucesso na SCAcademia.
+      Voc├¬ j├í pode acessar a plataforma com seu email e senha.
+
+      at sendEmail (src/lib/email.ts:68:13)
+
+    console.log
+      [AUDIT] WELCOME_EMAIL_SENT - User (7cd52e27-e6e7-4418-a568-82d417e6c448) by 7cd52e27-e6e7-4418-a568-82d417e6c448
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [EMAIL SIMULADO] Para: reset.user@academia.com
+
+      at sendEmail (src/lib/email.ts:66:13)
+
+    console.log
+      [EMAIL SIMULADO] Assunto: Redefini├º├úo de senha - SCAcademia
+
+      at sendEmail (src/lib/email.ts:67:13)
+
+    console.log
+      [EMAIL SIMULADO] Conteudo: Ol├í,
+      
+      Recebemos uma solicita├º├úo para redefinir sua senha.
+      Use o link abaixo (v├ílido por 1 hora):
+      http://localhost:4200/reset-password?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI3Y2Q1MmUyNy1lNmU3LTQ0MTgtYTU2OC04MmQ0MTdlNmM0NDgiLCJlbWFpbCI6InJlc2V0LnVzZXJAYWNhZGVtaWEuY29tIiwiYWNhZGVteUlkIjoiMTIwZWQ2NGMtNWY2OC00ZmExLWI3NTUtYmI3Yjc1ZDRjMzg5Iiwicm9sZSI6IlByb2Zlc3NvciIsImlhdCI6MTc3NDM3MzA1NywiZXhwIjoxNzc0Mzc2NjU3fQ.-hnmEx_ioPgDCgYvcuwBTjehvssuSaqxDQyXtvZWyA0
+      
+      Se voc├¬ n├úo solicitou este reset, ignore este email.
+
+      at sendEmail (src/lib/email.ts:68:13)
+
+    console.log
+      [AUDIT] PASSWORD_RESET_REQUESTED - Auth (forgot-password) by 7cd52e27-e6e7-4418-a568-82d417e6c448
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] PASSWORD_RESET_EMAIL_SENT - Auth (forgot-password) by 7cd52e27-e6e7-4418-a568-82d417e6c448
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] PASSWORD_RESET_REQUESTED - Auth (forgot-password) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (b108a625-adfa-4c9c-a195-205c3d6e5817) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (2b3ac37e-44b8-4fce-b2bb-ac3ede311a94) by 2b3ac37e-44b8-4fce-b2bb-ac3ede311a94
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (323ef768-7122-424d-ab3f-139e98e5a8bb) by 323ef768-7122-424d-ab3f-139e98e5a8bb
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [EMAIL SIMULADO] Para: reset.user@academia.com
+
+      at sendEmail (src/lib/email.ts:66:13)
+
+    console.log
+      [EMAIL SIMULADO] Assunto: Bem-vindo(a) ├á SCAcademia
+
+      at sendEmail (src/lib/email.ts:67:13)
+
+    console.log
+      [EMAIL SIMULADO] Conteudo: Ol├í Usuario Reset,
+      
+      Seu cadastro foi conclu├¡do com sucesso na SCAcademia.
+      Voc├¬ j├í pode acessar a plataforma com seu email e senha.
+
+      at sendEmail (src/lib/email.ts:68:13)
+
+    console.log
+      [AUDIT] WELCOME_EMAIL_SENT - User (323ef768-7122-424d-ab3f-139e98e5a8bb) by 323ef768-7122-424d-ab3f-139e98e5a8bb
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by 323ef768-7122-424d-ab3f-139e98e5a8bb
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [EMAIL SIMULADO] Para: reset.user@academia.com
+
+      at sendEmail (src/lib/email.ts:66:13)
+
+    console.log
+      [EMAIL SIMULADO] Assunto: Redefini├º├úo de senha - SCAcademia
+
+      at sendEmail (src/lib/email.ts:67:13)
+
+    console.log
+      [EMAIL SIMULADO] Conteudo: Ol├í,
+      
+      Recebemos uma solicita├º├úo para redefinir sua senha.
+      Use o link abaixo (v├ílido por 1 hora):
+      http://localhost:4200/reset-password?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIzMjNlZjc2OC03MTIyLTQyNGQtYWIzZi0xMzllOThlNWE4YmIiLCJlbWFpbCI6InJlc2V0LnVzZXJAYWNhZGVtaWEuY29tIiwiYWNhZGVteUlkIjoiYjEwOGE2MjUtYWRmYS00YzljLWExOTUtMjA1YzNkNmU1ODE3Iiwicm9sZSI6IlByb2Zlc3NvciIsImlhdCI6MTc3NDM3MzA1OCwiZXhwIjoxNzc0Mzc2NjU4fQ.9NMdBQ5k3q9C_ABqGot1kqqijnfnpo6BG5kPpK3LS-g
+      
+      Se voc├¬ n├úo solicitou este reset, ignore este email.
+
+      at sendEmail (src/lib/email.ts:68:13)
+
+    console.log
+      [AUDIT] PASSWORD_RESET_REQUESTED - Auth (forgot-password) by 323ef768-7122-424d-ab3f-139e98e5a8bb
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] PASSWORD_RESET_EMAIL_SENT - Auth (forgot-password) by 323ef768-7122-424d-ab3f-139e98e5a8bb
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] PASSWORD_RESET_SUCCESS - Auth (reset-password) by 323ef768-7122-424d-ab3f-139e98e5a8bb
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_FAILURE - Auth (login) by 323ef768-7122-424d-ab3f-139e98e5a8bb
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] LOGIN_SUCCESS - Auth (login) by 323ef768-7122-424d-ab3f-139e98e5a8bb
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] ACADEMY_CREATED - Academy (cdd1db24-aaa4-4679-818c-45d015f3cf61) by SYSTEM
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_CREATED - User (c0a8c989-e544-4086-8389-b5c6581eae2b) by c0a8c989-e544-4086-8389-b5c6581eae2b
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [AUDIT] USER_REGISTERED - User (7d5fb552-5d66-42ff-b57a-f7a0b4e8e194) by 7d5fb552-5d66-42ff-b57a-f7a0b4e8e194
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+    console.log
+      [EMAIL SIMULADO] Para: reset.user@academia.com
+
+      at sendEmail (src/lib/email.ts:66:13)
+
+    console.log
+      [EMAIL SIMULADO] Assunto: Bem-vindo(a) ├á SCAcademia
+
+      at sendEmail (src/lib/email.ts:67:13)
+
+    console.log
+      [EMAIL SIMULADO] Conteudo: Ol├í Usuario Reset,
+      
+      Seu cadastro foi conclu├¡do com sucesso na SCAcademia.
+      Voc├¬ j├í pode acessar a plataforma com seu email e senha.
+
+      at sendEmail (src/lib/email.ts:68:13)
+
+    console.log
+      [AUDIT] WELCOME_EMAIL_SENT - User (7d5fb552-5d66-42ff-b57a-f7a0b4e8e194) by 7d5fb552-5d66-42ff-b57a-f7a0b4e8e194
+
+      at logAudit (src/lib/audit.ts:71:11)
+
+
+Test Suites: 13 passed, 13 total
+Tests:       87 passed, 87 total
+Snapshots:   0 total
+Time:        77.846 s
+Ran all test suites.

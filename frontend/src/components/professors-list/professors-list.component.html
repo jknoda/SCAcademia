@@ -1,0 +1,77 @@
+<div class="professors-list-container">
+  <h2>Professores</h2>
+  <p>Gerencie cadastro, status de acesso e dados operacionais dos professores.</p>
+
+  <section class="card filters-card">
+    <div class="filters-grid">
+      <div class="form-group">
+        <label for="filterName">Buscar por nome</label>
+        <input
+          id="filterName"
+          type="text"
+          class="form-control"
+          [(ngModel)]="filterName"
+          placeholder="Digite parte do nome"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="filterStatus">Status</label>
+        <select id="filterStatus" class="form-control" [(ngModel)]="filterStatus">
+          <option value="all">Todos</option>
+          <option value="active">Ativos</option>
+          <option value="inactive">Inativos</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="actions-row">
+      <button class="btn btn-secondary" (click)="goToDashboard()">Voltar</button>
+      <button class="btn" (click)="loadProfessors()">Filtrar</button>
+      <button class="btn btn-primary" (click)="goToNewProfessor()">Novo Professor</button>
+    </div>
+  </section>
+
+  <div *ngIf="errorMessage" class="error-alert">{{ errorMessage }}</div>
+  <div *ngIf="successMessage" class="success-alert">{{ successMessage }}</div>
+
+  <section class="card list-card">
+    <div *ngIf="loading" class="loading">Carregando professores...</div>
+
+    <table *ngIf="!loading" class="professors-table">
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>Email</th>
+          <th>Telefone</th>
+          <th>Data de entrada</th>
+          <th>Status</th>
+          <th>Acoes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let professor of professors">
+          <td>{{ professor.fullName }}</td>
+          <td>{{ professor.email }}</td>
+          <td>{{ professor.phone || '-' }}</td>
+          <td>{{ formatDate(professor.dataEntrada) }}</td>
+          <td>
+            <span class="status-badge" [class.inactive]="professor.isActive === false">
+              {{ professor.isActive === false ? 'Inativo' : 'Ativo' }}
+            </span>
+          </td>
+          <td class="actions-cell">
+            <button class="btn btn-small" (click)="editProfessor(professor.id)">Editar</button>
+            <button class="btn btn-small" (click)="toggleStatus(professor)">
+              {{ professor.isActive === false ? 'Ativar' : 'Desativar' }}
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p *ngIf="!loading && professors.length === 0" class="empty-state">
+      Nenhum professor encontrado para os filtros informados.
+    </p>
+  </section>
+</div>

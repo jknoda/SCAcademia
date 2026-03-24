@@ -1,0 +1,85 @@
+.academy-profile-container {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 1.5rem;
+
+  h2 {
+    margin: 0 0 0.5rem;
+  }
+
+  h3 {
+    margin: 1.25rem 0 0.5rem;
+  }
+}
+
+.grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.two-columns {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.three-columns {
+  grid-template-columns: 1fr 2fr 1fr;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.form-control {
+  border: 1px solid #c6c8cc;
+  border-radius: 8px;
+  padding: 0.65rem 0.75rem;
+  font-size: 0.95rem;
+}
+
+.error-message {
+  color: #b42318;
+  font-size: 0.82rem;
+}
+
+.error-alert,
+.success-alert {
+  margin: 0.8rem 0;
+  padding: 0.75rem 0.9rem;
+  border-radius: 8px;
+}
+
+.error-alert {
+  background: #fef3f2;
+  color: #b42318;
+  border: 1px solid #fecdca;
+}
+
+.success-alert {
+  background: #ecfdf3;
+  color: #067647;
+  border: 1px solid #abefc6;
+}
+
+.btn-primary {
+  border: none;
+  border-radius: 8px;
+  background: #0052cc;
+  color: #ffffff;
+  font-weight: 600;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+}
+
+.btn-primary:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+@media (max-width: 900px) {
+  .two-columns,
+  .three-columns {
+    grid-template-columns: 1fr;
+  }
+}

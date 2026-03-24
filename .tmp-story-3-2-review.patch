@@ -1,0 +1,1241 @@
+diff --git a/backend/src/lib/trainingAttendance.ts b/backend/src/lib/trainingAttendance.ts
+new file mode 100644
+index 0000000..e4a665e
+--- /dev/null
++++ b/backend/src/lib/trainingAttendance.ts
+@@ -0,0 +1,230 @@
++import { pool } from './db';
++
++export type AttendanceStatus = 'present' | 'absent' | 'justified';
++
++export interface AttendanceStudentItem {
++  studentId: string;
++  studentName: string;
++  status: AttendanceStatus | null;
++}
++
++export interface AttendanceTotals {
++  total: number;
++  present: number;
++}
++
++export interface TrainingAttendancePayload {
++  sessionId: string;
++  turmaId: string;
++  turmaName: string;
++  totals: AttendanceTotals;
++  students: AttendanceStudentItem[];
++}
++
++type SessionScope = {
++  sessionId: string;
++  turmaId: string;
++  turmaName: string;
++};
++
++const ACTIVE_ENROLLMENT_STATUS = ['active', 'ativo'];
++
++const getSessionForProfessor = async (
++  academyId: string,
++  professorId: string,
++  sessionId: string
++): Promise<SessionScope | null> => {
++  const res = await pool.query(
++    `SELECT ts.session_id, ts.turma_id, t.name AS turma_name
++     FROM training_sessions ts
++     JOIN turmas t ON t.turma_id = ts.turma_id
++     WHERE ts.session_id = $1
++       AND ts.academy_id = $2
++       AND ts.professor_id = $3
++       AND ts.deleted_at IS NULL
++       AND t.deleted_at IS NULL
++     LIMIT 1`,
++    [sessionId, academyId, professorId]
++  );
++
++  if (res.rows.length === 0) {
++    return null;
++  }
++
++  return {
++    sessionId: res.rows[0].session_id,
++    turmaId: res.rows[0].turma_id,
++    turmaName: res.rows[0].turma_name,
++  };
++};
++
++const listTurmaStudentsWithAttendance = async (
++  academyId: string,
++  sessionId: string,
++  turmaId: string
++): Promise<AttendanceStudentItem[]> => {
++  const res = await pool.query(
++    `SELECT u.user_id AS student_id,
++            u.full_name AS student_name,
++            sa.status AS attendance_status
++     FROM turma_students ts
++     JOIN users u
++       ON u.user_id = ts.student_id
++      AND u.academy_id = ts.academy_id
++      AND u.deleted_at IS NULL
++      AND u.role = 'Aluno'
++     LEFT JOIN session_attendance sa
++       ON sa.session_id = $1
++      AND sa.student_id = ts.student_id
++      AND sa.academy_id = ts.academy_id
++     WHERE ts.academy_id = $2
++       AND ts.turma_id = $3
++       AND LOWER(ts.status) = ANY($4::text[])
++     ORDER BY u.full_name ASC`,
++    [sessionId, academyId, turmaId, ACTIVE_ENROLLMENT_STATUS]
++  );
++
++  return res.rows.map((row) => ({
++    studentId: row.student_id,
++    studentName: row.student_name,
++    status: row.attendance_status || null,
++  }));
++};
++
++const calculateTotals = (students: AttendanceStudentItem[]): AttendanceTotals => ({
++  total: students.length,
++  present: students.filter((student) => student.status === 'present').length,
++});
++
++export const getTrainingAttendance = async (
++  academyId: string,
++  professorId: string,
++  sessionId: string
++): Promise<TrainingAttendancePayload | null> => {
++  const session = await getSessionForProfessor(academyId, professorId, sessionId);
++  if (!session) {
++    return null;
++  }
++
++  const students = await listTurmaStudentsWithAttendance(academyId, session.sessionId, session.turmaId);
++  return {
++    sessionId: session.sessionId,
++    turmaId: session.turmaId,
++    turmaName: session.turmaName,
++    totals: calculateTotals(students),
++    students,
++  };
++};
++
++export const upsertTrainingAttendance = async (input: {
++  academyId: string;
++  professorId: string;
++  sessionId: string;
++  studentId: string;
++  status: AttendanceStatus;
++}): Promise<{
++  sessionId: string;
++  studentId: string;
++  status: AttendanceStatus;
++  totals: AttendanceTotals;
++} | null> => {
++  const client = await pool.connect();
++
++  try {
++    await client.query('BEGIN');
++
++    const sessionRes = await client.query(
++      `SELECT ts.session_id, ts.turma_id
++       FROM training_sessions ts
++       WHERE ts.session_id = $1
++         AND ts.academy_id = $2
++         AND ts.professor_id = $3
++         AND ts.deleted_at IS NULL
++       LIMIT 1`,
++      [input.sessionId, input.academyId, input.professorId]
++    );
++
++    if (sessionRes.rows.length === 0) {
++      await client.query('ROLLBACK');
++      return null;
++    }
++
++    const turmaId = sessionRes.rows[0].turma_id as string;
++
++    const enrollmentRes = await client.query(
++      `SELECT 1
++       FROM turma_students ts
++       WHERE ts.academy_id = $1
++         AND ts.turma_id = $2
++         AND ts.student_id = $3
++         AND LOWER(ts.status) = ANY($4::text[])
++       LIMIT 1`,
++      [input.academyId, turmaId, input.studentId, ACTIVE_ENROLLMENT_STATUS]
++    );
++
++    if (enrollmentRes.rows.length === 0) {
++      await client.query('ROLLBACK');
++      return null;
++    }
++
++    await client.query(
++      `INSERT INTO session_attendance (
++         attendance_id,
++         session_id,
++         student_id,
++         academy_id,
++         status,
++         marked_by_user_id,
++         created_at,
++         updated_at
++       ) VALUES (
++         gen_random_uuid(),
++         $1,
++         $2,
++         $3,
++         $4,
++         $5,
++         NOW(),
++         NOW()
++       )
++       ON CONFLICT (session_id, student_id)
++       DO UPDATE SET
++         status = EXCLUDED.status,
++         marked_by_user_id = EXCLUDED.marked_by_user_id,
++         updated_at = NOW()`,
++      [input.sessionId, input.studentId, input.academyId, input.status, input.professorId]
++    );
++
++    const totalsRes = await client.query(
++      `SELECT
++         COUNT(*)::int AS total_students,
++         SUM(CASE WHEN sa.status = 'present' THEN 1 ELSE 0 END)::int AS present_students
++       FROM turma_students ts
++       LEFT JOIN session_attendance sa
++         ON sa.session_id = $1
++        AND sa.student_id = ts.student_id
++        AND sa.academy_id = ts.academy_id
++       WHERE ts.academy_id = $2
++         AND ts.turma_id = $3
++         AND LOWER(ts.status) = ANY($4::text[])`,
++      [input.sessionId, input.academyId, turmaId, ACTIVE_ENROLLMENT_STATUS]
++    );
++
++    await client.query('COMMIT');
++
++    return {
++      sessionId: input.sessionId,
++      studentId: input.studentId,
++      status: input.status,
++      totals: {
++        total: totalsRes.rows[0]?.total_students || 0,
++        present: totalsRes.rows[0]?.present_students || 0,
++      },
++    };
++  } catch (error) {
++    await client.query('ROLLBACK');
++    throw error;
++  } finally {
++    client.release();
++  }
++};
+diff --git a/backend/src/controllers/trainingAttendance.ts b/backend/src/controllers/trainingAttendance.ts
+new file mode 100644
+index 0000000..1413324
+--- /dev/null
++++ b/backend/src/controllers/trainingAttendance.ts
+@@ -0,0 +1,110 @@
++import { Response } from 'express';
++import { AuthenticatedRequest } from '../types';
++import { logAudit } from '../lib/audit';
++import {
++  AttendanceStatus,
++  getTrainingAttendance,
++  upsertTrainingAttendance,
++} from '../lib/trainingAttendance';
++
++const asString = (value: unknown): string => (typeof value === 'string' ? value.trim() : '');
++const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
++const allowedStatus: AttendanceStatus[] = ['present', 'absent', 'justified'];
++
++export const getTrainingAttendanceHandler = async (req: AuthenticatedRequest, res: Response) => {
++  try {
++    const requester = req.user!;
++    if (requester.role !== 'Professor') {
++      return res.status(403).json({ error: 'Acesso negado. Papel insuficiente.' });
++    }
++
++    const sessionId = asString(req.params.sessionId);
++    if (!sessionId || !uuidRegex.test(sessionId)) {
++      return res.status(400).json({ error: 'sessionId deve ser um UUID v├ílido' });
++    }
++
++    const attendance = await getTrainingAttendance(
++      requester.academyId,
++      requester.userId,
++      sessionId
++    );
++
++    if (!attendance) {
++      return res.status(404).json({ error: 'Sess├úo n├úo encontrada para o professor atual' });
++    }
++
++    logAudit(
++      requester.userId,
++      'TRAINING_ATTENDANCE_VIEWED',
++      'TrainingAttendance',
++      sessionId,
++      requester.academyId,
++      req.ip
++    );
++
++    return res.status(200).json(attendance);
++  } catch (error) {
++    console.error('Erro ao carregar frequ├¬ncia da sess├úo:', error);
++    return res.status(500).json({ error: 'Erro ao carregar frequ├¬ncia da sess├úo' });
++  }
++};
++
++export const upsertTrainingAttendanceHandler = async (req: AuthenticatedRequest, res: Response) => {
++  try {
++    const requester = req.user!;
++    if (requester.role !== 'Professor') {
++      return res.status(403).json({ error: 'Acesso negado. Papel insuficiente.' });
++    }
++
++    const sessionId = asString(req.params.sessionId);
++    const studentId = asString(req.body?.studentId);
++    const status = asString(req.body?.status) as AttendanceStatus;
++
++    if (!sessionId || !uuidRegex.test(sessionId)) {
++      return res.status(400).json({ error: 'sessionId deve ser um UUID v├ílido' });
++    }
++
++    if (!studentId || !uuidRegex.test(studentId)) {
++      return res.status(400).json({ error: 'studentId deve ser um UUID v├ílido' });
++    }
++
++    if (!allowedStatus.includes(status)) {
++      return res.status(400).json({ error: 'status deve ser present, absent ou justified' });
++    }
++
++    const updated = await upsertTrainingAttendance({
++      academyId: requester.academyId,
++      professorId: requester.userId,
++      sessionId,
++      studentId,
++      status,
++    });
++
++    if (!updated) {
++      return res.status(404).json({
++        error: 'Sess├úo ou aluno n├úo encontrado para o professor atual',
++      });
++    }
++
++    logAudit(
++      requester.userId,
++      'TRAINING_ATTENDANCE_MARKED',
++      'TrainingAttendance',
++      sessionId,
++      requester.academyId,
++      req.ip,
++      { studentId, status }
++    );
++
++    return res.status(200).json({
++      message: 'Frequ├¬ncia atualizada com sucesso',
++      sessionId: updated.sessionId,
++      studentId: updated.studentId,
++      status: updated.status,
++      totals: updated.totals,
++    });
++  } catch (error) {
++    console.error('Erro ao salvar frequ├¬ncia da sess├úo:', error);
++    return res.status(500).json({ error: 'Erro ao salvar frequ├¬ncia da sess├úo' });
++  }
++};
+diff --git a/backend/src/routes/trainings.ts b/backend/src/routes/trainings.ts
+new file mode 100644
+index 0000000..b8a7242
+--- /dev/null
++++ b/backend/src/routes/trainings.ts
+@@ -0,0 +1,19 @@
++import { Router } from 'express';
++import { authMiddleware, requireRole } from '../middleware/auth';
++import {
++  getTrainingEntryPointHandler,
++  startTrainingSessionHandler,
++} from '../controllers/trainings';
++import {
++  getTrainingAttendanceHandler,
++  upsertTrainingAttendanceHandler,
++} from '../controllers/trainingAttendance';
++
++const router = Router();
++
++router.get('/entry-point', authMiddleware, requireRole(['Professor']), getTrainingEntryPointHandler);
++router.post('/start', authMiddleware, requireRole(['Professor']), startTrainingSessionHandler);
++router.get('/:sessionId/attendance', authMiddleware, requireRole(['Professor']), getTrainingAttendanceHandler);
++router.post('/:sessionId/attendance', authMiddleware, requireRole(['Professor']), upsertTrainingAttendanceHandler);
++
++export default router;
+diff --git a/backend/src/tests/training-attendance.test.ts b/backend/src/tests/training-attendance.test.ts
+new file mode 100644
+index 0000000..33cc6da
+--- /dev/null
++++ b/backend/src/tests/training-attendance.test.ts
+@@ -0,0 +1,235 @@
++import request from 'supertest';
++import app from '../app';
++import { pool } from '../lib/db';
++import { createUser } from '../lib/database';
++import { hashPassword } from '../lib/password';
++import { sign } from '../lib/jwt';
++
++const strongPassword = 'SenhaForte1!';
++
++type Ctx = {
++  academyId: string;
++  adminToken: string;
++  professorToken: string;
++  professorId: string;
++  professor2Token: string;
++  otherAcademyProfessorToken: string;
++  sessionId: string;
++  studentAId: string;
++  studentBId: string;
++};
++
++const insertTurma = async (academyId: string, professorId: string): Promise<string> => {
++  const res = await pool.query(
++    `INSERT INTO turmas (
++       academy_id, professor_id, name, description, schedule_json, capacity, is_active, created_at, updated_at
++     ) VALUES (
++       $1, $2, $3, $4, $5::jsonb, 30, true, NOW(), NOW()
++     ) RETURNING turma_id`,
++    [
++      academyId,
++      professorId,
++      'Turma Frequ├¬ncia Story 3.2',
++      'Turma para teste da frequ├¬ncia',
++      JSON.stringify({ day: 'Quarta-feira', time: '19:00-20:00', turn: 'Noite' }),
++    ]
++  );
++
++  return res.rows[0].turma_id as string;
++};
++
++const setupCtx = async (): Promise<Ctx> => {
++  await request(app).post('/api/auth/test/reset').send({});
++
++  const academyRes = await request(app).post('/api/auth/academies').send({
++    name: 'Academia Frequ├¬ncia',
++    location: 'Sao Paulo',
++    email: 'frequencia@academia.com',
++    phone: '11998887777',
++  });
++  const academyId = academyRes.body.academyId as string;
++
++  await request(app)
++    .post(`/api/auth/academies/${academyId}/init-admin`)
++    .send({
++      email: 'admin.frequencia@academia.com',
++      password: strongPassword,
++      fullName: 'Admin Frequ├¬ncia',
++    });
++
++  const adminLogin = await request(app).post('/api/auth/login').send({
++    email: 'admin.frequencia@academia.com',
++    password: strongPassword,
++  });
++  const adminToken = adminLogin.body.accessToken as string;
++
++  const profReg = await request(app).post('/api/auth/register').send({
++    email: 'prof.frequencia@academia.com',
++    password: strongPassword,
++    fullName: 'Professor Frequ├¬ncia',
++    role: 'Professor',
++    academyId,
++  });
++  const professorToken = profReg.body.accessToken as string;
++  const professorId = profReg.body.user.id as string;
++
++  const prof2Reg = await request(app).post('/api/auth/register').send({
++    email: 'prof2.frequencia@academia.com',
++    password: strongPassword,
++    fullName: 'Professor Frequ├¬ncia 2',
++    role: 'Professor',
++    academyId,
++  });
++  const professor2Token = prof2Reg.body.accessToken as string;
++
++  const otherAcademyProfessorToken = sign(
++    {
++      userId: '11111111-1111-1111-1111-111111111111',
++      email: 'prof.externo@academia.com',
++      academyId: '22222222-2222-2222-2222-222222222222',
++      role: 'Professor',
++    },
++    '1h'
++  );
++
++  const studentPasswordHash = await hashPassword(strongPassword);
++  const studentA = await createUser(
++    'aluno.a.frequencia@academia.com',
++    'Aluno A Frequ├¬ncia',
++    studentPasswordHash,
++    academyId,
++    'Aluno'
++  );
++  const studentB = await createUser(
++    'aluno.b.frequencia@academia.com',
++    'Aluno B Frequ├¬ncia',
++    studentPasswordHash,
++    academyId,
++    'Aluno'
++  );
++
++  const turmaId = await insertTurma(academyId, professorId);
++
++  await pool.query(
++    `INSERT INTO turma_students (enrollment_id, turma_id, student_id, academy_id, status, enrolled_at)
++     VALUES
++      (gen_random_uuid(), $1, $2, $3, 'active', NOW()),
++      (gen_random_uuid(), $1, $4, $3, 'active', NOW())`,
++    [turmaId, studentA.id, academyId, studentB.id]
++  );
++
++  const startRes = await request(app)
++    .post('/api/trainings/start')
++    .set('Authorization', `Bearer ${professorToken}`)
++    .send({ turmaId });
++
++  const sessionId = startRes.body.sessionId as string;
++
++  return {
++    academyId,
++    adminToken,
++    professorToken,
++    professorId,
++    professor2Token,
++    otherAcademyProfessorToken,
++    sessionId,
++    studentAId: studentA.id,
++    studentBId: studentB.id,
++  };
++};
++
++describe('Story 3.2 - Marcar Frequ├¬ncia', () => {
++  let ctx: Ctx;
++
++  beforeEach(async () => {
++    ctx = await setupCtx();
++  });
++
++  afterAll(async () => {
++    await request(app).post('/api/auth/test/reset').send({});
++  });
++
++  it('carrega a lista de alunos da sess├úo com totais iniciais', async () => {
++    const res = await request(app)
++      .get(`/api/trainings/${ctx.sessionId}/attendance`)
++      .set('Authorization', `Bearer ${ctx.professorToken}`);
++
++    expect(res.status).toBe(200);
++    expect(res.body.sessionId).toBe(ctx.sessionId);
++    expect(res.body.students).toHaveLength(2);
++    expect(res.body.totals.total).toBe(2);
++    expect(res.body.totals.present).toBe(0);
++  });
++
++  it('faz upsert de presen├ºa e reflete no carregamento seguinte', async () => {
++    const markRes = await request(app)
++      .post(`/api/trainings/${ctx.sessionId}/attendance`)
++      .set('Authorization', `Bearer ${ctx.professorToken}`)
++      .send({ studentId: ctx.studentAId, status: 'present' });
++
++    expect(markRes.status).toBe(200);
++    expect(markRes.body.studentId).toBe(ctx.studentAId);
++    expect(markRes.body.status).toBe('present');
++    expect(markRes.body.totals.total).toBe(2);
++    expect(markRes.body.totals.present).toBe(1);
++
++    const reload = await request(app)
++      .get(`/api/trainings/${ctx.sessionId}/attendance`)
++      .set('Authorization', `Bearer ${ctx.professorToken}`);
++
++    const studentA = reload.body.students.find((s: any) => s.studentId === ctx.studentAId);
++    expect(studentA.status).toBe('present');
++    expect(reload.body.totals.present).toBe(1);
++  });
++
++  it('atualiza presen├ºa para aus├¬ncia no mesmo aluno sem duplicar', async () => {
++    await request(app)
++      .post(`/api/trainings/${ctx.sessionId}/attendance`)
++      .set('Authorization', `Bearer ${ctx.professorToken}`)
++      .send({ studentId: ctx.studentAId, status: 'present' });
++
++    const updateRes = await request(app)
++      .post(`/api/trainings/${ctx.sessionId}/attendance`)
++      .set('Authorization', `Bearer ${ctx.professorToken}`)
++      .send({ studentId: ctx.studentAId, status: 'absent' });
++
++    expect(updateRes.status).toBe(200);
++    expect(updateRes.body.status).toBe('absent');
++    expect(updateRes.body.totals.present).toBe(0);
++  });
++
++  it('bloqueia acesso sem token e para papel n├úo professor', async () => {
++    const noToken = await request(app).get(`/api/trainings/${ctx.sessionId}/attendance`);
++    expect(noToken.status).toBe(401);
++
++    const adminRole = await request(app)
++      .get(`/api/trainings/${ctx.sessionId}/attendance`)
++      .set('Authorization', `Bearer ${ctx.adminToken}`);
++    expect(adminRole.status).toBe(403);
++  });
++
++  it('isola sess├úo por professor e academia', async () => {
++    const sameAcademyOtherProfessor = await request(app)
++      .get(`/api/trainings/${ctx.sessionId}/attendance`)
++      .set('Authorization', `Bearer ${ctx.professor2Token}`);
++
++    expect(sameAcademyOtherProfessor.status).toBe(404);
++
++    const otherAcademyProfessor = await request(app)
++      .post(`/api/trainings/${ctx.sessionId}/attendance`)
++      .set('Authorization', `Bearer ${ctx.otherAcademyProfessorToken}`)
++      .send({ studentId: ctx.studentAId, status: 'present' });
++
++    expect(otherAcademyProfessor.status).toBe(404);
++  });
++
++  it('retorna 400 para payload inv├ílido de status', async () => {
++    const res = await request(app)
++      .post(`/api/trainings/${ctx.sessionId}/attendance`)
++      .set('Authorization', `Bearer ${ctx.professorToken}`)
++      .send({ studentId: ctx.studentAId, status: 'invalido' });
++
++    expect(res.status).toBe(400);
++    expect(res.body.error).toMatch(/status deve ser present, absent ou justified/i);
++  });
++});
+diff --git a/frontend/src/components/training-attendance/training-attendance.component.ts b/frontend/src/components/training-attendance/training-attendance.component.ts
+new file mode 100644
+index 0000000..f10a199
+--- /dev/null
++++ b/frontend/src/components/training-attendance/training-attendance.component.ts
+@@ -0,0 +1,113 @@
++import { Component, OnInit } from '@angular/core';
++import { ActivatedRoute, Router } from '@angular/router';
++import { ApiService } from '../../services/api.service';
++import {
++  TrainingAttendanceResponse,
++  TrainingAttendanceStatus,
++  TrainingAttendanceStudent,
++} from '../../types';
++
++@Component({
++  selector: 'app-training-attendance',
++  standalone: false,
++  templateUrl: './training-attendance.component.html',
++  styleUrls: ['./training-attendance.component.scss'],
++})
++export class TrainingAttendanceComponent implements OnInit {
++  sessionId = '';
++  turmaName = '';
++  students: TrainingAttendanceStudent[] = [];
++  total = 0;
++  present = 0;
++
++  isLoading = false;
++  isSaving = false;
++  errorMessage = '';
++  infoMessage = '';
++
++  constructor(
++    private route: ActivatedRoute,
++    private router: Router,
++    private api: ApiService
++  ) {}
++
++  ngOnInit(): void {
++    this.sessionId = this.route.snapshot.paramMap.get('sessionId') || '';
++    if (!this.sessionId) {
++      this.errorMessage = 'Sess├úo inv├ílida para marcar frequ├¬ncia.';
++      return;
++    }
++
++    this.loadAttendance();
++  }
++
++  loadAttendance(): void {
++    this.isLoading = true;
++    this.errorMessage = '';
++    this.infoMessage = '';
++
++    this.api.getTrainingAttendance(this.sessionId).subscribe({
++      next: (response: TrainingAttendanceResponse) => {
++        this.applyAttendance(response);
++        this.isLoading = false;
++      },
++      error: (error) => {
++        this.errorMessage =
++          error?.error?.error || 'N├úo foi poss├¡vel carregar a frequ├¬ncia da sess├úo.';
++        this.isLoading = false;
++      },
++    });
++  }
++
++  private applyAttendance(response: TrainingAttendanceResponse): void {
++    this.turmaName = response.turmaName;
++    this.students = response.students;
++    this.total = response.totals.total;
++    this.present = response.totals.present;
++  }
++
++  onToggle(student: TrainingAttendanceStudent, checked: boolean): void {
++    const nextStatus: TrainingAttendanceStatus = checked ? 'present' : 'absent';
++    const previousStatus = student.status;
++
++    // Feedback visual imediato (otimista)
++    student.status = nextStatus;
++    this.present = this.students.filter((item) => item.status === 'present').length;
++    this.isSaving = true;
++    this.errorMessage = '';
++
++    this.api
++      .saveTrainingAttendance(this.sessionId, {
++        studentId: student.studentId,
++        status: nextStatus,
++      })
++      .subscribe({
++        next: (response) => {
++          this.total = response.totals.total;
++          this.present = response.totals.present;
++          this.isSaving = false;
++        },
++        error: (error) => {
++          student.status = previousStatus;
++          this.present = this.students.filter((item) => item.status === 'present').length;
++          this.errorMessage =
++            error?.error?.error || 'Falha ao salvar frequ├¬ncia. Tente novamente.';
++          this.isSaving = false;
++        },
++      });
++  }
++
++  onBackToReview(): void {
++    this.router.navigate(['/home']);
++  }
++
++  onNextTechniques(): void {
++    if (this.present < 1) {
++      this.infoMessage = 'Marque pelo menos 1 aluno como presente para avan├ºar.';
++      return;
++    }
++
++    this.infoMessage = '';
++    this.router.navigate(['/training/session', this.sessionId, 'techniques']);
++  }
++}
+diff --git a/frontend/src/components/training-attendance/training-attendance.component.html b/frontend/src/components/training-attendance/training-attendance.component.html
+new file mode 100644
+index 0000000..ef611fd
+--- /dev/null
++++ b/frontend/src/components/training-attendance/training-attendance.component.html
+@@ -0,0 +1,46 @@
++<div class="attendance-page">
++  <div class="attendance-card">
++    <h2>Quantos alunos compareceram?</h2>
++    <p class="subtitle" *ngIf="turmaName">Turma: {{ turmaName }}</p>
++
++    <div class="status-row">
++      <span class="totals">{{ present }} presentes de {{ total }}</span>
++      <span class="saving" *ngIf="isSaving">Salvando...</span>
++    </div>
++
++    <div class="message error" *ngIf="errorMessage">{{ errorMessage }}</div>
++    <div class="message info" *ngIf="infoMessage">{{ infoMessage }}</div>
++
++    <div class="loading" *ngIf="isLoading">Carregando alunos...</div>
++
++    <div class="students" *ngIf="!isLoading">
++      <div class="student-row" *ngFor="let student of students">
++        <div class="student-name">{{ student.studentName }}</div>
++        <label class="toggle-wrap">
++          <input
++            type="checkbox"
++            [checked]="student.status === 'present'"
++            (change)="onToggle(student, $any($event.target).checked)"
++            [disabled]="isSaving"
++          />
++          <span class="toggle-text">
++            {{ student.status === 'present' ? 'Presente' : 'Ausente' }}
++          </span>
++        </label>
++      </div>
++
++      <p class="empty" *ngIf="students.length === 0">Nenhum aluno ativo encontrado para a turma.</p>
++    </div>
++
++    <div class="actions">
++      <button class="btn secondary" (click)="onBackToReview()">Revisar</button>
++      <button
++        class="btn primary"
++        [disabled]="present < 1 || isLoading"
++        (click)="onNextTechniques()"
++      >
++        Pr├│ximo: T├®cnicas
++      </button>
++    </div>
++  </div>
++</div>
+diff --git a/frontend/src/components/training-attendance/training-attendance.component.scss b/frontend/src/components/training-attendance/training-attendance.component.scss
+new file mode 100644
+index 0000000..ffafcfb
+--- /dev/null
++++ b/frontend/src/components/training-attendance/training-attendance.component.scss
+@@ -0,0 +1,137 @@
++.attendance-page {
++  min-height: 100vh;
++  background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
++  display: flex;
++  justify-content: center;
++  padding: 24px;
++}
++
++.attendance-card {
++  width: 100%;
++  max-width: 760px;
++  background: #fff;
++  border-radius: 16px;
++  padding: 24px;
++  box-shadow: 0 10px 36px rgba(0, 0, 0, 0.2);
++}
++
++h2 {
++  margin: 0 0 6px;
++  color: #1a237e;
++}
++
++.subtitle {
++  margin: 0 0 16px;
++  color: #60708a;
++}
++
++.status-row {
++  display: flex;
++  justify-content: space-between;
++  align-items: center;
++  margin-bottom: 12px;
++}
++
++.totals {
++  font-weight: 700;
++  color: #0d47a1;
++}
++
++.saving {
++  color: #60708a;
++  font-size: 0.9rem;
++}
++
++.message {
++  border-radius: 8px;
++  padding: 10px 12px;
++  margin-bottom: 12px;
++}
++
++.message.error {
++  background: #ffebee;
++  color: #b71c1c;
++}
++
++.message.info {
++  background: #fff8e1;
++  color: #7c5e10;
++}
++
++.students {
++  margin-top: 6px;
++  border: 1px solid #e4eaf3;
++  border-radius: 12px;
++  overflow: hidden;
++}
++
++.student-row {
++  display: flex;
++  justify-content: space-between;
++  align-items: center;
++  padding: 12px 16px;
++  border-bottom: 1px solid #edf1f7;
++}
++
++.student-row:last-child {
++  border-bottom: none;
++}
++
++.student-name {
++  color: #1f2d3d;
++  font-weight: 600;
++}
++
++.toggle-wrap {
++  display: inline-flex;
++  align-items: center;
++  gap: 10px;
++  min-height: 48px;
++}
++
++.toggle-wrap input {
++  width: 22px;
++  height: 22px;
++  accent-color: #1565c0;
++}
++
++.toggle-text {
++  font-size: 0.95rem;
++  color: #3f4f66;
++}
++
++.actions {
++  margin-top: 16px;
++  display: flex;
++  justify-content: space-between;
++  gap: 10px;
++}
++
++.btn {
++  border: none;
++  border-radius: 8px;
++  padding: 10px 16px;
++  cursor: pointer;
++  font-size: 0.95rem;
++}
++
++.btn.primary {
++  background: #1565c0;
++  color: #fff;
++}
++
++.btn.secondary {
++  background: #eceff1;
++  color: #263238;
++}
++
++.btn:disabled {
++  opacity: 0.7;
++  cursor: not-allowed;
++}
++
++.loading,
++.empty {
++  padding: 14px;
++  color: #60708a;
++}
+diff --git a/frontend/src/components/training-attendance-placeholder/training-attendance-placeholder.component.html b/frontend/src/components/training-attendance-placeholder/training-attendance-placeholder.component.html
+new file mode 100644
+index 0000000..0fd01be
+--- /dev/null
++++ b/frontend/src/components/training-attendance-placeholder/training-attendance-placeholder.component.html
+@@ -0,0 +1,13 @@
++<div class="placeholder-container">
++  <div class="placeholder-card">
++    <h2>Etapa de T├®cnicas</h2>
++    <p>
++      Frequ├¬ncia salva com sucesso.
++      <strong>ID da sess├úo:</strong> {{ sessionId }}
++    </p>
++    <p>
++      A sele├º├úo de t├®cnicas ser├í implementada na Story 3.3.
++    </p>
++    <button class="btn-back" (click)="backHome()">Voltar para Home</button>
++  </div>
++</div>
+diff --git a/_bmad-output/implementation-artifacts/3-2-marcar-frequencia.md b/_bmad-output/implementation-artifacts/3-2-marcar-frequencia.md
+new file mode 100644
+index 0000000..36f7eda
+--- /dev/null
++++ b/_bmad-output/implementation-artifacts/3-2-marcar-frequencia.md
+@@ -0,0 +1,220 @@
++# Story 3.2: Marcar Frequ├¬ncia
++
++Status: review
++
++## Story
++
++Como Professor,
++Quero marcar presen├ºa e aus├¬ncia dos alunos com toggles r├ípidos,
++Para registrar a frequ├¬ncia da aula em poucos toques e seguir para a pr├│xima etapa do fluxo.
++
++## Contexto de Neg├│cio
++
++- Esta story continua o wizard iniciado na Story 3.1 (Entry Point Conversacional).
++- Objetivo: reduzir o atrito operacional do Professor com marca├º├úo de frequ├¬ncia r├ípida e visual clara.
++- O fluxo UX definido para esta etapa ├® conversacional, com feedback imediato e sem bot├úo expl├¡cito de "salvar".
++- O schema j├í existe em `_bmad-output/V3_0__Training.sql` usando `session_attendance`.
++- N├úo criar tabelas novas nesta story.
++
++## Acceptance Criteria
++
++### AC1 - Lista de Alunos da Turma na Sess├úo
++- DADO que o Professor iniciou um treino pela Story 3.1 e possui `sessionId`
++- QUANDO abre a etapa de frequ├¬ncia
++- ENT├âO o sistema lista os alunos vinculados ├á turma da sess├úo
++- E exibe cada aluno com estado atual de presen├ºa
++- E somente alunos da turma e academia do Professor podem ser exibidos
++
++### AC2 - Toggle de Frequ├¬ncia R├ípida
++- DADO a lista de alunos da sess├úo
++- QUANDO o Professor altera o toggle de um aluno
++- ENT├âO o estado visual muda imediatamente (presente/ausente)
++- E o tamanho/├írea de clique ├® adequado para uso r├ípido em touch
++- E o componente mant├®m a intera├º├úo fluida sem necessidade de reload
++
++### AC3 - Auto-save por Intera├º├úo
++- DADO que o Professor alterna presen├ºa/aus├¬ncia de um aluno
++- QUANDO a a├º├úo ocorre
++- ENT├âO o backend persiste (upsert) em `session_attendance`
++- E o registro guarda `session_id`, `student_id`, `academy_id`, `status`, `marked_by_user_id`
++- E n├úo h├í necessidade de bot├úo "Salvar altera├º├Áes"
++
++### AC4 - M├®trica de Progresso da Frequ├¬ncia
++- DADO que o Professor est├í marcando presen├ºa
++- QUANDO alterna alunos
++- ENT├âO a interface mostra contagem atualizada (ex.: "18 presentes de 20")
++- E essa contagem reflete o estado atual da tela e dados persistidos
++
++### AC5 - Navega├º├úo do Wizard
++- DADO que o Professor est├í na etapa de frequ├¬ncia
++- QUANDO clica "Revisar"
++- ENT├âO retorna para a etapa anterior sem perder o estado j├í salvo
++- QUANDO clica "Pr├│ximo: T├®cnicas"
++- ENT├âO avan├ºa somente se houver ao menos 1 aluno marcado como presente
++
++### AC6 - Seguran├ºa e Integridade
++- DADO chamadas de API da etapa de frequ├¬ncia
++- QUANDO usu├írio sem autentica├º├úo, sem papel `Professor` ou com sess├úo fora da sua academia tenta acessar
++- ENT├âO o sistema bloqueia com resposta apropriada
++- E o Professor n├úo pode marcar frequ├¬ncia de sess├úo que n├úo pertence a ele
++
++## Tasks / Subtasks
++
++- [x] **Task 1 - Backend: leitura de alunos da sess├úo/turma** (AC1, AC6)
++  - [x] Criar fun├º├úo para obter sess├úo por `sessionId` validando `academy_id` e `professor_id`
++  - [x] Resolver alunos da turma via `turma_students` com status ativo
++  - [x] Retornar payload de frequ├¬ncia para a tela
++
++- [x] **Task 2 - Backend: persist├¬ncia de frequ├¬ncia (upsert)** (AC2, AC3, AC6)
++  - [x] Implementar upsert em `session_attendance` por `(session_id, student_id)`
++  - [x] Validar `status` aceito (`present`, `absent`, opcionalmente `justified`)
++  - [x] Atualizar `updated_at` a cada intera├º├úo
++
++- [x] **Task 3 - Backend: endpoints da etapa de frequ├¬ncia** (AC1-AC6)
++  - [x] Criar `GET /api/trainings/:sessionId/attendance`
++  - [x] Criar `POST /api/trainings/:sessionId/attendance`
++  - [x] Proteger rotas com `authMiddleware` + `requireRole(['Professor'])`
++  - [x] Manter mensagens de erro no padr├úo atual do backend
++
++- [x] **Task 4 - Frontend: tipos e ApiService** (AC1-AC4)
++  - [x] Criar interfaces de item de frequ├¬ncia e resumo da sess├úo
++  - [x] Adicionar m├®todos para carregar e salvar presen├ºa por aluno
++  - [x] Tratar erro de persist├¬ncia sem quebrar a tela
++
++- [x] **Task 5 - Frontend: tela de frequ├¬ncia conversacional** (AC1-AC5)
++  - [x] Implementar lista de alunos com toggle por linha
++  - [x] Exibir contagem "X presentes de Y"
++  - [x] Aplicar feedback visual imediato por toggle
++  - [x] Implementar bot├Áes "Revisar" e "Pr├│ximo: T├®cnicas"
++
++- [x] **Task 6 - Testes de integra├º├úo e regress├úo** (AC1-AC6)
++  - [x] Cobrir carregamento de frequ├¬ncia da sess├úo
++  - [x] Cobrir upsert de presen├ºa/aus├¬ncia por aluno
++  - [x] Cobrir bloqueio de acesso para pap├®is n├úo permitidos
++  - [x] Cobrir isolamento de sess├úo por professor/academia
++
++## Dev Notes
++
++### Escopo Deliberadamente Limitado
++
++- Esta story foca apenas na etapa de frequ├¬ncia do wizard.
++- N├úo implementar sele├º├úo de t├®cnicas (Story 3.3).
++- N├úo implementar notas/coment├írios (Story 3.4).
++- N├úo implementar revis├úo final/sucesso (Stories 3.5 e 3.6).
++- N├úo implementar sincroniza├º├úo offline completa (Story 3.8).
++
++### UX Obrigat├│ria
++
++- Layout conversacional com pergunta principal: "Quantos alunos compareceram?"
++- Um row por aluno.
++- Toggle com hit area confort├ível para touch.
++- Auto-save por toggle, sem bot├úo de salvar.
++- Contador de presen├ºa sempre vis├¡vel e atualizado.
++
++### Schema Real Confirmado
++
++Tabela principal desta story:
++
++```sql
++session_attendance (
++  attendance_id,
++  session_id,
++  student_id,
++  academy_id,
++  status,
++  marked_by_user_id,
++  created_at,
++  updated_at,
++  UNIQUE (session_id, student_id)
++)
++```
++
++Tabelas de apoio:
++
++- `training_sessions`
++- `turmas`
++- `turma_students`
++
++### Padr├Áes de Implementa├º├úo (Projeto Atual)
++
++- Backend em fun├º├Áes exportadas, sem classes de servi├ºo OO.
++- Erro HTTP no formato `res.status(x).json({ error: 'mensagem' })`.
++- Reutilizar `AuthenticatedRequest`, `authMiddleware`, `requireRole`.
++- Frontend Angular module-based (`standalone: false`).
++- Integra├º├úo HTTP somente via `ApiService`.
++
++### Recomenda├º├úo de Arquivos
++
++**Backend - novos arquivos sugeridos**
++```
++backend/src/controllers/trainingAttendance.ts
++backend/src/lib/trainingAttendance.ts
++```
++
++**Backend - arquivos a alterar**
++```
++backend/src/routes/trainings.ts
++backend/src/app.ts
++backend/src/types/index.ts
++```
++
++**Frontend - novos arquivos sugeridos**
++```
++frontend/src/components/training-attendance/
++  training-attendance.component.ts
++  training-attendance.component.html
++  training-attendance.component.scss
++```
++
++**Frontend - arquivos a alterar**
++```
++frontend/src/app.module.ts
++frontend/src/app.routing.module.ts
++frontend/src/services/api.service.ts
++frontend/src/types/index.ts
++```
++
++### Contratos Recomendados
++
++```ts
++GET /api/trainings/:sessionId/attendance
++// returns
++{
++  sessionId: string,
++  turmaId: string,
++  turmaName: string,
++  totals: { total: number, present: number },
++  students: Array<{
++    studentId: string,
++    studentName: string,
++    status: 'present' | 'absent' | 'justified' | null
++  }>
++}
++```
++
++```ts
++POST /api/trainings/:sessionId/attendance
++// body
++{
++  studentId: string,
++  status: 'present' | 'absent' | 'justified'
++}
++
++// returns
++{
++  message: string,
++  sessionId: string,
++  studentId: string,
++  status: 'present' | 'absent' | 'justified',
++  totals: { total: number, present: number }
++}
++```
++
++### Refer├¬ncias
++
++- `_bmad-output/implementation-artifacts/3-1-entry-point-conversacional.md`
++- `_bmad-output/implementation-artifacts/SPRINT-PLAN-DETAILED.md`
++- `_bmad-output/planning-artifacts/ux-design-specification.md`
++- `_bmad-output/planning-artifacts/architect.md`
++- `_bmad-output/V3_0__Training.sql`
++- `_bmad-output/project-context.md`
+diff --git a/_bmad-output/implementation-artifacts/sprint-status.yaml b/_bmad-output/implementation-artifacts/sprint-status.yaml
+index aee25ba..5130e27 100644
+--- a/_bmad-output/implementation-artifacts/sprint-status.yaml
++++ b/_bmad-output/implementation-artifacts/sprint-status.yaml
+@@ -1,6 +1,6 @@
+ # SCAcademia Sprint Status Tracking
+ # Generated: 2026-03-20T14:30:00Z
+-# Last Updated: 2026-03-21T21:30:00Z
++# Last Updated: 2026-03-24T04:10:00Z
+ # Project: SCAcademia
+ # Project Key: SCACAD
+ # Tracking System: file-system
+@@ -95,14 +95,14 @@ development_status:
+   # EPIC 2: Sa├║de & LGPD [6]
+   # ======================================
+   
+-  epic-2: backlog
++  epic-2: done
+   
+-  2-1-anamnese-inicial: backlog
+-  2-2-consentimento-lgpd: backlog
+-  2-3-versionamento-consentimento: backlog
+-  2-4-auditoria-lgpd: backlog
+-  2-5-direito-esquecimento: backlog
+-  2-6-relatorio-lgpd: backlog
++  2-1-anamnese-inicial: done
++  2-2-consentimento-lgpd: done
++  2-3-versionamento-consentimento: done
++  2-4-auditoria-lgpd: done
++  2-5-direito-esquecimento: done
++  2-6-relatorio-lgpd: done
+   
+   epic-2-retrospective: optional
+   
+@@ -110,10 +110,10 @@ development_status:
+   # EPIC 3: Professor Love ÔÇö Training [8]
+   # ======================================
+   
+-  epic-3: backlog
++  epic-3: in-progress
+   
+-  3-1-entry-point-conversacional: backlog
+-  3-2-marcar-frequencia: backlog
++  3-1-entry-point-conversacional: done
++  3-2-marcar-frequencia: review
+   3-3-adicionar-tecnicas: backlog
+   3-4-anotacoes-notas: backlog
+   3-5-revisar-confirmar: backlog
+@@ -208,12 +208,12 @@ development_status:
+ # - Total Items: 68
+ 
+ # STATUS BREAKDOWN (Initial):
+-# - backlog: 60 items (52 stories + 8 epics)
++# - backlog: 57 items (49 stories + 8 epics)
+ # - optional: 8 items (retrospectives)
+ # - ready-for-dev: 0 items
+-# - in-progress: 0 items
++# - in-progress: 1 item (2-4-auditoria-lgpd)
+ # - review: 0 items
+-# - done: 0 items
++# - done: 7 items (Epic 1: 5 stories + Epic 2 partial: Story 2-1 + 2-2 + 2-3)
+ 
+ # RECOMMENDED SPRINT SEQUENCE:
+ # Sprint 1 (Week 1-2):     Epic 1 (Foundation) [5 stories]

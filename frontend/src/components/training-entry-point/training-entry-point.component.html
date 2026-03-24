@@ -1,0 +1,37 @@
+<div class="training-card">
+  <h3>Entry Point Conversacional</h3>
+
+  <div class="loading" *ngIf="isLoading">Carregando contexto da aula...</div>
+  <div class="error" *ngIf="errorMessage">{{ errorMessage }}</div>
+  <div class="info" *ngIf="infoMessage">{{ infoMessage }}</div>
+
+  <div *ngIf="!isLoading && context">
+    <p class="greeting">{{ context.greeting }}</p>
+
+    <div *ngIf="context.currentOrNextClass; else noClass" class="class-context">
+      <p><strong>Turma:</strong> {{ context.currentOrNextClass.turmaName }}</p>
+      <p><strong>Contexto:</strong> {{ context.currentOrNextClass.label }}</p>
+      <p><strong>Agenda:</strong> {{ context.currentOrNextClass.scheduledAtText }}</p>
+      <p *ngIf="context.currentOrNextClass.description">
+        <strong>Detalhes:</strong> {{ context.currentOrNextClass.description }}
+      </p>
+
+      <div class="offline-hint" *ngIf="!isOnline">
+        Você está offline. Pode iniciar o registro e sincronizar ao reconectar.
+      </div>
+
+      <div class="actions-row">
+        <button class="btn-primary" (click)="startNow()" [disabled]="isStarting">
+          {{ isStarting ? 'Iniciando...' : 'Sim, registrar agora' }}
+        </button>
+        <button class="btn-secondary" (click)="maybeLater()">Talvez depois</button>
+        <button class="btn-secondary" (click)="reloadForNextClass()">Próxima aula</button>
+      </div>
+    </div>
+
+    <ng-template #noClass>
+      <p class="empty">Nenhuma turma ativa atribuída no momento.</p>
+      <button class="btn-secondary" (click)="reloadForNextClass()">Atualizar</button>
+    </ng-template>
+  </div>
+</div>

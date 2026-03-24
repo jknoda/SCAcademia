@@ -1,0 +1,64 @@
+<div class="attendance-page">
+  <div class="attendance-card">
+    <h2>Quantos alunos compareceram?</h2>
+    <p class="subtitle" *ngIf="turmaName">Turma: {{ turmaName }}</p>
+
+    <div class="status-row">
+      <span class="totals">{{ present }} presentes de {{ total }}</span>
+      <span class="saving" *ngIf="isSaving">Salvando...</span>
+    </div>
+
+    <div class="message error" *ngIf="errorMessage">{{ errorMessage }}</div>
+    <div class="message info" *ngIf="infoMessage">{{ infoMessage }}</div>
+
+    <div class="loading" *ngIf="isLoading">Carregando alunos...</div>
+
+    <div class="students" *ngIf="!isLoading">
+      <div class="student-row" *ngFor="let student of students">
+        <div class="student-name">
+          {{ student.studentName }}
+          <div class="message info" *ngIf="!student.hasHealthScreening">Anamnese pendente</div>
+        </div>
+        <div class="status-actions">
+          <button
+            class="status-btn"
+            [class.active]="student.status === 'present'"
+            [disabled]="isStudentSaving(student.studentId)"
+            (click)="onSelectStatus(student, 'present')"
+          >
+            Presente
+          </button>
+          <button
+            class="status-btn"
+            [class.active]="student.status === 'absent' || student.status === null"
+            [disabled]="isStudentSaving(student.studentId)"
+            (click)="onSelectStatus(student, 'absent')"
+          >
+            Ausente
+          </button>
+          <button
+            class="status-btn"
+            [class.active]="student.status === 'justified'"
+            [disabled]="isStudentSaving(student.studentId)"
+            (click)="onSelectStatus(student, 'justified')"
+          >
+            Justificado
+          </button>
+        </div>
+      </div>
+
+      <p class="empty" *ngIf="students.length === 0">Nenhum aluno ativo encontrado para a turma.</p>
+    </div>
+
+    <div class="actions">
+      <button class="btn secondary" (click)="onBackToReview()">Revisar</button>
+      <button
+        class="btn primary"
+        [disabled]="present < 1 || isLoading || isSaving"
+        (click)="onNextTechniques()"
+      >
+        Próximo: Técnicas
+      </button>
+    </div>
+  </div>
+</div>

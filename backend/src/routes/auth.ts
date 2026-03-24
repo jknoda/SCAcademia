@@ -5,6 +5,7 @@ import { validate } from '../middleware/validate';
 import {
   academyFormSchema,
   adminRegistrationSchema,
+  changePasswordSchema,
   forgotPasswordSchema,
   loginSchema,
   resetPasswordSchema,
@@ -41,5 +42,6 @@ router.post('/reset-password', validate(resetPasswordSchema), authController.res
 
 // Protected routes
 router.get('/users/@me', authMiddleware, authController.getCurrentUserHandler);
+router.put('/change-password', authMiddleware, validate(changePasswordSchema), authController.changePasswordHandler);
 
 export default router;

@@ -1,0 +1,234 @@
+<div class="consent-container">
+  <div class="consent-card">
+    <div class="academy-header">
+      <h1 class="academy-title">{{ tokenData?.academyName || 'SCAcademia' }}</h1>
+      <p class="academy-subtitle">Autorização e Consentimento LGPD</p>
+    </div>
+
+    <!-- Step indicator (steps 2-4) -->
+    <div class="step-indicator" *ngIf="currentStep >= 2 && currentStep <= 4">
+      <div class="step" [class.active]="currentStep === 2" [class.done]="currentStep > 2">
+        <span class="step-num">1</span>
+        <span class="step-label">Privacidade</span>
+      </div>
+      <div class="step-line" [class.done]="currentStep > 2"></div>
+      <div class="step" [class.active]="currentStep === 3" [class.done]="currentStep > 3">
+        <span class="step-num">2</span>
+        <span class="step-label">Saúde e Ética</span>
+      </div>
+      <div class="step-line" [class.done]="currentStep > 3"></div>
+      <div class="step" [class.active]="currentStep === 4">
+        <span class="step-num">3</span>
+        <span class="step-label">Assinatura</span>
+      </div>
+    </div>
+
+    <!-- Loading step -->
+    <div class="step-content centered" *ngIf="currentStep === 1 && isLoading">
+      <div class="spinner"></div>
+      <p class="loading-text">Verificando link de consentimento...</p>
+    </div>
+
+    <!-- Re-consent comparison step -->
+    <div class="step-content" *ngIf="currentStep === 1 && !isLoading && tokenData?.isReconsent">
+      <h2 class="step-title reconsentTitle">Revisão de Mudanças</h2>
+      <p class="step-intro">
+        Os termos de consentimento foram atualizados. Veja as mudanças em relação à versão anterior:
+      </p>
+      <p class="version-info">
+        Versão anterior: {{ tokenData?.previousVersion }} → Versão atual: {{ tokenData?.newVersion }}
+      </p>
+
+      <!-- Privacy comparison -->
+      <div class="comparison-block" *ngIf="privacyOldTemplate && privacyTemplate">
+        <div class="comparison-header" (click)="toggleComparison('privacy')">
+          <h3 class="comparison-title">📋 Política de Privacidade</h3>
+          <span class="toggle-icon" [class.expanded]="isComparisonExpanded('privacy')">▼</span>
+        </div>
+        <div class="comparison-content" *ngIf="isComparisonExpanded('privacy')">
+          <div class="comparison-grid">
+            <div class="comparison-column old">
+              <h4>Versão {{ tokenData?.previousVersion }}</h4>
+              <div class="template-content changed" [innerHTML]="privacyOldTemplate.content"></div>
+            </div>
+            <div class="comparison-column new">
+              <h4>Versão {{ tokenData?.newVersion }}</h4>
+              <div class="template-content highlighted" [innerHTML]="privacyTemplate.content"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Health comparison -->
+      <div class="comparison-block" *ngIf="healthOldTemplate && healthTemplate">
+        <div class="comparison-header" (click)="toggleComparison('health')">
+          <h3 class="comparison-title">💪 Termo de Saúde</h3>
+          <span class="toggle-icon" [class.expanded]="isComparisonExpanded('health')">▼</span>
+        </div>
+        <div class="comparison-content" *ngIf="isComparisonExpanded('health')">
+          <div class="comparison-grid">
+            <div class="comparison-column old">
+              <h4>Versão {{ tokenData?.previousVersion }}</h4>
+              <div class="template-content changed" [innerHTML]="healthOldTemplate.content"></div>
+            </div>
+            <div class="comparison-column new">
+              <h4>Versão {{ tokenData?.newVersion }}</h4>
+              <div class="template-content highlighted" [innerHTML]="healthTemplate.content"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ethics comparison -->
+      <div class="comparison-block" *ngIf="ethicsOldTemplate && ethicsTemplate">
+        <div class="comparison-header" (click)="toggleComparison('ethics')">
+          <h3 class="comparison-title">⚖️ Código de Ética</h3>
+          <span class="toggle-icon" [class.expanded]="isComparisonExpanded('ethics')">▼</span>
+        </div>
+        <div class="comparison-content" *ngIf="isComparisonExpanded('ethics')">
+          <div class="comparison-grid">
+            <div class="comparison-column old">
+              <h4>Versão {{ tokenData?.previousVersion }}</h4>
+              <div class="template-content changed" [innerHTML]="ethicsOldTemplate.content"></div>
+            </div>
+            <div class="comparison-column new">
+              <h4>Versão {{ tokenData?.newVersion }}</h4>
+              <div class="template-content highlighted" [innerHTML]="ethicsTemplate.content"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="reconsentActions">
+        <button class="btn btn-secondary" (click)="proceedFromReconsent()">
+          Ler Todos os Detalhes →
+        </button>
+        <button class="btn btn-primary" (click)="quickSignReconsent()">
+          ✓ Estou Ciente das Mudanças
+        </button>
+      </div>
+    </div>
+
+    <!-- Error state -->
+    <div class="step-content centered" *ngIf="errorMessage && !isLoading">
+      <div class="error-icon">⚠️</div>
+      <p class="error-message">{{ errorMessage }}</p>
+    </div>
+
+    <!-- Step 2: Privacy Policy -->
+    <div class="step-content" *ngIf="currentStep === 2">
+      <h2 class="step-title">Política de Privacidade</h2>
+      <p class="step-intro">
+        Olá! Este formulário é para autorizar o uso dos dados de
+        <strong>{{ tokenData?.studentName }}</strong> pela academia.
+        Por favor, leia atentamente os termos abaixo.
+      </p>
+      <div class="scroll-box" (scroll)="onPrivacyScroll($event)">
+        <div class="template-content" [innerHTML]="privacyTemplate?.content"></div>
+      </div>
+      <p class="scroll-hint" *ngIf="!privacyScrolled">
+        ↓ Role até o final para habilitar o botão de aceite
+      </p>
+      <p class="scroll-done" *ngIf="privacyScrolled">✓ Você chegou ao final do documento</p>
+      <button
+        class="btn btn-primary"
+        [disabled]="!privacyScrolled || isLoading"
+        (click)="goToStep3()"
+      >
+        <span *ngIf="isLoading" class="spinner-sm"></span>
+        <span *ngIf="!isLoading">Li e aceito a Política de Privacidade →</span>
+      </button>
+    </div>
+
+    <!-- Step 3: Health & Ethics Checkboxes -->
+    <div class="step-content" *ngIf="currentStep === 3">
+      <h2 class="step-title">Termos de Saúde e Ética</h2>
+      <p class="step-intro">
+        Leia e aceite os termos abaixo para prosseguir com a autorização.
+      </p>
+
+      <div class="consent-block">
+        <h3 class="block-title">Termo de Saúde</h3>
+        <div class="scroll-box scroll-box-sm">
+          <div class="template-content" [innerHTML]="healthTemplate?.content"></div>
+        </div>
+        <label class="checkbox-label">
+          <input type="checkbox" [(ngModel)]="healthAccepted" />
+          <span>Declaro que li e aceito o Termo de Saúde</span>
+        </label>
+      </div>
+
+      <div class="consent-block">
+        <h3 class="block-title">Código de Ética</h3>
+        <div class="scroll-box scroll-box-sm">
+          <div class="template-content" [innerHTML]="ethicsTemplate?.content"></div>
+        </div>
+        <label class="checkbox-label">
+          <input type="checkbox" [(ngModel)]="ethicsAccepted" />
+          <span>Declaro que li e aceito o Código de Ética</span>
+        </label>
+      </div>
+
+      <div class="error-alert" *ngIf="errorMessage">{{ errorMessage }}</div>
+
+      <button
+        class="btn btn-primary"
+        [disabled]="!healthAccepted || !ethicsAccepted"
+        (click)="goToStep4()"
+      >
+        Próximo: Assinatura →
+      </button>
+    </div>
+
+    <!-- Step 4: Signature Canvas -->
+    <div class="step-content" *ngIf="currentStep === 4">
+      <h2 class="step-title">Assinatura Digital</h2>
+      <p class="step-intro">
+        Assine no campo abaixo para confirmar seu consentimento como responsável de
+        <strong>{{ tokenData?.studentName }}</strong>.
+      </p>
+
+      <div class="canvas-wrapper">
+        <canvas
+          #sigPad
+          class="sig-canvas"
+          (mousedown)="onMouseDown($event)"
+          (mousemove)="onMouseMove($event)"
+          (mouseup)="onMouseUp()"
+          (mouseleave)="onMouseUp()"
+          (touchstart)="onTouchStart($event)"
+          (touchmove)="onTouchMove($event)"
+          (touchend)="onTouchEnd()"
+        ></canvas>
+        <p class="canvas-hint" *ngIf="!hasSignature">Assine aqui</p>
+      </div>
+
+      <div class="canvas-actions">
+        <button class="btn btn-secondary" (click)="clearSignature()">Limpar</button>
+      </div>
+
+      <div class="error-alert" *ngIf="errorMessage">{{ errorMessage }}</div>
+
+      <button
+        class="btn btn-primary btn-submit"
+        [disabled]="!hasSignature || isLoading"
+        (click)="submitConsent()"
+      >
+        <span *ngIf="isLoading" class="spinner-sm"></span>
+        <span *ngIf="!isLoading">Confirmar Consentimento ✓</span>
+      </button>
+    </div>
+
+    <!-- Step 5: Success -->
+    <div class="step-content centered" *ngIf="currentStep === 5">
+      <div class="success-icon">✅</div>
+      <h2 class="success-title">Consentimento Registrado!</h2>
+      <p class="success-message">
+        O consentimento de <strong>{{ successStudentName }}</strong> foi registrado com sucesso.
+      </p>
+      <p class="success-sub">
+        Você já pode fechar esta página. Obrigado!
+      </p>
+    </div>
+  </div>
+</div>

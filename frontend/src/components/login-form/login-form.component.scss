@@ -16,6 +16,33 @@ p {
   text-align: center;
 }
 
+.consent-pending {
+  background: #fff3cd;
+  border: 1px solid #ffe69c;
+  color: #664d03;
+  border-radius: 6px;
+  padding: 10px 12px;
+  margin-bottom: 14px;
+
+  strong {
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  p {
+    margin: 0 0 8px;
+    color: #664d03;
+    text-align: left;
+    font-size: 13px;
+  }
+
+  a {
+    color: #0052cc;
+    font-weight: 600;
+    text-decoration: none;
+  }
+}
+
 .form-group {
   margin-bottom: 15px;
 }

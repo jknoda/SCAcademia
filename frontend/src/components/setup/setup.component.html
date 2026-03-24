@@ -1,4 +1,15 @@
-<div class="setup-wizard-container">
+<div class="setup-loading" *ngIf="isChecking">
+  <div class="loading-card">
+    <h2>Preparando o setup...</h2>
+    <p>Estamos verificando se a academia já foi inicializada.</p>
+  </div>
+</div>
+
+<div class="setup-wizard-container" *ngIf="!isChecking">
+  <div class="setup-warning" *ngIf="checkErrorMessage">
+    {{ checkErrorMessage }}
+  </div>
+
   <div class="wizard-header">
     <div class="stepper">
       <div class="step" [class.active]="currentStep === 1" [class.completed]="currentStep > 1">

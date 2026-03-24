@@ -13,6 +13,7 @@ pnpm-lock.yaml
 dist/
 build/
 *.tsbuildinfo
+frontend/.angular/
 
 # IDE
 .vscode/

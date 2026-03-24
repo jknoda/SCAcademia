@@ -1,0 +1,112 @@
+[
+  {
+    "academyId": "485ccba8-d83d-4653-9cde-704f566ed238",
+    "generatedBy": "79514ec0-d7f5-4223-9b30-e8aca11f9a39",
+    "frequency": "monthly",
+    "dayOfMonth": 1,
+    "hour": 8,
+    "minute": 30,
+    "enabled": true,
+    "nextRunAt": "2026-04-01T11:30:00.000Z",
+    "updatedAt": "2026-03-24T09:13:07.791Z"
+  },
+  {
+    "academyId": "3879a2b9-e3de-47bf-95ba-5bd4a5bff8d1",
+    "generatedBy": "cc8e2827-727d-410d-bc99-5450c125ce49",
+    "frequency": "monthly",
+    "dayOfMonth": 1,
+    "hour": 8,
+    "minute": 30,
+    "enabled": true,
+    "nextRunAt": "2026-04-01T11:30:00.000Z",
+    "updatedAt": "2026-03-24T09:15:32.734Z"
+  },
+  {
+    "academyId": "fb390527-5107-43d0-9d1c-ce1d0848ad8b",
+    "generatedBy": "0b90067e-b749-4f73-8a3c-2dcb10f5af7e",
+    "frequency": "monthly",
+    "dayOfMonth": 1,
+    "hour": 8,
+    "minute": 30,
+    "enabled": true,
+    "nextRunAt": "2026-04-01T11:30:00.000Z",
+    "updatedAt": "2026-03-24T09:49:06.751Z"
+  },
+  {
+    "academyId": "778e95b7-a57b-40b7-8ed6-f8b615dd10f3",
+    "generatedBy": "98b9be0d-3ec9-43ba-af59-86569a8b9d09",
+    "frequency": "monthly",
+    "dayOfMonth": 1,
+    "hour": 8,
+    "minute": 30,
+    "enabled": true,
+    "nextRunAt": "2026-04-01T11:30:00.000Z",
+    "updatedAt": "2026-03-24T16:25:48.846Z"
+  },
+  {
+    "academyId": "aef6e784-d50e-45bd-84c4-af5c060ccf64",
+    "generatedBy": "39ce9f7c-77d7-442f-82fe-b771d0a0327e",
+    "frequency": "monthly",
+    "dayOfMonth": 1,
+    "hour": 8,
+    "minute": 30,
+    "enabled": true,
+    "nextRunAt": "2026-04-01T11:30:00.000Z",
+    "updatedAt": "2026-03-24T16:27:34.433Z"
+  },
+  {
+    "academyId": "aa10a863-95df-4303-9a6b-a087ade80e9e",
+    "generatedBy": "209a2c7a-94a6-4896-a904-15285a671450",
+    "frequency": "monthly",
+    "dayOfMonth": 1,
+    "hour": 8,
+    "minute": 30,
+    "enabled": true,
+    "nextRunAt": "2026-04-01T11:30:00.000Z",
+    "updatedAt": "2026-03-24T16:58:11.631Z"
+  },
+  {
+    "academyId": "d218673c-05a0-4294-9133-9a34ce125e60",
+    "generatedBy": "862b9d5c-5f62-4d1e-9da8-abfa6c1b7af3",
+    "frequency": "monthly",
+    "dayOfMonth": 1,
+    "hour": 8,
+    "minute": 30,
+    "enabled": true,
+    "nextRunAt": "2026-04-01T11:30:00.000Z",
+    "updatedAt": "2026-03-24T17:20:05.258Z"
+  },
+  {
+    "academyId": "5a3412c0-1856-4e28-a97d-b4cce0a7c645",
+    "generatedBy": "60812581-5e90-40f8-9b4c-2b579b63669a",
+    "frequency": "monthly",
+    "dayOfMonth": 1,
+    "hour": 8,
+    "minute": 30,
+    "enabled": true,
+    "nextRunAt": "2026-04-01T11:30:00.000Z",
+    "updatedAt": "2026-03-24T17:24:10.078Z"
+  },
+  {
+    "academyId": "37c614cf-a4be-46aa-98ea-7bbcfc8d7182",
+    "generatedBy": "d4460d7b-27c8-448c-ac81-40c5329badf7",
+    "frequency": "monthly",
+    "dayOfMonth": 1,
+    "hour": 8,
+    "minute": 30,
+    "enabled": true,
+    "nextRunAt": "2026-04-01T11:30:00.000Z",
+    "updatedAt": "2026-03-24T17:25:25.252Z"
+  },
+  {
+    "academyId": "8f5186e7-4700-455e-9e1f-391e6dfeee9e",
+    "generatedBy": "b6351975-00dd-4af3-a6e7-7828dc581ac4",
+    "frequency": "monthly",
+    "dayOfMonth": 1,
+    "hour": 8,
+    "minute": 30,
+    "enabled": true,
+    "nextRunAt": "2026-04-01T11:30:00.000Z",
+    "updatedAt": "2026-03-24T17:33:59.753Z"
+  }
+]

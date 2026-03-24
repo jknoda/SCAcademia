@@ -1,0 +1,92 @@
+<div class="consent-admin-page">
+  <header class="page-header">
+    <button class="back-link" (click)="backToDashboard()">← Voltar ao Dashboard</button>
+    <div>
+      <p class="eyebrow">Configurações</p>
+      <h1>Termos de Consentimento</h1>
+      <p class="subtitle">Edite os textos ativos e publique uma nova versão para a academia {{ academyName || 'atual' }}.</p>
+    </div>
+  </header>
+
+  <div class="loading" *ngIf="isLoading">Carregando termos...</div>
+
+  <div class="page-content" *ngIf="!isLoading">
+    <section class="summary-card">
+      <div>
+        <span class="summary-label">Versão ativa</span>
+        <strong>{{ currentVersion }}</strong>
+      </div>
+      <div>
+        <span class="summary-label">Próxima publicação</span>
+        <strong>{{ getNextVersionLabel() }}</strong>
+      </div>
+      <div>
+        <label class="summary-label" for="bumpType">Tipo de incremento</label>
+        <select id="bumpType" [(ngModel)]="bumpType">
+          <option value="minor">Minor (1.0 → 1.1)</option>
+          <option value="major">Major (1.1 → 2.0)</option>
+        </select>
+      </div>
+    </section>
+
+    <div class="alert success" *ngIf="successMessage">{{ successMessage }}</div>
+    <div class="alert error" *ngIf="errorMessage">{{ errorMessage }}</div>
+
+    <section class="editor-grid">
+      <article class="editor-card">
+        <div class="editor-header">
+          <h2>Saúde</h2>
+          <span>Texto exibido no passo clínico</span>
+        </div>
+        <textarea [(ngModel)]="form.healthContent" rows="10"></textarea>
+      </article>
+
+      <article class="editor-card">
+        <div class="editor-header">
+          <h2>Ética</h2>
+          <span>Conduta e responsabilidades</span>
+        </div>
+        <textarea [(ngModel)]="form.ethicsContent" rows="10"></textarea>
+      </article>
+
+      <article class="editor-card full-width">
+        <div class="editor-header">
+          <h2>Privacidade</h2>
+          <span>LGPD, dados pessoais e uso interno</span>
+        </div>
+        <textarea [(ngModel)]="form.privacyContent" rows="12"></textarea>
+      </article>
+    </section>
+
+    <section class="history-card">
+      <h3>Versões ativas carregadas</h3>
+      <div class="template-list">
+        <div class="template-pill" *ngFor="let template of templates">
+          <strong>{{ template.consentType | titlecase }}</strong>
+          <span>v{{ template.version }}</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="history-card" *ngIf="affectedStudents.length > 0">
+      <h3>Responsáveis que precisam reconsentir</h3>
+      <div class="affected-list">
+        <article class="affected-card" *ngFor="let student of affectedStudents">
+          <div>
+            <strong>{{ student.studentName }}</strong>
+            <p>Versão anterior: {{ student.previousVersion }} → nova versão: {{ student.newVersion }}</p>
+          </div>
+          <a [href]="student.consentLink" target="_blank" rel="noopener noreferrer">Abrir link</a>
+          <button class="btn-secondary inline" (click)="copyConsentLink(student.consentLink)">Copiar link</button>
+        </article>
+      </div>
+    </section>
+
+    <div class="actions">
+      <button class="btn-secondary" (click)="loadTemplates()" [disabled]="isPublishing">Recarregar</button>
+      <button class="btn-primary" (click)="publish()" [disabled]="isPublishing">
+        {{ isPublishing ? 'Publicando...' : 'Publicar Nova Versão' }}
+      </button>
+    </div>
+  </div>
+</div>

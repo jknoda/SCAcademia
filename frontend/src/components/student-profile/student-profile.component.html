@@ -1,0 +1,113 @@
+<div class="student-profile-container">
+  <h2>Ficha Completa do Aluno</h2>
+
+  <div *ngIf="loading" class="loading">Carregando ficha...</div>
+  <div *ngIf="errorMessage" class="error-alert">{{ errorMessage }}</div>
+  <div *ngIf="successMessage" class="success-alert">{{ successMessage }}</div>
+  <div *ngIf="createdGuardianTemporaryPassword" class="success-alert temporary-password-alert">
+    Senha temporaria do responsavel criado: <strong>{{ createdGuardianTemporaryPassword }}</strong>
+  </div>
+
+  <div *ngIf="ficha" class="grid-layout">
+    <section class="card">
+      <h3>Dados Pessoais</h3>
+      <p><strong>Nome:</strong> {{ ficha.student.fullName }}</p>
+      <p><strong>Email:</strong> {{ ficha.student.email }}</p>
+      <p><strong>CPF:</strong> {{ ficha.student.documentId || '-' }}</p>
+      <p><strong>Data de Nascimento:</strong> {{ toDate(ficha.student.birthDate) }}</p>
+      <p><strong>Telefone:</strong> {{ ficha.student.phone || '-' }}</p>
+      <p><strong>Status:</strong> {{ ficha.student.isActive === false ? 'Inativo' : 'Ativo' }}</p>
+      <p><strong>Menor de idade:</strong> {{ ficha.student.isMinor ? 'Sim' : 'Nao' }}</p>
+      <p><strong>Faixa:</strong> {{ ficha.student.faixa || '-' }}</p>
+    </section>
+
+    <section class="card">
+      <h3>Status LGPD</h3>
+      <p><strong>Consentimento assinado:</strong> {{ ficha.lgpd.consentSigned ? 'Sim' : 'Nao' }}</p>
+      <p><strong>Data do consentimento:</strong> {{ toDate(ficha.lgpd.consentSignedAt) }}</p>
+    </section>
+
+    <section class="card">
+      <h3>Status Saude</h3>
+      <p><strong>Situacao:</strong> {{ getHealthStatusLabel() }}</p>
+      <p *ngIf="ficha.health.anamnesePreenchida"><strong>Ultima atualizacao:</strong> {{ toDate(ficha.health.lastUpdatedAt) }}</p>
+      <p *ngIf="isProfessorView" class="muted">Professor visualiza apenas o indicador operacional de saude.</p>
+      <button *ngIf="canManageHealth()" class="btn btn-primary" (click)="goToHealthScreening()">
+        {{ ficha.health.anamnesePreenchida ? 'Visualizar / Editar' : 'Preencher Agora' }}
+      </button>
+    </section>
+
+    <section class="card">
+      <h3>Responsavel</h3>
+      <p><strong>Nome:</strong> {{ ficha.responsavel.guardianName || '-' }}</p>
+      <p><strong>Email:</strong> {{ ficha.responsavel.guardianEmail || '-' }}</p>
+      <p><strong>Parentesco:</strong> {{ ficha.responsavel.relationship || '-' }}</p>
+      <button
+        *ngIf="ficha.responsavel.guardianId"
+        class="btn btn-danger"
+        (click)="unlinkGuardian()"
+        [disabled]="loadingLink"
+      >
+        {{ loadingLink ? 'Desvinculando...' : 'Desvincular Responsavel' }}
+      </button>
+      <p *ngIf="ficha.responsavel.pendenteVinculacao" class="warning-text">
+        Aluno menor sem responsavel vinculado. Pendencia da Story 9.5.
+      </p>
+
+      <div *ngIf="ficha.student.isMinor && ficha.responsavel.pendenteVinculacao" class="guardian-linking">
+        <h4>Vincular Responsavel Existente</h4>
+        <div class="inline-form">
+          <input
+            type="email"
+            [(ngModel)]="searchGuardianEmail"
+            class="form-control"
+            placeholder="Email do responsavel"
+          />
+          <input
+            type="text"
+            [(ngModel)]="searchRelationship"
+            class="form-control"
+            placeholder="Parentesco (ex: Mae, Pai)"
+          />
+          <button class="btn" (click)="searchGuardian()" [disabled]="loadingGuardianSearch">
+            {{ loadingGuardianSearch ? 'Buscando...' : 'Buscar' }}
+          </button>
+        </div>
+
+        <div *ngIf="searchedGuardian" class="search-result">
+          <p><strong>Encontrado:</strong> {{ searchedGuardian.fullName }} ({{ searchedGuardian.email }})</p>
+          <p><strong>Vinculos atuais:</strong> {{ searchedGuardian.linkedStudentsCount }}</p>
+          <button class="btn btn-primary" (click)="linkExistingGuardian()" [disabled]="loadingLink">
+            {{ loadingLink ? 'Vinculando...' : 'Vincular este responsavel' }}
+          </button>
+        </div>
+
+        <h4>Criar Novo Responsavel e Vincular</h4>
+        <div class="create-form-grid">
+          <input type="text" [(ngModel)]="createGuardianForm.fullName" class="form-control" placeholder="Nome completo" />
+          <input type="email" [(ngModel)]="createGuardianForm.email" class="form-control" placeholder="Email" />
+          <input type="text" [(ngModel)]="createGuardianForm.relationship" class="form-control" placeholder="Parentesco" />
+          <input type="text" [(ngModel)]="createGuardianForm.phone" class="form-control" placeholder="Telefone (opcional)" />
+          <input type="text" [(ngModel)]="createGuardianForm.documentId" class="form-control" placeholder="CPF (opcional)" />
+        </div>
+        <button class="btn btn-primary" (click)="createAndLinkGuardian()" [disabled]="loadingCreateAndLink">
+          {{ loadingCreateAndLink ? 'Criando e vinculando...' : 'Criar e vincular responsavel' }}
+        </button>
+      </div>
+    </section>
+
+    <section class="card">
+      <h3>Turmas Vinculadas</h3>
+      <ul>
+        <li *ngFor="let turma of ficha.turmas">
+          {{ turma.turmaName }} ({{ turma.isActive ? 'Ativa' : 'Inativa' }})
+        </li>
+      </ul>
+      <p *ngIf="ficha.turmas.length === 0" class="muted">Nenhuma turma vinculada.</p>
+    </section>
+  </div>
+
+  <div class="actions-row">
+    <button class="btn btn-secondary" (click)="goBack()">Voltar</button>
+  </div>
+</div>

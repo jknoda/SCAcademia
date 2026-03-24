@@ -29,15 +29,152 @@
     <section class="actions">
       <h3>Próximas Ações</h3>
       <div class="action-buttons">
-        <button class="action-btn" disabled title="Próximas funcionalidades em desenvolvimento">
-          👨‍🏫 Adicionar Professor
+        <button class="action-btn" (click)="goToProfessors()">
+          👨‍🏫 Professores
         </button>
-        <button class="action-btn" disabled title="Próximas funcionalidades em desenvolvimento">
+        <button class="action-btn" (click)="goToStudents()">
           👨‍🎓 Adicionar Aluno
         </button>
-        <button class="action-btn" disabled title="Próximas funcionalidades em desenvolvimento">
-          ⚙️ Configurações
+        <button class="action-btn" (click)="goToAcademyProfile()">
+          🏢 Perfil da Academia
         </button>
+        <button class="action-btn" (click)="goToMyProfile()">
+          👤 Meu Perfil
+        </button>
+        <button class="action-btn" (click)="goToConsentTemplates()">
+          ⚙️ Termos de Consentimento
+        </button>
+        <button class="action-btn" (click)="goToAuditLogs()">
+          🔍 Log de Auditoria LGPD
+        </button>
+        <button class="action-btn" (click)="goToComplianceReports()">
+          📄 Relatórios LGPD
+        </button>
+      </div>
+    </section>
+
+    <section class="compliance-lgpd">
+      <div class="section-heading">
+        <div>
+          <h3>Conformidade LGPD</h3>
+          <p class="muted">Gere um relatório assinado, visualize alertas e acompanhe o histórico recente.</p>
+        </div>
+        <button class="action-btn primary" (click)="generateComplianceReport()" [disabled]="complianceLoading">
+          {{ complianceLoading ? 'Gerando...' : 'Gerar Relatório' }}
+        </button>
+      </div>
+
+      <div class="status-message success" *ngIf="complianceMessage">{{ complianceMessage }}</div>
+      <div class="status-message error" *ngIf="complianceError">{{ complianceError }}</div>
+
+      <div class="alerts-grid" *ngIf="complianceAlerts.length > 0">
+        <article class="alert-card" *ngFor="let alert of complianceAlerts" [class.high]="alert.severity === 'high'">
+          <strong>{{ alert.message }}</strong>
+          <p>{{ alert.recommendation }}</p>
+        </article>
+      </div>
+
+      <div class="report-summary" *ngIf="latestComplianceReport">
+        <div>
+          <p><strong>Última geração:</strong> {{ formatDateTime(latestComplianceReport.createdAt) }}</p>
+          <p><strong>Assinatura:</strong> {{ latestComplianceReport.signatureHash || 'N/D' }}</p>
+          <p><strong>Consentimentos expirados:</strong> {{ latestComplianceReport.reportData.statistics.expiredConsentCount }}</p>
+        </div>
+        <button class="action-btn" (click)="downloadComplianceReport(latestComplianceReport.id)">
+          Download PDF
+        </button>
+      </div>
+
+      <div class="history-list">
+        <h4>Histórico recente</h4>
+        <p *ngIf="complianceHistory.length === 0" class="muted">Nenhum relatório LGPD gerado até o momento.</p>
+        <div class="history-item" *ngFor="let report of complianceHistory | slice:0:3">
+          <div>
+            <p><strong>Gerado em:</strong> {{ formatDateTime(report.createdAt) }}</p>
+            <p><strong>Alertas:</strong> {{ report.reportData.alerts.length }}</p>
+          </div>
+          <button class="action-btn" (click)="downloadComplianceReport(report.id)">Baixar</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="compliance-lgpd">
+      <div class="section-heading">
+        <div>
+          <h3>Pendencias LGPD - Menores sem Responsavel</h3>
+          <p class="muted">Acompanhe alunos menores com pendencia de vinculo de responsavel para consentimento.</p>
+        </div>
+        <button class="action-btn" (click)="goToMinorsWithoutGuardian()">
+          Abrir Filtro
+        </button>
+      </div>
+
+      <div class="status-message error" *ngIf="minorsWithoutGuardianError">{{ minorsWithoutGuardianError }}</div>
+      <p *ngIf="minorsWithoutGuardianLoading" class="muted">Carregando pendencias...</p>
+
+      <div class="report-summary" *ngIf="!minorsWithoutGuardianLoading && !minorsWithoutGuardianError">
+        <div>
+          <p><strong>Total pendente:</strong> {{ minorsWithoutGuardian.length }}</p>
+          <p><strong>Acao recomendada:</strong> priorizar vinculo na ficha dos alunos menores.</p>
+        </div>
+        <button class="action-btn" (click)="loadMinorsWithoutGuardian()">Atualizar</button>
+      </div>
+
+      <div class="history-list" *ngIf="!minorsWithoutGuardianLoading && minorsWithoutGuardian.length > 0">
+        <h4>Exemplos de pendencias</h4>
+        <div class="history-item" *ngFor="let student of minorsWithoutGuardian | slice:0:5">
+          <div>
+            <p><strong>Aluno:</strong> {{ student.fullName }}</p>
+            <p><strong>Idade:</strong> {{ student.idade ?? '-' }}</p>
+          </div>
+          <button class="action-btn" (click)="goToMinorsWithoutGuardian()">Resolver</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="deletion-lgpd">
+      <h3>Direito ao Esquecimento (LGPD)</h3>
+      <p class="deletion-warning">
+        Esta ação agenda a deleção de dados do aluno após 30 dias de graça. Durante esse período, a solicitação pode ser cancelada.
+      </p>
+
+      <div class="deletion-form">
+        <div class="field">
+          <label for="deletionStudentId">ID do Aluno</label>
+          <input id="deletionStudentId" [(ngModel)]="deletionStudentId" placeholder="UUID do aluno" />
+        </div>
+        <div class="field">
+          <label for="deletionReason">Motivo (opcional)</label>
+          <input id="deletionReason" [(ngModel)]="deletionReason" placeholder="Ex: Direito ao esquecimento" />
+        </div>
+        <label class="confirm-row">
+          <input type="checkbox" [(ngModel)]="deletionConfirm" />
+          <span>Entendo e concordo com o agendamento de deleção após 30 dias.</span>
+        </label>
+        <div class="deletion-actions">
+          <button class="action-btn" (click)="requestDeletion()" [disabled]="deletionLoading">
+            {{ deletionLoading ? 'Enviando...' : 'Solicitar Deleção' }}
+          </button>
+          <button class="action-btn" (click)="processDueRequests()" [disabled]="processingDue">
+            {{ processingDue ? 'Processando...' : 'Processar Solicitações Vencidas' }}
+          </button>
+        </div>
+      </div>
+
+      <div class="status-message success" *ngIf="deletionMessage">{{ deletionMessage }}</div>
+      <div class="status-message error" *ngIf="deletionError">{{ deletionError }}</div>
+
+      <div class="pending-list">
+        <h4>Solicitações Pendentes</h4>
+        <p *ngIf="pendingDeletionRequests.length === 0" class="muted">Nenhuma solicitação pendente no momento.</p>
+        <div class="pending-item" *ngFor="let item of pendingDeletionRequests">
+          <div>
+            <p><strong>Aluno:</strong> {{ item.studentName || item.studentId }}</p>
+            <p><strong>Solicitado por:</strong> {{ item.requestedByName || item.requestedById }}</p>
+            <p><strong>Agendado para:</strong> {{ formatDateTime(item.deletionScheduledAt) }}</p>
+          </div>
+          <button class="action-btn" (click)="cancelDeletionRequest(item.deletionRequestId)">Cancelar</button>
+        </div>
       </div>
     </section>
 

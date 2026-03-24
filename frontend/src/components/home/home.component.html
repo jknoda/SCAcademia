@@ -1,0 +1,110 @@
+<div class="home-container">
+  <div class="home-card" *ngIf="currentUser">
+    <div class="welcome-header">
+      <div class="avatar">{{ currentUser.fullName.charAt(0).toUpperCase() }}</div>
+      <div>
+        <h2>Bem-vindo, {{ currentUser.fullName }}!</h2>
+        <span class="role-badge">{{ getRoleLabel() }}</span>
+      </div>
+    </div>
+
+    <div class="info-section">
+      <p><strong>Academia:</strong> {{ currentUser.academy.name }}</p>
+      <p><strong>Email:</strong> {{ currentUser.email }}</p>
+    </div>
+
+    <div class="actions">
+      <app-training-entry-point *ngIf="isProfessor()"></app-training-entry-point>
+
+      <div class="health-card" *ngIf="isResponsavel()">
+        <h3>Saude dos Filhos</h3>
+        <p class="lgpd-note">Preencha a anamnese pendente para manter o onboarding do aluno completo.</p>
+
+        <p *ngIf="isLoadingLinkedStudents" class="lgpd-note">Carregando filhos vinculados...</p>
+        <div *ngIf="linkedStudentsErrorMessage" class="status-message error">{{ linkedStudentsErrorMessage }}</div>
+
+        <div *ngIf="!isLoadingLinkedStudents && studentsWithoutHealthScreening.length === 0" class="status-message success">
+          Nenhum filho com anamnese pendente no momento.
+        </div>
+
+        <div class="health-student-card" *ngFor="let student of studentsWithoutHealthScreening">
+          <div>
+            <p><strong>{{ student.studentName }}</strong></p>
+            <p class="lgpd-note">Anamnese pendente. Recomendamos preencher antes do próximo treino.</p>
+          </div>
+          <button class="btn-primary" (click)="goToStudentHealthScreening(student.studentId)">Preencher Saude</button>
+        </div>
+      </div>
+
+      <div class="lgpd-card" *ngIf="isResponsavel()">
+        <h3>Direito ao Esquecimento (LGPD)</h3>
+        <p class="lgpd-note">
+          Solicite a exclusao dos dados de um filho vinculado. O processamento ocorre apos o periodo de carencia.
+        </p>
+
+        <div class="field">
+          <label for="student-id">Filho vinculado</label>
+          <select
+            id="student-id"
+            [(ngModel)]="selectedStudentId"
+            [disabled]="linkedStudents.length === 0"
+          >
+            <option value="" disabled>Selecione um aluno</option>
+            <option *ngFor="let student of linkedStudents" [value]="student.studentId">
+              {{ student.studentName }}
+            </option>
+          </select>
+        </div>
+
+        <p class="lgpd-note" *ngIf="linkedStudents.length === 0">
+          Nenhum filho vinculado encontrado para este perfil.
+        </p>
+
+        <div class="field">
+          <label for="deletion-reason">Motivo (opcional)</label>
+          <textarea
+            id="deletion-reason"
+            rows="3"
+            [(ngModel)]="deletionReason"
+            placeholder="Descreva o motivo da solicitacao"
+          ></textarea>
+        </div>
+
+        <label class="confirm-row">
+          <input type="checkbox" [(ngModel)]="confirmDeletionRequest" />
+          <span>
+            Confirmo a solicitacao de exclusao para
+            <strong>{{ selectedStudentName }}</strong>
+            e entendo que essa acao pode ser irreversivel apos o processamento.
+          </span>
+        </label>
+
+        <div class="lgpd-actions">
+          <button class="btn-primary" (click)="requestDeletion()" [disabled]="isSubmittingDeletion">
+            {{ isSubmittingDeletion ? 'Solicitando...' : 'Solicitar exclusao' }}
+          </button>
+          <button class="btn-secondary" (click)="loadDeletionStatus()" [disabled]="isLoadingStatus">
+            {{ isLoadingStatus ? 'Consultando...' : 'Consultar status' }}
+          </button>
+        </div>
+
+        <div *ngIf="deletionSuccessMessage" class="status-message success">{{ deletionSuccessMessage }}</div>
+        <div *ngIf="deletionErrorMessage" class="status-message error">{{ deletionErrorMessage }}</div>
+
+        <div class="status-card" *ngIf="deletionStatus">
+          <p><strong>Status:</strong> {{ deletionStatus.status }}</p>
+          <p><strong>Solicitado em:</strong> {{ deletionStatus.requestedAt | date: 'short' }}</p>
+          <p><strong>Execucao prevista:</strong> {{ deletionStatus.deletionScheduledAt | date: 'short' }}</p>
+          <p *ngIf="deletionStatus.processedAt">
+            <strong>Processado em:</strong> {{ deletionStatus.processedAt | date: 'short' }}
+          </p>
+        </div>
+      </div>
+
+      <p class="coming-soon" *ngIf="!isResponsavel() && !isProfessor()">
+        Funcionalidades do seu perfil estao sendo implementadas.
+      </p>
+      <button class="btn-logout" (click)="logout()">Sair</button>
+    </div>
+  </div>
+</div>

@@ -1,8 +1,9 @@
 import { Response, NextFunction } from 'express';
 import { verify } from '../lib/jwt';
+import { getUserById } from '../lib/database';
 import { AuthenticatedRequest } from '../types';
 
-export const authMiddleware = (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+export const authMiddleware = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -18,11 +19,17 @@ export const authMiddleware = (req: AuthenticatedRequest, res: Response, next: N
     if (!decoded.academyId) {
       return res.status(401).json({ error: 'Token inválido ou expirado' });
     }
+
+    const user = await getUserById(decoded.userId);
+    if (!user || user.academyId !== decoded.academyId || user.isActive === false) {
+      return res.status(401).json({ error: 'Token inválido ou expirado' });
+    }
+
     req.user = decoded;
     req.academyId = decoded.academyId;
-    next();
+    return next();
   } catch (error) {
-    res.status(401).json({ error: 'Token inválido ou expirado' });
+    return res.status(401).json({ error: 'Token inválido ou expirado' });
   }
 };
 

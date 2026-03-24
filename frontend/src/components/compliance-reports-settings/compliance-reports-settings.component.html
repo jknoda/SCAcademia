@@ -1,0 +1,57 @@
+<div class="settings-page">
+  <header class="settings-header">
+    <div>
+      <h2>Configurações > Relatórios Automáticos</h2>
+      <p>Configure a geração mensal do relatório LGPD e acompanhe o histórico auditável.</p>
+    </div>
+    <button class="action-btn" (click)="goBack()">Voltar ao dashboard</button>
+  </header>
+
+  <section class="settings-card">
+    <h3>Agendamento Mensal</h3>
+    <div class="form-grid">
+      <label>
+        <span>Dia do mês</span>
+        <input type="number" min="1" max="28" [(ngModel)]="dayOfMonth" />
+      </label>
+      <label>
+        <span>Hora</span>
+        <input type="number" min="0" max="23" [(ngModel)]="hour" />
+      </label>
+      <label>
+        <span>Minuto</span>
+        <input type="number" min="0" max="59" [(ngModel)]="minute" />
+      </label>
+    </div>
+
+    <label class="checkbox-row">
+      <input type="checkbox" [(ngModel)]="enabled" />
+      <span>Ativar geração automática todo mês</span>
+    </label>
+
+    <div class="status-message success" *ngIf="message">{{ message }}</div>
+    <div class="status-message error" *ngIf="error">{{ error }}</div>
+
+    <div class="current-schedule" *ngIf="schedule">
+      <p><strong>Próxima execução:</strong> {{ formatDateTime(schedule.nextRunAt) }}</p>
+      <p><strong>Atualizado em:</strong> {{ formatDateTime(schedule.updatedAt) }}</p>
+    </div>
+
+    <button class="action-btn primary" (click)="saveSchedule()" [disabled]="loading">
+      {{ loading ? 'Salvando...' : 'Salvar Agendamento' }}
+    </button>
+  </section>
+
+  <section class="settings-card">
+    <h3>Histórico de Relatórios</h3>
+    <p *ngIf="history.length === 0" class="muted">Nenhum relatório gerado até agora.</p>
+    <div class="history-row" *ngFor="let report of history">
+      <div>
+        <p><strong>Gerado em:</strong> {{ formatDateTime(report.createdAt) }}</p>
+        <p><strong>Hash:</strong> {{ report.signatureHash || 'N/D' }}</p>
+        <p><strong>Alertas:</strong> {{ report.reportData.alerts.length }}</p>
+      </div>
+      <button class="action-btn" (click)="downloadReport(report.id)">Download PDF</button>
+    </div>
+  </section>
+</div>

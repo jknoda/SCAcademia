@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Router } from '@angular/router';
+import { finalize } from 'rxjs/operators';
 import { ApiService } from '../../services/api.service';
-import { AuthService } from '../../services/auth.service';
 import { PasswordValidatorService } from '../../services/password-validator.service';
 
 @Component({
@@ -18,6 +18,8 @@ export class RegisterFormComponent implements OnInit {
   errorMessage = '';
   successMessage = '';
   requiresConsent = false;
+  consentLink = '';
+  linkCopied = false;
   suggestions: string[] = [];
   showPassword = false;
   today = new Date().toISOString().split('T')[0];
@@ -37,7 +39,6 @@ export class RegisterFormComponent implements OnInit {
     private fb: FormBuilder,
     private route: ActivatedRoute,
     private api: ApiService,
-    private auth: AuthService,
     private router: Router,
     private passwordValidator: PasswordValidatorService
   ) {}
@@ -59,8 +60,18 @@ export class RegisterFormComponent implements OnInit {
     const academyIdFromQuery = this.route.snapshot.queryParamMap.get('academyId');
     const academyIdFromStorage = localStorage.getItem('academyId') || '';
     this.academyId = academyIdFromQuery || academyIdFromStorage;
+
     if (academyIdFromQuery) {
       localStorage.setItem('academyId', academyIdFromQuery);
+    }
+
+    if (!this.academyId) {
+      this.api.checkSetupNeeded().subscribe((response: any) => {
+        if (response.academyId) {
+          this.academyId = response.academyId;
+          localStorage.setItem('academyId', response.academyId);
+        }
+      });
     }
 
     this.registerForm.get('password')?.valueChanges.subscribe((value: string) => {
@@ -134,14 +145,62 @@ export class RegisterFormComponent implements OnInit {
     this.router.navigate(['/login']);
   }
 
-  onSubmit(): void {
-    if (this.registerForm.invalid) {
-      this.registerForm.markAllAsTouched();
+  copyLink(): void {
+    if (this.consentLink) {
+      navigator.clipboard.writeText(this.consentLink);
+      this.linkCopied = true;
+      setTimeout(() => (this.linkCopied = false), 2000);
+    }
+  }
+
+  private handleRegisterSuccess(response: any): void {
+    this.successMessage = response.message || '✓ Registro realizado com sucesso';
+
+    if (response.requiresConsent) {
+      this.requiresConsent = true;
+      this.consentLink = response.consentLink || '';
+
+      if (this.consentLink) {
+        const popup = window.open(this.consentLink, '_blank', 'noopener,noreferrer');
+        if (!popup) {
+          sessionStorage.setItem('pendingConsentLink', this.consentLink);
+        } else {
+          sessionStorage.removeItem('pendingConsentLink');
+        }
+      }
+
+      setTimeout(() => this.router.navigate(['/login']), 300);
       return;
     }
 
-    if (!this.academyId) {
-      this.errorMessage = 'Academia não encontrada. Verifique a URL ou entre em contato com o administrador.';
+    if (response.accessToken) {
+      this.api.setAccessToken(response.accessToken);
+      const destination = response.user?.role === 'Admin' ? '/admin/dashboard' : '/home';
+      setTimeout(() => this.router.navigate([destination]), 1500);
+      return;
+    }
+
+    setTimeout(() => this.router.navigate(['/login']), 1500);
+  }
+
+  private handleRegisterError(error: any): void {
+    if (error.status === 0) {
+      this.errorMessage = 'Servidor indisponível. Verifique se o backend está rodando.';
+    } else if (error.status === 409) {
+      this.errorMessage = error.error?.error || 'Email já registrado';
+      this.suggestions = error.error?.suggestions || [];
+    } else if (error.status === 400) {
+      this.errorMessage = error.error?.error || 'Dados inválidos';
+    } else if (error.status === 404) {
+      this.errorMessage = error.error?.error || 'Academia não encontrada. Verifique se a URL está correta.';
+    } else {
+      this.errorMessage = error.error?.error || 'Erro ao registrar. Dados não foram salvos. Tente novamente';
+    }
+  }
+
+  onSubmit(): void {
+    if (this.registerForm.invalid) {
+      this.registerForm.markAllAsTouched();
       return;
     }
 
@@ -149,46 +208,40 @@ export class RegisterFormComponent implements OnInit {
     this.errorMessage = '';
     this.suggestions = [];
 
-    const { fullName, email, password, role, birthDate, responsavelEmail } = this.registerForm.value;
-
-    this.api
-      .registerUser({
-        email,
-        password,
-        fullName,
-        role,
-        academyId: this.academyId,
-        birthDate: birthDate || undefined,
-        responsavelEmail: responsavelEmail || undefined,
-      })
-      .subscribe(
-        (response: any) => {
+    this.api.checkSetupNeeded().subscribe(
+      (setupResponse: any) => {
+        if (setupResponse?.needsSetup || !setupResponse?.academyId) {
           this.isLoading = false;
-          this.successMessage = response.message || '✓ Registro realizado com sucesso';
-
-          if (response.requiresConsent) {
-            this.requiresConsent = true;
-            return;
-          }
-
-          if (response.accessToken) {
-            this.api.setAccessToken(response.accessToken);
-            setTimeout(() => this.router.navigate(['/admin/dashboard']), 1500);
-          } else {
-            setTimeout(() => this.router.navigate(['/login']), 1500);
-          }
-        },
-        (error: any) => {
-          this.isLoading = false;
-          if (error.status === 409) {
-            this.errorMessage = error.error?.error || 'Email já registrado';
-            this.suggestions = error.error?.suggestions || [];
-          } else if (error.status === 400) {
-            this.errorMessage = error.error?.error || 'Dados inválidos';
-          } else {
-            this.errorMessage = error.error?.error || 'Erro ao registrar. Dados não foram salvos. Tente novamente';
-          }
+          this.errorMessage = 'Academia não encontrada. Execute o setup inicial da academia.';
+          return;
         }
-      );
+
+        this.academyId = setupResponse.academyId;
+        localStorage.setItem('academyId', setupResponse.academyId);
+
+        const { fullName, email, password, role, birthDate, responsavelEmail } = this.registerForm.value;
+        const payload = {
+          email,
+          password,
+          fullName,
+          role,
+          academyId: this.academyId,
+          birthDate: birthDate || undefined,
+          responsavelEmail: responsavelEmail || undefined,
+        };
+
+        this.api
+          .registerUser(payload)
+          .pipe(finalize(() => (this.isLoading = false)))
+          .subscribe(
+            (response: any) => this.handleRegisterSuccess(response),
+            (error: any) => this.handleRegisterError(error)
+          );
+      },
+      () => {
+        this.isLoading = false;
+        this.errorMessage = 'Não foi possível validar a academia. Tente novamente.';
+      }
+    );
   }
 }

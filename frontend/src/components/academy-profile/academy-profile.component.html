@@ -1,0 +1,119 @@
+<div class="academy-profile-container">
+  <h2>Perfil da Academia</h2>
+  <p>Atualize dados fiscais, operacionais e de contato da academia.</p>
+
+  <div class="loading" *ngIf="isLoading">Carregando perfil...</div>
+
+  <form *ngIf="!isLoading" [formGroup]="form" (ngSubmit)="save()">
+    <div class="grid two-columns">
+      <div class="form-group">
+        <label for="name">Nome da Academia *</label>
+        <input id="name" type="text" formControlName="name" class="form-control" />
+        <div class="error-message" *ngIf="getFieldError('name')">{{ getFieldError('name') }}</div>
+      </div>
+
+      <div class="form-group">
+        <label for="documentId">CNPJ/CPF *</label>
+        <input id="documentId" type="text" formControlName="documentId" class="form-control" placeholder="00.000.000/0000-00" />
+        <div class="error-message" *ngIf="getFieldError('documentId')">{{ getFieldError('documentId') }}</div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="description">Descrição</label>
+      <textarea id="description" rows="3" formControlName="description" class="form-control"></textarea>
+      <div class="error-message" *ngIf="getFieldError('description')">{{ getFieldError('description') }}</div>
+    </div>
+
+    <div class="grid two-columns">
+      <div class="form-group">
+        <label for="contactEmail">Email de Contato *</label>
+        <input id="contactEmail" type="email" formControlName="contactEmail" class="form-control" />
+        <div class="error-message" *ngIf="getFieldError('contactEmail')">{{ getFieldError('contactEmail') }}</div>
+      </div>
+
+      <div class="form-group">
+        <label for="contactPhone">Telefone *</label>
+        <input id="contactPhone" type="text" formControlName="contactPhone" class="form-control" />
+        <div class="error-message" *ngIf="getFieldError('contactPhone')">{{ getFieldError('contactPhone') }}</div>
+      </div>
+    </div>
+
+    <h3>Endereço</h3>
+
+    <div class="grid two-columns">
+      <div class="form-group">
+        <label for="addressStreet">Logradouro</label>
+        <input id="addressStreet" type="text" formControlName="addressStreet" class="form-control" />
+      </div>
+      <div class="form-group">
+        <label for="addressNumber">Número</label>
+        <input id="addressNumber" type="text" formControlName="addressNumber" class="form-control" />
+      </div>
+    </div>
+
+    <div class="grid two-columns">
+      <div class="form-group">
+        <label for="addressComplement">Complemento</label>
+        <input id="addressComplement" type="text" formControlName="addressComplement" class="form-control" />
+      </div>
+      <div class="form-group">
+        <label for="addressNeighborhood">Bairro</label>
+        <input id="addressNeighborhood" type="text" formControlName="addressNeighborhood" class="form-control" />
+      </div>
+    </div>
+
+    <div class="grid three-columns">
+      <div class="form-group">
+        <label for="addressPostalCode">CEP</label>
+        <input
+          id="addressPostalCode"
+          type="text"
+          formControlName="addressPostalCode"
+          class="form-control"
+          placeholder="00000-000"
+          (input)="onPostalCodeInput($event)"
+        />
+        <div class="error-message" *ngIf="getFieldError('addressPostalCode')">{{ getFieldError('addressPostalCode') }}</div>
+      </div>
+
+      <div class="form-group">
+        <label for="addressCity">Cidade</label>
+        <input id="addressCity" type="text" formControlName="addressCity" class="form-control" />
+      </div>
+
+      <div class="form-group">
+        <label for="addressState">UF</label>
+        <input
+          id="addressState"
+          type="text"
+          maxlength="2"
+          formControlName="addressState"
+          class="form-control"
+          (input)="onAddressStateInput($event)"
+        />
+        <div class="error-message" *ngIf="getFieldError('addressState')">{{ getFieldError('addressState') }}</div>
+      </div>
+    </div>
+
+    <h3>Limites da Plataforma (Somente leitura)</h3>
+
+    <div class="grid two-columns">
+      <div class="form-group">
+        <label for="maxUsers">Máximo de Usuários</label>
+        <input id="maxUsers" type="text" formControlName="maxUsers" class="form-control" />
+      </div>
+      <div class="form-group">
+        <label for="storageLimitGb">Limite de Armazenamento (GB)</label>
+        <input id="storageLimitGb" type="text" formControlName="storageLimitGb" class="form-control" />
+      </div>
+    </div>
+
+    <div *ngIf="errorMessage" class="error-alert">{{ errorMessage }}</div>
+    <div *ngIf="successMessage" class="success-alert">{{ successMessage }}</div>
+
+    <button type="submit" [disabled]="isSaving || form.invalid" class="btn btn-primary">
+      {{ isSaving ? 'Salvando...' : 'Salvar Alterações' }}
+    </button>
+  </form>
+</div>

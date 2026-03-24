@@ -2,6 +2,12 @@
   <h2>Fazer Login</h2>
   <p>Digite suas credenciais para acessar a academia</p>
 
+  <div class="consent-pending" *ngIf="pendingConsentLink">
+    <strong>Consentimento pendente</strong>
+    <p>O cadastro do aluno foi criado. Abra o link para o responsável assinar.</p>
+    <a href="#" (click)="openPendingConsent($event)">Abrir link de consentimento</a>
+  </div>
+
   <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
     <div class="form-group">
       <label for="email">Email *</label>
@@ -49,10 +55,10 @@
   </p>
 
   <div class="register-link" style="margin-bottom: 8px;">
-    Esqueceu a senha? <a (click)="goToForgotPassword()" href="#" style="color:#0052CC;font-weight:600">Redefinir senha</a>
+    Esqueceu a senha? <a (click)="goToForgotPassword($event)" href="#" style="color:#0052CC;font-weight:600">Redefinir senha</a>
   </div>
 
   <div class="register-link">
-    Não tem conta? <a (click)="goToRegister()" href="#" style="color:#0052CC;font-weight:600">Criar Conta</a>
+    Não tem conta? <a (click)="goToRegister($event)" href="#" style="color:#0052CC;font-weight:600">Criar Conta</a>
   </div>
 </div>

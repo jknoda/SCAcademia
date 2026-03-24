@@ -1,0 +1,64 @@
+diff --git a/_bmad-output/implementation-artifacts/sprint-status.yaml b/_bmad-output/implementation-artifacts/sprint-status.yaml
+index aee25ba..5130e27 100644
+--- a/_bmad-output/implementation-artifacts/sprint-status.yaml
++++ b/_bmad-output/implementation-artifacts/sprint-status.yaml
+@@ -1,6 +1,6 @@
+ # SCAcademia Sprint Status Tracking
+ # Generated: 2026-03-20T14:30:00Z
+-# Last Updated: 2026-03-21T21:30:00Z
++# Last Updated: 2026-03-24T04:10:00Z
+ # Project: SCAcademia
+ # Project Key: SCACAD
+ # Tracking System: file-system
+@@ -95,14 +95,14 @@ development_status:
+   # EPIC 2: Saúde & LGPD [6]
+   # ======================================
+   
+-  epic-2: backlog
++  epic-2: done
+   
+-  2-1-anamnese-inicial: backlog
+-  2-2-consentimento-lgpd: backlog
+-  2-3-versionamento-consentimento: backlog
+-  2-4-auditoria-lgpd: backlog
+-  2-5-direito-esquecimento: backlog
+-  2-6-relatorio-lgpd: backlog
++  2-1-anamnese-inicial: done
++  2-2-consentimento-lgpd: done
++  2-3-versionamento-consentimento: done
++  2-4-auditoria-lgpd: done
++  2-5-direito-esquecimento: done
++  2-6-relatorio-lgpd: done
+   
+   epic-2-retrospective: optional
+   
+@@ -110,10 +110,10 @@ development_status:
+   # EPIC 3: Professor Love — Training [8]
+   # ======================================
+   
+-  epic-3: backlog
++  epic-3: in-progress
+   
+-  3-1-entry-point-conversacional: backlog
+-  3-2-marcar-frequencia: backlog
++  3-1-entry-point-conversacional: done
++  3-2-marcar-frequencia: review
+   3-3-adicionar-tecnicas: backlog
+   3-4-anotacoes-notas: backlog
+   3-5-revisar-confirmar: backlog
+@@ -208,12 +208,12 @@ development_status:
+ # - Total Items: 68
+ 
+ # STATUS BREAKDOWN (Initial):
+-# - backlog: 60 items (52 stories + 8 epics)
++# - backlog: 57 items (49 stories + 8 epics)
+ # - optional: 8 items (retrospectives)
+ # - ready-for-dev: 0 items
+-# - in-progress: 0 items
++# - in-progress: 1 item (2-4-auditoria-lgpd)
+ # - review: 0 items
+-# - done: 0 items
++# - done: 7 items (Epic 1: 5 stories + Epic 2 partial: Story 2-1 + 2-2 + 2-3)
+ 
+ # RECOMMENDED SPRINT SEQUENCE:
+ # Sprint 1 (Week 1-2):     Epic 1 (Foundation) [5 stories]

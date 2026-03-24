@@ -1,9 +1,10 @@
 import { Response } from 'express';
-import { AuthenticatedRequest, AcademyCreateRequest, AdminRegistrationRequest, LoginRequest } from '../types';
+import { AuthenticatedRequest, AcademyCreateRequest, AdminRegistrationRequest, ChangePasswordRequest, LoginRequest } from '../types';
 import {
   createAcademy,
   getAcademyById,
   academyExists,
+  getAllAcademies,
   createUser,
   getUserByEmail,
   getUserByEmailAcrossAcademies,
@@ -17,13 +18,18 @@ import {
 import { logAudit } from '../lib/audit';
 import { hashPassword, verifyPassword, validatePasswordStrength } from '../lib/password';
 import { sign, verify } from '../lib/jwt';
+import { seedDefaultTemplates, createConsentRequest } from '../lib/consents';
+import { sendConsentEmail, sendPasswordResetEmail, sendWelcomeEmail } from '../lib/email';
 
 const toExpiresAt = (seconds: number): Date => new Date(Date.now() + seconds * 1000);
 
 export const checkSetupNeeded = async (req: any, res: Response) => {
   try {
-    const needsSetup = !(await academyExists());
-    res.json({ needsSetup });
+    const academies = await getAllAcademies();
+    if (academies.length === 0) {
+      return res.json({ needsSetup: true });
+    }
+    return res.json({ needsSetup: false, academyId: academies[0].id });
   } catch (error) {
     res.status(500).json({ error: 'Erro ao verificar status de setup' });
   }
@@ -32,10 +38,6 @@ export const checkSetupNeeded = async (req: any, res: Response) => {
 export const createAcademyHandler = async (req: any, res: Response) => {
   try {
     const { name, location, email, phone } = req.body as AcademyCreateRequest;
-
-    if (await academyExists()) {
-      return res.status(409).json({ error: 'Academia já existe. Setup já foi realizado.' });
-    }
 
     const academy = await createAcademy(name, location, email, phone);
 
@@ -88,6 +90,10 @@ export const initAdminHandler = async (req: any, res: Response) => {
       role: 'Admin',
     });
 
+    await seedDefaultTemplates(academyId).catch(err =>
+      console.warn('[Seed] Aviso ao criar templates de consentimento:', err.message)
+    );
+
     res.status(201).json({
       userId: user.id,
       email: user.email,
@@ -113,6 +119,14 @@ export const loginHandler = async (req: any, res: Response) => {
       return res.status(401).json({ error: 'Email ou senha incorretos' });
     }
 
+    if (user.isActive === false) {
+      logAudit(user.id, 'LOGIN_FAILURE', 'Auth', 'login', user.academyId, undefined, {
+        email,
+        reason: 'Inactive user',
+      });
+      return res.status(403).json({ error: 'Usuário inativo. Procure a administração da academia.' });
+    }
+
     const passwordMatch = await verifyPassword(password, user.passwordHash);
     if (!passwordMatch) {
       logAudit(user.id, 'LOGIN_FAILURE', 'Auth', 'login', user.academyId, undefined, {
@@ -120,6 +134,22 @@ export const loginHandler = async (req: any, res: Response) => {
         reason: 'Invalid password',
       });
       return res.status(401).json({ error: 'Email ou senha incorretos' });
+    }
+
+    if (user.role === 'Aluno' && user.necessitaConsentimentoResponsavel && user.consentStatus !== 'consentido') {
+      const consentToken = await createConsentRequest(user.id, user.academyId);
+      const consentLink = `http://localhost:4200/consent/${consentToken}`;
+
+      logAudit(user.id, 'LOGIN_FAILURE', 'Auth', 'login', user.academyId, undefined, {
+        email,
+        reason: 'Pending guardian consent',
+      });
+
+      return res.status(403).json({
+        error: 'Consentimento pendente. Solicite a assinatura do responsável para liberar o acesso.',
+        consentPending: true,
+        consentLink,
+      });
     }
 
     const academy = await getAcademyById(user.academyId);
@@ -341,16 +371,24 @@ export const registerUserHandler = async (req: any, res: Response) => {
       role,
     });
 
+    let consentLink: string | undefined;
     if (user.necessitaConsentimentoResponsavel) {
-      console.log(`[EMAIL] Enviando email de consentimento para ${user.responsavelEmail} - aluno menor de idade: ${user.fullName}`);
+      const consentToken = await createConsentRequest(user.id, academyId);
+      consentLink = `http://localhost:4200/consent/${consentToken}`;
+
+      if (user.responsavelEmail) {
+        await sendConsentEmail(user.responsavelEmail, user.fullName, consentLink);
+      }
+
       logAudit(user.id, 'CONSENT_EMAIL_SENT', 'User', user.id, academyId, undefined, {
         responsavelEmail: user.responsavelEmail,
+        consentLink,
         reason: 'Aluno menor de idade',
       });
     }
 
     if (role === 'Professor') {
-      console.log(`[EMAIL] Enviando email de boas-vindas para professor: ${email}`);
+      await sendWelcomeEmail(email, user.fullName);
       logAudit(user.id, 'WELCOME_EMAIL_SENT', 'User', user.id, academyId, undefined, {
         email,
         role: 'Professor',
@@ -404,6 +442,7 @@ export const registerUserHandler = async (req: any, res: Response) => {
       userId: user.id,
       requiresConsent: true,
       consentStatus: 'pendente',
+      consentLink,
     });
   } catch (error) {
     const ip = req.ip || req.connection?.remoteAddress || 'unknown';
@@ -456,7 +495,7 @@ export const forgotPasswordHandler = async (req: any, res: Response) => {
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:4200';
     const resetLink = `${frontendUrl}/reset-password?token=${encodeURIComponent(resetToken)}`;
 
-    console.log(`[EMAIL] Enviando reset de senha para ${email}: ${resetLink}`);
+    await sendPasswordResetEmail(email, resetLink);
     logAudit(user.id, 'PASSWORD_RESET_REQUESTED', 'Auth', 'forgot-password', user.academyId, undefined, {
       email,
       userFound: true,
@@ -520,5 +559,44 @@ export const resetPasswordHandler = async (req: any, res: Response) => {
     });
   } catch (error) {
     return res.status(500).json({ error: 'Erro ao redefinir senha' });
+  }
+};
+
+export const changePasswordHandler = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ error: 'Não autenticado' });
+    }
+
+    const { currentPassword, newPassword } = req.body as ChangePasswordRequest;
+
+    const user = await getUserById(req.user.userId);
+    if (!user || user.academyId !== req.user.academyId) {
+      return res.status(404).json({ error: 'Usuário não encontrado' });
+    }
+
+    const currentMatches = await verifyPassword(currentPassword, user.passwordHash);
+    if (!currentMatches) {
+      return res.status(400).json({ error: 'Senha atual incorreta' });
+    }
+
+    const passwordValidation = validatePasswordStrength(newPassword);
+    if (!passwordValidation.valid) {
+      return res.status(400).json({
+        error: 'Senha não atende aos requisitos de segurança',
+        details: passwordValidation.errors,
+      });
+    }
+
+    const newPasswordHash = await hashPassword(newPassword);
+    await updateUserPassword(user.id, newPasswordHash);
+
+    logAudit(user.id, 'PASSWORD_CHANGED', 'Auth', 'change-password', user.academyId, undefined, {
+      email: user.email,
+    });
+
+    return res.json({ message: 'Senha alterada com sucesso' });
+  } catch (error) {
+    return res.status(500).json({ error: 'Erro ao alterar senha' });
   }
 };

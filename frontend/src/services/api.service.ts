@@ -1,7 +1,55 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Academy, User, JWTResponse } from '../types';
+import {
+  Academy,
+  AcademyProfile,
+  AdminProfileUpdatePayload,
+  ChangePasswordPayload,
+  User,
+  JWTResponse,
+  ListProfessorsResponse,
+  CreateProfessorPayload,
+  UpdateProfessorPayload,
+  UpdateProfessorStatusPayload,
+  ResetProfessorPasswordPayload,
+  ProfessorMutationResponse,
+  ProfessorProfile,
+  ListStudentsResponse,
+  CreateStudentPayload,
+  UpdateStudentPayload,
+  UpdateStudentStatusPayload,
+  StudentMutationResponse,
+  StudentFichaResponse,
+  StudentProfile,
+  GuardianSearchResult,
+  LinkGuardianPayload,
+  CreateAndLinkGuardianPayload,
+  GuardianMutationResponse,
+  MinorWithoutGuardianItem,
+  StudentWithoutHealthScreeningItem,
+  HealthRecord,
+  HealthScreeningPayload,
+  ConsentValidation,
+  ConsentTemplate,
+  AdminConsentTemplatesResponse,
+  PublishConsentTemplatesPayload,
+  ReconsentAffectedStudent,
+  AuditLogsResponse,
+  AuditLogFilter,
+  DeletionRequestItem,
+  DeletionRequestResponse,
+  LinkedStudentItem,
+  ComplianceReportHistoryItem,
+  ComplianceReportSchedule,
+  GenerateComplianceReportResponse,
+  TrainingEntryPointResponse,
+  StartTrainingSessionResponse,
+  TrainingAttendanceResponse,
+  SaveTrainingAttendancePayload,
+  SaveTrainingAttendanceResponse,
+  UpdateAcademyProfilePayload,
+} from '../types';
 
 @Injectable({
   providedIn: 'root',
@@ -19,8 +67,8 @@ export class ApiService {
     });
   }
 
-  checkSetupNeeded(): Observable<{ needsSetup: boolean }> {
-    return this.http.get<{ needsSetup: boolean }>(`${this.apiUrl}/auth/setup/init`);
+  checkSetupNeeded(): Observable<{ needsSetup: boolean; academyId?: string }> {
+    return this.http.get<{ needsSetup: boolean; academyId?: string }>(`${this.apiUrl}/auth/setup/init`);
   }
 
   createAcademy(data: {
@@ -30,6 +78,174 @@ export class ApiService {
     phone: string;
   }): Observable<{ academyId: string; message: string; nextStep: string }> {
     return this.http.post<any>(`${this.apiUrl}/auth/academies`, data);
+  }
+
+  getAdminAcademyProfile(): Observable<AcademyProfile> {
+    return this.http.get<AcademyProfile>(`${this.apiUrl}/admin/academy-profile`, {
+      headers: this.getHeaders(),
+    });
+  }
+
+  updateAdminAcademyProfile(
+    payload: UpdateAcademyProfilePayload
+  ): Observable<{ message: string; academy: AcademyProfile }> {
+    return this.http.put<{ message: string; academy: AcademyProfile }>(
+      `${this.apiUrl}/admin/academy-profile`,
+      payload,
+      { headers: this.getHeaders() }
+    );
+  }
+
+  getUserProfile(userId: string): Observable<User> {
+    return this.http.get<User>(`${this.apiUrl}/users/${userId}/profile`, {
+      headers: this.getHeaders(),
+    });
+  }
+
+  updateUserProfile(
+    userId: string,
+    payload: AdminProfileUpdatePayload
+  ): Observable<{ message: string; user: User }> {
+    return this.http.put<{ message: string; user: User }>(
+      `${this.apiUrl}/users/${userId}`,
+      payload,
+      { headers: this.getHeaders() }
+    );
+  }
+
+  listProfessors(filters?: { name?: string; status?: 'active' | 'inactive' | 'all' }): Observable<ListProfessorsResponse> {
+    const params: Record<string, string> = {};
+    if (filters?.name) params['name'] = filters.name;
+    if (filters?.status) params['status'] = filters.status;
+
+    return this.http.get<ListProfessorsResponse>(`${this.apiUrl}/users/professores`, {
+      headers: this.getHeaders(),
+      params,
+    });
+  }
+
+  createProfessor(payload: CreateProfessorPayload): Observable<ProfessorMutationResponse> {
+    return this.http.post<ProfessorMutationResponse>(`${this.apiUrl}/users/professores`, payload, {
+      headers: this.getHeaders(),
+    });
+  }
+
+  updateProfessor(userId: string, payload: UpdateProfessorPayload): Observable<ProfessorMutationResponse> {
+    return this.http.put<ProfessorMutationResponse>(`${this.apiUrl}/users/professores/${userId}`, payload, {
+      headers: this.getHeaders(),
+    });
+  }
+
+  updateProfessorStatus(
+    userId: string,
+    payload: UpdateProfessorStatusPayload
+  ): Observable<ProfessorMutationResponse> {
+    return this.http.put<ProfessorMutationResponse>(`${this.apiUrl}/users/professores/${userId}/status`, payload, {
+      headers: this.getHeaders(),
+    });
+  }
+
+  resetProfessorPassword(userId: string, payload: ResetProfessorPasswordPayload): Observable<{ message: string }> {
+    return this.http.put<{ message: string }>(`${this.apiUrl}/users/professores/${userId}/reset-password`, payload, {
+      headers: this.getHeaders(),
+    });
+  }
+
+  getProfessorById(userId: string): Observable<ProfessorProfile> {
+    return this.http.get<ProfessorProfile>(`${this.apiUrl}/users/${userId}/profile`, {
+      headers: this.getHeaders(),
+    });
+  }
+
+  listStudents(filters?: { name?: string; status?: 'active' | 'inactive' | 'all' }): Observable<ListStudentsResponse> {
+    const params: Record<string, string> = {};
+    if (filters?.name) params['name'] = filters.name;
+    if (filters?.status) params['status'] = filters.status;
+
+    return this.http.get<ListStudentsResponse>(`${this.apiUrl}/users/alunos`, {
+      headers: this.getHeaders(),
+      params,
+    });
+  }
+
+  listMyStudents(filters?: { name?: string; status?: 'active' | 'inactive' | 'all' }): Observable<ListStudentsResponse> {
+    const params: Record<string, string> = {};
+    if (filters?.name) params['name'] = filters.name;
+    if (filters?.status) params['status'] = filters.status;
+
+    return this.http.get<ListStudentsResponse>(`${this.apiUrl}/users/professores/meus-alunos`, {
+      headers: this.getHeaders(),
+      params,
+    });
+  }
+
+  createStudent(payload: CreateStudentPayload): Observable<StudentMutationResponse> {
+    return this.http.post<StudentMutationResponse>(`${this.apiUrl}/users/alunos`, payload, {
+      headers: this.getHeaders(),
+    });
+  }
+
+  updateStudent(userId: string, payload: UpdateStudentPayload): Observable<StudentMutationResponse> {
+    return this.http.put<StudentMutationResponse>(`${this.apiUrl}/users/alunos/${userId}`, payload, {
+      headers: this.getHeaders(),
+    });
+  }
+
+  updateStudentStatus(userId: string, payload: UpdateStudentStatusPayload): Observable<StudentMutationResponse> {
+    return this.http.put<StudentMutationResponse>(`${this.apiUrl}/users/alunos/${userId}/status`, payload, {
+      headers: this.getHeaders(),
+    });
+  }
+
+  getStudentById(userId: string): Observable<StudentProfile> {
+    return this.http.get<StudentProfile>(`${this.apiUrl}/users/${userId}/profile`, {
+      headers: this.getHeaders(),
+    });
+  }
+
+  getStudentFicha(userId: string): Observable<StudentFichaResponse> {
+    return this.http.get<StudentFichaResponse>(`${this.apiUrl}/users/alunos/${userId}/ficha`, {
+      headers: this.getHeaders(),
+    });
+  }
+
+  searchGuardianByEmail(email: string): Observable<{ guardian: GuardianSearchResult }> {
+    return this.http.get<{ guardian: GuardianSearchResult }>(`${this.apiUrl}/users/responsaveis/search`, {
+      headers: this.getHeaders(),
+      params: { email },
+    });
+  }
+
+  linkGuardianToStudent(studentId: string, payload: LinkGuardianPayload): Observable<GuardianMutationResponse> {
+    return this.http.post<GuardianMutationResponse>(
+      `${this.apiUrl}/users/alunos/${studentId}/responsavel/link`,
+      payload,
+      { headers: this.getHeaders() }
+    );
+  }
+
+  createAndLinkGuardian(
+    studentId: string,
+    payload: CreateAndLinkGuardianPayload
+  ): Observable<GuardianMutationResponse> {
+    return this.http.post<GuardianMutationResponse>(
+      `${this.apiUrl}/users/alunos/${studentId}/responsavel`,
+      payload,
+      { headers: this.getHeaders() }
+    );
+  }
+
+  unlinkGuardianFromStudent(studentId: string, guardianId: string): Observable<{ message: string }> {
+    return this.http.delete<{ message: string }>(
+      `${this.apiUrl}/users/alunos/${studentId}/responsavel/${guardianId}`,
+      { headers: this.getHeaders() }
+    );
+  }
+
+  changePassword(payload: ChangePasswordPayload): Observable<{ message: string }> {
+    return this.http.put<{ message: string }>(`${this.apiUrl}/auth/change-password`, payload, {
+      headers: this.getHeaders(),
+    });
   }
 
   initAdmin(
@@ -53,9 +269,7 @@ export class ApiService {
     return this.http.post<{ accessToken: string }>(
       `${this.apiUrl}/auth/refresh`,
       {},
-      {
-        withCredentials: true,
-      }
+      { withCredentials: true }
     );
   }
 
@@ -63,9 +277,7 @@ export class ApiService {
     return this.http.post<{ message: string }>(
       `${this.apiUrl}/auth/logout`,
       {},
-      {
-        withCredentials: true,
-      }
+      { withCredentials: true }
     );
   }
 
@@ -110,5 +322,281 @@ export class ApiService {
 
   clearTokens(): void {
     localStorage.removeItem('accessToken');
+  }
+
+  getHealthScreening(studentId: string): Observable<{ healthRecord: HealthRecord }> {
+    return this.http.get<{ healthRecord: HealthRecord }>(
+      `${this.apiUrl}/health-screening/${studentId}`,
+      { headers: this.getHeaders() }
+    );
+  }
+
+  createHealthScreening(
+    studentId: string,
+    data: HealthScreeningPayload
+  ): Observable<{ healthRecordId: string; message: string }> {
+    return this.http.post<{ healthRecordId: string; message: string }>(
+      `${this.apiUrl}/health-screening/${studentId}`,
+      data,
+      { headers: this.getHeaders() }
+    );
+  }
+
+  updateHealthScreening(
+    studentId: string,
+    data: Partial<HealthScreeningPayload>
+  ): Observable<{ message: string }> {
+    return this.http.put<{ message: string }>(
+      `${this.apiUrl}/health-screening/${studentId}`,
+      data,
+      { headers: this.getHeaders() }
+    );
+  }
+
+  validateConsentToken(token: string): Observable<ConsentValidation> {
+    return this.http.get<ConsentValidation>(`${this.apiUrl}/consent/${token}/validate`);
+  }
+
+  getConsentTemplate(
+    token: string,
+    type: 'privacy' | 'health' | 'ethics'
+  ): Observable<ConsentTemplate> {
+    return this.http.get<ConsentTemplate>(`${this.apiUrl}/consent/${token}/template/${type}`);
+  }
+
+  getConsentTemplateByVersion(
+    token: string,
+    type: 'privacy' | 'health' | 'ethics',
+    version: number
+  ): Observable<ConsentTemplate> {
+    return this.http.get<ConsentTemplate>(
+      `${this.apiUrl}/consent/${token}/template/${type}/version/${version}`
+    );
+  }
+
+  signConsent(
+    token: string,
+    signatureBase64: string
+  ): Observable<{ message: string; studentName: string }> {
+    return this.http.post<{ message: string; studentName: string }>(
+      `${this.apiUrl}/consent/${token}/sign`,
+      { signatureBase64 }
+    );
+  }
+
+  resendConsent(studentId: string): Observable<{ message: string; consentLink: string }> {
+    return this.http.post<{ message: string; consentLink: string }>(
+      `${this.apiUrl}/consent/admin/students/${studentId}/resend`,
+      {},
+      { headers: this.getHeaders() }
+    );
+  }
+
+  getAdminConsentTemplates(): Observable<AdminConsentTemplatesResponse> {
+    return this.http.get<AdminConsentTemplatesResponse>(
+      `${this.apiUrl}/admin/consent-templates`,
+      {
+        headers: this.getHeaders().set('Cache-Control', 'no-cache').set('Pragma', 'no-cache'),
+        params: { _t: Date.now().toString() },
+      }
+    );
+  }
+
+  publishAdminConsentTemplates(
+    data: PublishConsentTemplatesPayload
+  ): Observable<{
+    message: string;
+    version: string;
+    templates: AdminConsentTemplatesResponse['templates'];
+    affectedStudents: ReconsentAffectedStudent[];
+  }> {
+    return this.http.post<{
+      message: string;
+      version: string;
+      templates: AdminConsentTemplatesResponse['templates'];
+      affectedStudents: ReconsentAffectedStudent[];
+    }>(`${this.apiUrl}/admin/consent-templates/publish`, data, {
+      headers: this.getHeaders(),
+    });
+  }
+
+  // ── Auditoria LGPD ─────────────────────────────────────────────────────────
+
+  private buildAuditQueryParams(
+    filter: AuditLogFilter,
+    extra?: Record<string, string>
+  ): Record<string, string> {
+    const params: Record<string, string> = {};
+    if (filter.userId) params['userId'] = filter.userId;
+    if (filter.action) params['action'] = filter.action;
+    if (filter.resourceType) params['resourceType'] = filter.resourceType;
+    if (filter.dateFrom) params['dateFrom'] = filter.dateFrom;
+    if (filter.dateTo) params['dateTo'] = filter.dateTo;
+    return { ...params, ...extra };
+  }
+
+  getAuditLogs(
+    filter: AuditLogFilter,
+    page: number = 1,
+    limit: number = 50
+  ): Observable<AuditLogsResponse> {
+    const params = this.buildAuditQueryParams(filter, {
+      page: String(page),
+      limit: String(limit),
+    });
+    return this.http.get<AuditLogsResponse>(`${this.apiUrl}/admin/audit-logs`, {
+      headers: this.getHeaders(),
+      params,
+    });
+  }
+
+  exportAuditLogsCsv(filter: AuditLogFilter): Observable<Blob> {
+    const params = this.buildAuditQueryParams(filter);
+    return this.http.get(`${this.apiUrl}/admin/audit-logs/export`, {
+      headers: this.getHeaders(),
+      responseType: 'blob',
+      params,
+    });
+  }
+
+  getTrainingEntryPoint(): Observable<TrainingEntryPointResponse> {
+    return this.http.get<TrainingEntryPointResponse>(`${this.apiUrl}/trainings/entry-point`, {
+      headers: this.getHeaders(),
+    });
+  }
+
+  startTrainingSession(turmaId: string): Observable<StartTrainingSessionResponse> {
+    return this.http.post<StartTrainingSessionResponse>(
+      `${this.apiUrl}/trainings/start`,
+      { turmaId },
+      { headers: this.getHeaders() }
+    );
+  }
+
+  getTrainingAttendance(sessionId: string): Observable<TrainingAttendanceResponse> {
+    return this.http.get<TrainingAttendanceResponse>(
+      `${this.apiUrl}/trainings/${sessionId}/attendance`,
+      { headers: this.getHeaders() }
+    );
+  }
+
+  saveTrainingAttendance(
+    sessionId: string,
+    payload: SaveTrainingAttendancePayload
+  ): Observable<SaveTrainingAttendanceResponse> {
+    return this.http.post<SaveTrainingAttendanceResponse>(
+      `${this.apiUrl}/trainings/${sessionId}/attendance`,
+      payload,
+      { headers: this.getHeaders() }
+    );
+  }
+
+  // ── Direito ao Esquecimento (LGPD) ────────────────────────────────────────
+
+  requestStudentDeletion(studentId: string, reason?: string): Observable<DeletionRequestResponse> {
+    return this.http.post<DeletionRequestResponse>(
+      `${this.apiUrl}/users/students/${studentId}/deletion-request`,
+      { reason: reason || '' },
+      { headers: this.getHeaders() }
+    );
+  }
+
+  getStudentDeletionStatus(studentId: string): Observable<{ request: DeletionRequestItem | null }> {
+    return this.http.get<{ request: DeletionRequestItem | null }>(
+      `${this.apiUrl}/users/students/${studentId}/deletion-status`,
+      { headers: this.getHeaders() }
+    );
+  }
+
+  listLinkedStudents(): Observable<{ students: LinkedStudentItem[] }> {
+    return this.http.get<{ students: LinkedStudentItem[] }>(
+      `${this.apiUrl}/users/students/linked`,
+      { headers: this.getHeaders() }
+    );
+  }
+
+  listPendingDeletionRequests(): Observable<{ requests: DeletionRequestItem[] }> {
+    return this.http.get<{ requests: DeletionRequestItem[] }>(
+      `${this.apiUrl}/admin/deletion-requests`,
+      { headers: this.getHeaders() }
+    );
+  }
+
+  listMinorsWithoutGuardian(): Observable<{ students: MinorWithoutGuardianItem[]; total: number; filter: string }> {
+    return this.http.get<{ students: MinorWithoutGuardianItem[]; total: number; filter: string }>(
+      `${this.apiUrl}/admin/lgpd/minors-without-guardian`,
+      { headers: this.getHeaders() }
+    );
+  }
+
+  listStudentsWithoutHealthScreening(): Observable<{ students: StudentWithoutHealthScreeningItem[]; total: number; filter: string }> {
+    return this.http.get<{ students: StudentWithoutHealthScreeningItem[]; total: number; filter: string }>(
+      `${this.apiUrl}/admin/lgpd/students-without-health-screening`,
+      { headers: this.getHeaders() }
+    );
+  }
+
+  cancelDeletionRequest(requestId: string): Observable<{ message: string }> {
+    return this.http.delete<{ message: string }>(
+      `${this.apiUrl}/admin/deletion-requests/${requestId}`,
+      { headers: this.getHeaders() }
+    );
+  }
+
+  processDueDeletionRequests(): Observable<{ message: string; processedCount: number }> {
+    return this.http.post<{ message: string; processedCount: number }>(
+      `${this.apiUrl}/admin/deletion-requests/process-due`,
+      {},
+      { headers: this.getHeaders() }
+    );
+  }
+
+  generateComplianceReport(): Observable<GenerateComplianceReportResponse> {
+    return this.http.post<GenerateComplianceReportResponse>(
+      `${this.apiUrl}/admin/compliance-report/generate`,
+      {},
+      { headers: this.getHeaders() }
+    );
+  }
+
+  getComplianceReportStatus(): Observable<{ status: string; message: string; latestReport?: ComplianceReportHistoryItem | null }> {
+    return this.http.get<{ status: string; message: string; latestReport?: ComplianceReportHistoryItem | null }>(
+      `${this.apiUrl}/admin/compliance-report/status`,
+      { headers: this.getHeaders() }
+    );
+  }
+
+  listComplianceReports(): Observable<{ reports: ComplianceReportHistoryItem[] }> {
+    return this.http.get<{ reports: ComplianceReportHistoryItem[] }>(
+      `${this.apiUrl}/admin/compliance-report/history`,
+      { headers: this.getHeaders() }
+    );
+  }
+
+  downloadComplianceReport(reportId: string): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/admin/compliance-report/download/${reportId}`, {
+      headers: this.getHeaders(),
+      responseType: 'blob',
+    });
+  }
+
+  getComplianceReportSchedule(): Observable<{ schedule: ComplianceReportSchedule | null }> {
+    return this.http.get<{ schedule: ComplianceReportSchedule | null }>(
+      `${this.apiUrl}/admin/compliance-report/schedule`,
+      { headers: this.getHeaders() }
+    );
+  }
+
+  saveComplianceReportSchedule(payload: {
+    dayOfMonth: number;
+    hour: number;
+    minute: number;
+    enabled: boolean;
+  }): Observable<{ message: string; schedule: ComplianceReportSchedule }> {
+    return this.http.post<{ message: string; schedule: ComplianceReportSchedule }>(
+      `${this.apiUrl}/admin/compliance-report/schedule`,
+      payload,
+      { headers: this.getHeaders() }
+    );
   }
 }

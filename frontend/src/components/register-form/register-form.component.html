@@ -33,7 +33,7 @@
       </div>
     </div>
 
-    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" *ngIf="!successMessage || requiresConsent">
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" *ngIf="!successMessage">
 
       <!-- Nome Completo -->
       <div class="form-group">
@@ -177,6 +177,26 @@
 
     <div class="redirect-actions" *ngIf="successMessage && !requiresConsent">
       <p>Redirecionando para o dashboard...</p>
+    </div>
+
+    <div class="consent-result" *ngIf="successMessage && requiresConsent">
+      <div class="consent-result-icon">📋</div>
+      <h3>Aguardando consentimento do responsável</h3>
+      <p>Envie o link abaixo para o responsável assinar digitalmente:</p>
+
+      <div class="consent-link-box" *ngIf="consentLink">
+        <span class="consent-link-text">{{ consentLink }}</span>
+        <button type="button" class="btn-copy" (click)="copyLink()">
+          {{ linkCopied ? '✓ Copiado!' : '📋 Copiar' }}
+        </button>
+      </div>
+
+      <a *ngIf="consentLink" [href]="consentLink" target="_blank" rel="noopener noreferrer" class="btn-open-link">
+        🔗 Abrir link de consentimento
+      </a>
+
+      <p class="consent-result-hint">Após a assinatura, o aluno poderá fazer login normalmente.</p>
+      <button type="button" class="btn-secondary" (click)="goToLogin()">Ir para Login</button>
     </div>
 
     <div class="login-link">

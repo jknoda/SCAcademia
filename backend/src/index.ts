@@ -1,9 +1,11 @@
 import dotenv from 'dotenv';
 import app from './app';
 import { testConnection } from './lib/db';
+import { initializeComplianceScheduler } from './lib/complianceSchedule';
 
 dotenv.config();
 const PORT = process.env.PORT || 3000;
+initializeComplianceScheduler();
 
 // Start server
 app.listen(PORT, async () => {
