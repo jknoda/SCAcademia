@@ -4,6 +4,8 @@ type ScheduleEntry = {
   dayName: string;
   dayIndex: number;
   timeText: string;
+  startTimeText?: string;
+  endTimeText?: string;
   hour: number;
   minute: number;
   turn?: string;
@@ -20,6 +22,27 @@ export interface ProfessorTurmaEntry {
   turmaName: string;
   description?: string;
   scheduleJson?: any;
+  studentIds?: string[];
+}
+
+export interface CreateProfessorTurmaInput {
+  academyId: string;
+  professorId: string;
+  turmaName: string;
+  description?: string;
+  scheduleJson?: any;
+  studentIds?: string[];
+}
+
+export interface UpdateProfessorTurmaInput {
+  academyId: string;
+  professorId: string;
+  turmaId: string;
+  turmaName?: string;
+  description?: string;
+  scheduleJson?: any;
+  isActive?: boolean;
+  studentIds?: string[];
 }
 
 export interface TrainingEntryPointContext {
@@ -39,7 +62,140 @@ const toTurmaEntry = (row: any): ProfessorTurmaEntry => ({
   turmaName: row.name,
   description: row.description || undefined,
   scheduleJson: row.schedule_json || undefined,
+  studentIds: Array.isArray(row.student_ids)
+    ? row.student_ids.filter((value: unknown): value is string => typeof value === 'string')
+    : undefined,
 });
+
+const normalizeStudentIds = (studentIds: string[] | undefined): string[] =>
+  [...new Set((studentIds || []).filter((value) => typeof value === 'string' && value.trim().length > 0))];
+
+const assertActiveAlunoIds = async (
+  db: any,
+  academyId: string,
+  studentIds: string[]
+): Promise<string[]> => {
+  if (studentIds.length === 0) {
+    return [];
+  }
+
+  const validStudentsRes = await db.query(
+    `SELECT u.user_id
+     FROM users u
+     WHERE u.academy_id = $1
+       AND u.role = 'Aluno'
+       AND u.is_active = true
+       AND u.deleted_at IS NULL
+       AND u.user_id = ANY($2::uuid[])`,
+    [academyId, studentIds]
+  );
+
+  const validStudentIds = validStudentsRes.rows.map((row: any) => row.user_id as string);
+  if (validStudentIds.length !== studentIds.length) {
+    throw new Error('studentIds inválidos para vínculo na turma');
+  }
+
+  return validStudentIds;
+};
+
+const upsertTurmaStudents = async (
+  db: any,
+  turmaId: string,
+  academyId: string,
+  studentIds: string[]
+): Promise<void> => {
+  if (studentIds.length === 0) {
+    return;
+  }
+
+  await db.query(
+    `INSERT INTO turma_students (
+       enrollment_id,
+       turma_id,
+       student_id,
+       academy_id,
+       status,
+       enrolled_at,
+       dropped_at
+     )
+     SELECT
+       gen_random_uuid(),
+       $1,
+       s.student_id,
+       $2,
+       'active',
+       NOW(),
+       NULL
+     FROM UNNEST($3::uuid[]) AS s(student_id)
+     ON CONFLICT (turma_id, student_id)
+     DO UPDATE SET
+       status = 'active',
+       dropped_at = NULL`,
+    [turmaId, academyId, studentIds]
+  );
+};
+
+const syncTurmaStudents = async (
+  db: any,
+  turmaId: string,
+  academyId: string,
+  studentIds: string[]
+): Promise<void> => {
+  await db.query(
+    `UPDATE turma_students
+     SET status = 'dropped',
+         dropped_at = NOW()
+     WHERE turma_id = $1
+       AND academy_id = $2
+       AND status = 'active'
+       AND ($3::uuid[] IS NULL OR student_id <> ALL($3::uuid[]))`,
+    [turmaId, academyId, studentIds.length > 0 ? studentIds : null]
+  );
+
+  await upsertTurmaStudents(db, turmaId, academyId, studentIds);
+};
+
+const getTurmaWithStudents = async (
+  db: any,
+  academyId: string,
+  professorId: string,
+  turmaId: string
+): Promise<ProfessorTurmaEntry | null> => {
+  const res = await db.query(
+    `SELECT
+       t.turma_id,
+       t.name,
+       t.description,
+       t.schedule_json,
+       t.is_active,
+       COALESCE(
+         ARRAY_AGG(ts.student_id ORDER BY u.full_name)
+           FILTER (
+             WHERE ts.status = 'active'
+               AND u.deleted_at IS NULL
+               AND u.role = 'Aluno'
+               AND u.is_active = true
+           ),
+         '{}'::uuid[]
+       ) AS student_ids
+     FROM turmas t
+     LEFT JOIN turma_students ts
+       ON ts.turma_id = t.turma_id
+      AND ts.academy_id = t.academy_id
+     LEFT JOIN users u
+       ON u.user_id = ts.student_id
+      AND u.academy_id = ts.academy_id
+     WHERE t.academy_id = $1
+       AND t.professor_id = $2
+       AND t.turma_id = $3
+       AND t.deleted_at IS NULL
+     GROUP BY t.turma_id, t.name, t.description, t.schedule_json, t.is_active
+     LIMIT 1`,
+    [academyId, professorId, turmaId]
+  );
+
+  return res.rows.length ? toTurmaEntry(res.rows[0]) : null;
+};
 
 const buildScheduleDisplay = (scheduleJson: any): { label: string; scheduledAtText: string } => {
   const fallback = {
@@ -58,7 +214,10 @@ const buildScheduleDisplay = (scheduleJson: any): { label: string; scheduledAtTe
   }
 
   const day = String(first.day || first.weekday || first.dia || '').trim();
-  const time = String(first.time || first.start || first.horario || '').trim();
+  const startTime = String(first.startTime || first.start_time || first.start || '').trim();
+  const endTime = String(first.endTime || first.end_time || first.finish || '').trim();
+  const legacyTime = String(first.time || first.horario || '').trim();
+  const time = legacyTime || (startTime && endTime ? `${startTime}-${endTime}` : startTime);
   const turn = String(first.turn || first.shift || first.turno || '').trim();
 
   const dayPart = day || 'Dia programado';
@@ -135,8 +294,11 @@ const extractScheduleEntries = (scheduleJson: any): ScheduleEntry[] => {
     const dayNameNormalized = normalizeDayToken(dayNameRaw);
     const dayIndex = weekDayByName[dayNameNormalized];
 
-    const timeRaw = String(item.time || item.start || item.horario || '').trim();
-    const parsedTime = parseTimeToken(timeRaw);
+    const startTimeRaw = String(item.startTime || item.start_time || item.start || '').trim();
+    const endTimeRaw = String(item.endTime || item.end_time || item.finish || '').trim();
+    const legacyTimeRaw = String(item.time || item.horario || '').trim();
+    const canonicalTime = legacyTimeRaw || (startTimeRaw && endTimeRaw ? `${startTimeRaw}-${endTimeRaw}` : startTimeRaw);
+    const parsedTime = parseTimeToken(startTimeRaw || legacyTimeRaw);
     if (dayIndex === undefined || !parsedTime) {
       continue;
     }
@@ -146,7 +308,9 @@ const extractScheduleEntries = (scheduleJson: any): ScheduleEntry[] => {
     entries.push({
       dayName: dayNameRaw || 'Dia programado',
       dayIndex,
-      timeText: timeRaw || `${String(parsedTime.hour).padStart(2, '0')}:${String(parsedTime.minute).padStart(2, '0')}`,
+      timeText: canonicalTime || `${String(parsedTime.hour).padStart(2, '0')}:${String(parsedTime.minute).padStart(2, '0')}`,
+      startTimeText: startTimeRaw || undefined,
+      endTimeText: endTimeRaw || undefined,
       hour: parsedTime.hour,
       minute: parsedTime.minute,
       turn,
@@ -288,6 +452,260 @@ export const getProfessorTrainingEntryPointContext = async (
   };
 };
 
+export const createProfessorTurma = async (
+  input: CreateProfessorTurmaInput
+): Promise<ProfessorTurmaEntry> => {
+  const name = input.turmaName.trim();
+  if (!name) {
+    throw new Error('turmaName é obrigatório');
+  }
+
+  const description = typeof input.description === 'string' && input.description.trim()
+    ? input.description.trim()
+    : null;
+  const scheduleJson = input.scheduleJson ?? null;
+  const scheduleJsonDb = scheduleJson === null ? null : JSON.stringify(scheduleJson);
+  const selectedStudentIds = normalizeStudentIds(input.studentIds);
+
+  const client = await pool.connect();
+
+  try {
+    await client.query('BEGIN');
+
+    const res = await client.query(
+      `INSERT INTO turmas (
+         academy_id,
+         professor_id,
+         name,
+         description,
+         schedule_json,
+         is_active,
+         created_at,
+         updated_at
+       ) VALUES (
+         $1,
+         $2,
+         $3,
+         $4,
+         $5::jsonb,
+         true,
+         NOW(),
+         NOW()
+       )
+       RETURNING turma_id, name, description, schedule_json`,
+      [input.academyId, input.professorId, name, description, scheduleJsonDb]
+    );
+
+    const turmaId = res.rows[0].turma_id as string;
+    const validStudentIds = await assertActiveAlunoIds(client, input.academyId, selectedStudentIds);
+    await upsertTurmaStudents(client, turmaId, input.academyId, validStudentIds);
+
+    await client.query('COMMIT');
+
+    const created = await getTurmaWithStudents(client, input.academyId, input.professorId, turmaId);
+    if (!created) {
+      throw new Error('Falha ao carregar turma recém-criada');
+    }
+
+    return created;
+  } catch (error: any) {
+    await client.query('ROLLBACK');
+
+    // Compatibility fallback for legacy schemas that still do not have schedule_json.
+    if (error?.code === '42703') {
+      const fallbackRes = await client.query(
+        `INSERT INTO turmas (
+           academy_id,
+           professor_id,
+           name,
+           description,
+           is_active,
+           created_at,
+           updated_at
+         ) VALUES (
+           $1,
+           $2,
+           $3,
+           $4,
+           true,
+           NOW(),
+           NOW()
+         )
+         RETURNING turma_id, name, description`,
+        [input.academyId, input.professorId, name, description]
+      );
+
+      const turmaId = fallbackRes.rows[0].turma_id as string;
+      const validStudentIds = await assertActiveAlunoIds(client, input.academyId, selectedStudentIds);
+      await upsertTurmaStudents(client, turmaId, input.academyId, validStudentIds);
+
+      return {
+        turmaId: fallbackRes.rows[0].turma_id,
+        turmaName: fallbackRes.rows[0].name,
+        description: fallbackRes.rows[0].description || undefined,
+        scheduleJson: scheduleJson || undefined,
+        studentIds: validStudentIds,
+      };
+    }
+
+    throw error;
+  } finally {
+    client.release();
+  }
+};
+
+export const listProfessorTurmas = async (
+  academyId: string,
+  professorId: string
+): Promise<Array<ProfessorTurmaEntry & { isActive: boolean }>> => {
+  const res = await pool.query(
+    `SELECT
+       t.turma_id,
+       t.name,
+       t.description,
+       t.schedule_json,
+       t.is_active,
+       COALESCE(
+         ARRAY_AGG(ts.student_id ORDER BY u.full_name)
+           FILTER (
+             WHERE ts.status = 'active'
+               AND u.deleted_at IS NULL
+               AND u.role = 'Aluno'
+               AND u.is_active = true
+           ),
+         '{}'::uuid[]
+       ) AS student_ids
+     FROM turmas t
+     LEFT JOIN turma_students ts
+       ON ts.turma_id = t.turma_id
+      AND ts.academy_id = t.academy_id
+     LEFT JOIN users u
+       ON u.user_id = ts.student_id
+      AND u.academy_id = ts.academy_id
+     WHERE t.academy_id = $1
+       AND t.professor_id = $2
+       AND t.deleted_at IS NULL
+     GROUP BY t.turma_id, t.name, t.description, t.schedule_json, t.is_active, t.updated_at, t.created_at
+     ORDER BY t.is_active DESC, t.updated_at DESC, t.created_at DESC`,
+    [academyId, professorId]
+  );
+
+  return res.rows.map((row) => ({
+    ...toTurmaEntry(row),
+    isActive: row.is_active === true,
+  }));
+};
+
+export const updateProfessorTurma = async (
+  input: UpdateProfessorTurmaInput
+): Promise<(ProfessorTurmaEntry & { isActive: boolean }) | null> => {
+  const nextName = typeof input.turmaName === 'string' ? input.turmaName.trim() : undefined;
+  if (nextName !== undefined && !nextName) {
+    throw new Error('turmaName inválido');
+  }
+
+  const nextDescription = typeof input.description === 'string'
+    ? (input.description.trim() || null)
+    : undefined;
+
+  const nextScheduleJson = input.scheduleJson === undefined ? undefined : input.scheduleJson;
+  const nextScheduleJsonDb = nextScheduleJson === undefined
+    ? undefined
+    : JSON.stringify(nextScheduleJson);
+  const nextIsActive = typeof input.isActive === 'boolean' ? input.isActive : undefined;
+  const normalizedStudentIds = input.studentIds === undefined
+    ? undefined
+    : normalizeStudentIds(input.studentIds);
+
+  const client = await pool.connect();
+
+  try {
+    await client.query('BEGIN');
+
+    const res = await client.query(
+      `UPDATE turmas
+       SET name = COALESCE($4, name),
+           description = COALESCE($5, description),
+           schedule_json = COALESCE($6::jsonb, schedule_json),
+           is_active = COALESCE($7, is_active),
+           updated_at = NOW()
+       WHERE academy_id = $1
+         AND professor_id = $2
+         AND turma_id = $3
+         AND deleted_at IS NULL
+       RETURNING turma_id, name, description, schedule_json, is_active`,
+      [
+        input.academyId,
+        input.professorId,
+        input.turmaId,
+        nextName,
+        nextDescription,
+        nextScheduleJsonDb,
+        nextIsActive,
+      ]
+    );
+
+    if (!res.rows.length) {
+      await client.query('ROLLBACK');
+      return null;
+    }
+
+    if (normalizedStudentIds !== undefined) {
+      const validStudentIds = await assertActiveAlunoIds(client, input.academyId, normalizedStudentIds);
+      await syncTurmaStudents(client, input.turmaId, input.academyId, validStudentIds);
+    }
+
+    const updated = await getTurmaWithStudents(client, input.academyId, input.professorId, input.turmaId);
+    if (!updated) {
+      await client.query('ROLLBACK');
+      return null;
+    }
+
+    await client.query('COMMIT');
+
+    return {
+      ...updated,
+      isActive: res.rows[0].is_active === true,
+    };
+  } catch (error) {
+    await client.query('ROLLBACK');
+    throw error;
+  } finally {
+    client.release();
+  }
+};
+
+export const listEligibleTurmaStudents = async (
+  academyId: string,
+  nameFilter?: string
+): Promise<Array<{ studentId: string; fullName: string }>> => {
+  const values: any[] = [academyId];
+  let nameClause = '';
+
+  const trimmedName = typeof nameFilter === 'string' ? nameFilter.trim() : '';
+  if (trimmedName) {
+    values.push(`%${trimmedName.toLowerCase()}%`);
+    nameClause = ` AND LOWER(u.full_name) LIKE $${values.length}`;
+  }
+
+  const res = await pool.query(
+    `SELECT u.user_id, u.full_name
+     FROM users u
+     WHERE u.academy_id = $1
+       AND u.role = 'Aluno'
+       AND u.is_active = true
+       AND u.deleted_at IS NULL
+       ${nameClause}
+     ORDER BY u.full_name ASC`,
+    values
+  );
+
+  return res.rows.map((row) => ({
+    studentId: row.user_id as string,
+    fullName: row.full_name as string,
+  }));
+};
+
 const toDateOnly = (value: Date): string => value.toISOString().slice(0, 10);
 const toTimeOnly = (value: Date): string => value.toTimeString().slice(0, 8);
 
@@ -295,13 +713,16 @@ export const findOrCreateTrainingDraft = async (input: {
   academyId: string;
   professorId: string;
   turmaId: string;
+  sessionDate?: string;  // YYYY-MM-DD; defaults to today
+  sessionTime?: string;  // HH:MM:SS; defaults to current time
 }): Promise<{ sessionId: string; created: boolean }> => {
   if (!input.academyId?.trim() || !input.professorId?.trim() || !input.turmaId?.trim()) {
     throw new Error('academyId, professorId e turmaId são obrigatórios');
   }
 
   const now = new Date();
-  const sessionDate = toDateOnly(now);
+  const sessionDate = input.sessionDate || toDateOnly(now);
+  const sessionTime = input.sessionTime || toTimeOnly(now);
 
   const lockKey = `${input.academyId}:${input.professorId}:${input.turmaId}:${sessionDate}`;
   const client = await pool.connect();
@@ -365,7 +786,7 @@ export const findOrCreateTrainingDraft = async (input: {
         input.professorId,
         input.academyId,
         sessionDate,
-        toTimeOnly(now),
+        sessionTime,
         90,
         now,
       ]

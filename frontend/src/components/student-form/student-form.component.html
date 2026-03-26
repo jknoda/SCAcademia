@@ -2,6 +2,9 @@
   <h2>{{ isEditMode ? 'Editar Aluno' : 'Novo Aluno' }}</h2>
   <p *ngIf="!isEditMode">Preencha os dados completos para cadastrar um novo aluno.</p>
   <p *ngIf="isEditMode">Atualize os dados do aluno. O email permanece somente leitura.</p>
+  <p *ngIf="!isEditMode && targetTurmaId" class="warning-highlight">
+    Cadastro vinculado a turma da sessão atual. O aluno será associado automaticamente a esta turma.
+  </p>
 
   <div class="loading" *ngIf="isLoading">Carregando dados...</div>
 
@@ -126,7 +129,14 @@
 
       <div class="form-group" *ngIf="!isEditMode">
         <label for="turmaId">Turma principal (opcional)</label>
-        <input id="turmaId" type="text" formControlName="turmaId" class="form-control" placeholder="UUID da turma" />
+        <input
+          id="turmaId"
+          type="text"
+          formControlName="turmaId"
+          class="form-control"
+          placeholder="UUID da turma"
+          [readonly]="!!targetTurmaId"
+        />
       </div>
     </div>
 

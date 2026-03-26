@@ -34,7 +34,7 @@ const maskForProfessor = (r: HealthRecord) => ({
 
 /**
  * GET /api/health-screening/:studentId
- * Allowed roles: Admin, Professor (limited fields), Responsavel
+ * Allowed roles: Admin, Professor (limited fields), Responsavel, Aluno (self)
  */
 export const getHealthScreeningHandler = async (
   req: AuthenticatedRequest,
@@ -44,8 +44,12 @@ export const getHealthScreeningHandler = async (
     const { studentId } = req.params as { studentId: string };
     const { role, academyId, userId } = req.user!;
 
-    if (!['Admin', 'Professor', 'Responsavel'].includes(role)) {
+    if (!['Admin', 'Professor', 'Responsavel', 'Aluno'].includes(role)) {
       return res.status(403).json({ error: 'Acesso negado' });
+    }
+
+    if (role === 'Aluno' && userId !== studentId) {
+      return res.status(403).json({ error: 'Acesso negado. Aluno só pode consultar a própria anamnese.' });
     }
 
     const student = await getUserById(studentId);
@@ -70,7 +74,7 @@ export const getHealthScreeningHandler = async (
 
 /**
  * POST /api/health-screening/:studentId
- * Allowed roles: Admin, Responsavel
+ * Allowed roles: Admin, Responsavel, Aluno (self)
  */
 export const createHealthScreeningHandler = async (
   req: AuthenticatedRequest,
@@ -80,8 +84,12 @@ export const createHealthScreeningHandler = async (
     const { studentId } = req.params as { studentId: string };
     const { role, academyId, userId } = req.user!;
 
-    if (!['Admin', 'Responsavel'].includes(role)) {
-      return res.status(403).json({ error: 'Acesso negado. Apenas administradores e responsáveis podem criar anamnese.' });
+    if (!['Admin', 'Responsavel', 'Aluno'].includes(role)) {
+      return res.status(403).json({ error: 'Acesso negado. Apenas administradores, responsáveis e o próprio aluno podem criar anamnese.' });
+    }
+
+    if (role === 'Aluno' && userId !== studentId) {
+      return res.status(403).json({ error: 'Acesso negado. Aluno só pode criar a própria anamnese.' });
     }
 
     const student = await getUserById(studentId);
@@ -141,7 +149,7 @@ export const createHealthScreeningHandler = async (
 
 /**
  * PUT /api/health-screening/:studentId
- * Allowed roles: Admin (full update), Professor (notes only)
+ * Allowed roles: Admin (full update), Professor (notes only), Aluno (self, full update)
  */
 export const updateHealthScreeningHandler = async (
   req: AuthenticatedRequest,
@@ -151,8 +159,12 @@ export const updateHealthScreeningHandler = async (
     const { studentId } = req.params as { studentId: string };
     const { role, academyId, userId } = req.user!;
 
-    if (!['Admin', 'Professor'].includes(role)) {
-      return res.status(403).json({ error: 'Acesso negado. Responsáveis não podem editar a anamnese.' });
+    if (!['Admin', 'Professor', 'Aluno'].includes(role)) {
+      return res.status(403).json({ error: 'Acesso negado. Perfil sem permissão para editar anamnese.' });
+    }
+
+    if (role === 'Aluno' && userId !== studentId) {
+      return res.status(403).json({ error: 'Acesso negado. Aluno só pode atualizar a própria anamnese.' });
     }
 
     const student = await getUserById(studentId);

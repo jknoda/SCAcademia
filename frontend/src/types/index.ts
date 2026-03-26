@@ -605,6 +605,72 @@ export interface StartTrainingSessionResponse {
   nextStep: string;
 }
 
+export interface CreateProfessorTurmaPayload {
+  turmaName: string;
+  description?: string;
+  scheduleJson?: TurmaScheduleEntry[];
+  studentIds?: string[];
+}
+
+export interface TurmaScheduleEntry {
+  day: string;
+  startTime?: string;
+  endTime?: string;
+  time?: string;
+  turn?: string;
+}
+
+export interface CreateProfessorTurmaResponse {
+  message: string;
+  turma: {
+    turmaId: string;
+    turmaName: string;
+    description?: string;
+    scheduleJson?: TurmaScheduleEntry[];
+    isActive?: boolean;
+  };
+}
+
+export interface ProfessorTurmaItem {
+  turmaId: string;
+  turmaName: string;
+  description?: string;
+  scheduleJson?: TurmaScheduleEntry[];
+  studentIds?: string[];
+  isActive: boolean;
+}
+
+export interface ListProfessorTurmasResponse {
+  turmas: ProfessorTurmaItem[];
+  total: number;
+}
+
+export interface UpdateProfessorTurmaPayload {
+  turmaName?: string;
+  description?: string;
+  scheduleJson?: TurmaScheduleEntry[];
+  studentIds?: string[];
+  isActive?: boolean;
+}
+
+export interface TurmaEligibleStudentItem {
+  studentId: string;
+  fullName: string;
+}
+
+export interface ListTurmaEligibleStudentsResponse {
+  students: TurmaEligibleStudentItem[];
+  filters: {
+    name?: string;
+  };
+  total: number;
+}
+
+export interface UpdateProfessorTurmaResponse {
+  message: string;
+  turma: ProfessorTurmaItem;
+}
+
 export type TrainingAttendanceStatus = 'present' | 'absent' | 'justified';
 
 export interface TrainingAttendanceStudent {
@@ -640,4 +706,266 @@ export interface SaveTrainingAttendanceResponse {
     total: number;
     present: number;
   };
+}
+
+export interface EnrollTrainingStudentResponse {
+  message: string;
+  attendance: TrainingAttendanceResponse;
+}
+
+export interface PresentStudent {
+  userId: string;
+  fullName: string;
+  avatarInitials: string;
+}
+
+export interface StudentNote {
+  studentId: string;
+  content: string;
+  updatedAt: string;
+}
+
+export interface GetSessionNotesResponse {
+  generalNotes: string | null;
+  presentStudents: PresentStudent[];
+  studentNotes: StudentNote[];
+}
+
+export interface SaveNotesPayload {
+  notes: string;
+}
+
+export interface SaveStudentNotePayload {
+  content: string;
+}
+
+export interface SaveNotesResponse {
+  success: boolean;
+}
+
+export interface TrainingReviewSummaryResponse {
+  session: {
+    sessionId: string;
+    turmaId: string;
+    turmaName: string;
+    sessionDate: string;
+    sessionTime: string;
+    durationMinutes: number;
+  };
+  attendance: {
+    total: number;
+    present: number;
+    absentNames: string[];
+  };
+  techniques: {
+    count: number;
+    names: string[];
+  };
+  notes: {
+    general: string;
+  };
+}
+
+export interface ConfirmTrainingResponse {
+  success: boolean;
+  message: string;
+  sessionId: string;
+  confirmedAt: string;
+  studentsNotified: boolean;
+}
+
+export interface Technique {
+  techniqueId: string;
+  name: string;
+  description?: string;
+  category: 'Básica' | 'Avançada';
+  iconUrl?: string;
+  displayOrder: number;
+}
+
+export interface GetTechniquesResponse {
+  byId: Record<string, Technique>;
+  categories: Record<string, string[]>;
+}
+
+export interface GetSessionTechniquesResponse {
+  selectedTechniqueIds: string[];
+  summary: {
+    count: number;
+    names: string[];
+  };
+  allTechniques: GetTechniquesResponse;
+}
+
+export interface SelectTechniqueResponse {
+  message: string;
+  sessionId: string;
+  techniqueId: string;
+  selectedTechniqueIds: string[];
+  summary: {
+    count: number;
+    names: string[];
+  };
+}
+
+export interface DeselectTechniqueResponse {
+  message: string;
+  sessionId: string;
+  techniqueId: string;
+  selectedTechniqueIds: string[];
+  summary: {
+    count: number;
+    names: string[];
+  };
+}
+
+export interface CustomTechniqueRequest {
+  name: string;
+}
+
+export interface AddCustomTechniqueResponse {
+  message: string;
+  technique: Technique;
+}
+
+export interface CreateAcademyTechniquePayload {
+  name: string;
+  description?: string;
+  category: 'Básica' | 'Avançada';
+}
+
+export interface CreateAcademyTechniqueResponse {
+  message: string;
+  technique: Technique;
+}
+
+export interface DeleteAcademyTechniqueResponse {
+  message: string;
+  technique: Technique;
+}
+
+export interface TechniquePreset {
+  presetId: string;
+  name: string;
+  techniqueCount: number;
+  createdAt: Date;
+}
+
+export interface SaveTechniquePresetPayload {
+  name: string;
+  techniqueIds: string[];
+}
+
+export interface SaveTechniquePresetResponse {
+  message: string;
+  preset: TechniquePreset;
+}
+
+export interface GetPresetsResponse {
+  presets: TechniquePreset[];
+}
+
+export interface ApplyPresetResponse {
+  message: string;
+  sessionId: string;
+  presetId: string;
+  presetName: string;
+  selectedTechniqueIds: string[];
+  summary: {
+    count: number;
+    names: string[];
+  };
+}
+
+export interface ReorderSessionTechniquesResponse {
+  message: string;
+  sessionId: string;
+  selectedTechniqueIds: string[];
+  summary: {
+    count: number;
+    names: string[];
+  };
+}
+
+export interface RecentTrainingSummary {
+  sessionId: string;
+  sessionDate: string;
+  turmaName: string;
+  presentCount: number;
+  techniquePreview: string[];
+}
+
+export interface GetRecentTrainingsResponse {
+  trainings: RecentTrainingSummary[];
+}
+
+// Story 3-7: Training History types
+export interface TrainingHistoryItem {
+  session_id: string;
+  session_date: string;
+  session_time: string;
+  turma_name: string;
+  present_count: number;
+  total_count: number;
+  technique_names: string[];
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface TrainingHistoryFilters {
+  dateFrom?: string;
+  dateTo?: string;
+  turmaId?: string;
+  keyword?: string;
+}
+
+export interface TrainingHistoryResponse {
+  trainings: TrainingHistoryItem[];
+  total: number;
+  page: number;
+  pageSize: number;
+}
+
+export interface TrainingAttendanceRecord {
+  student_id: string;
+  student_name: string;
+  status: 'present' | 'absent' | 'justified';
+}
+
+export interface TrainingDetailsResponse {
+  session_id: string;
+  turma_id: string;
+  professor_id: string;
+  session_date: string;
+  session_time: string;
+  duration_minutes: number;
+  notes: string | null;
+  turma_name: string;
+  created_at: string;
+  updated_at: string;
+  deleted_at: string | null;
+  attendance: TrainingAttendanceRecord[];
+  techniques?: Array<{ technique_id: string; name: string; category: string }>;
+}
+
+export interface UpdateTrainingPayload {
+  notes?: string;
+}
+
+export interface UpdateTrainingResponse {
+  success: boolean;
+  data: TrainingDetailsResponse;
+}
+
+export interface DeleteTrainingResponse {
+  success: boolean;
+  data: {
+    undo_deadline: string;
+  };
+}
+
+export interface RestoreTrainingResponse {
+  success: boolean;
+  data: TrainingDetailsResponse;
 }

@@ -1,0 +1,179 @@
+<div class="training-history-container">
+  <h2 class="page-title">Histórico de Treinos</h2>
+
+  <div class="top-actions">
+    <button class="btn-secondary" type="button" (click)="backToHome()">Voltar</button>
+    <button class="btn-primary" type="button" (click)="goToTrainingEntry()" [disabled]="isStartingTraining">
+      {{ isStartingTraining ? 'Iniciando...' : 'Registrar treino' }}
+    </button>
+  </div>
+
+  <!-- Success / Error messages -->
+  <div *ngIf="successMessage" class="status-message success">{{ successMessage }}</div>
+  <div *ngIf="errorMessage" class="status-message error">{{ errorMessage }}</div>
+
+  <!-- Undo banner -->
+  <div *ngIf="deletedSessionId && undoCountdown > 0" class="undo-banner">
+    <span>Treino excluído. ({{ undoCountdown }}s)</span>
+    <button type="button" class="btn-undo" (click)="undoDelete()">Desfazer</button>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-card">
+    <div class="filters-row">
+      <div class="filter-field">
+        <label for="filter-keyword">Buscar observações</label>
+        <input
+          id="filter-keyword"
+          type="text"
+          [(ngModel)]="filterKeyword"
+          placeholder="Digite para filtrar..."
+          (keyup.enter)="applyFilters()"
+        />
+      </div>
+      <div class="filter-field">
+        <label for="filter-date-from">De</label>
+        <input id="filter-date-from" type="date" [(ngModel)]="filterDateFrom" />
+      </div>
+      <div class="filter-field">
+        <label for="filter-date-to">Até</label>
+        <input id="filter-date-to" type="date" [(ngModel)]="filterDateTo" />
+      </div>
+      <div class="filter-actions">
+        <button class="btn-primary" type="button" (click)="applyFilters()">Filtrar</button>
+        <button class="btn-secondary" type="button" (click)="clearFilters()">Limpar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading state -->
+  <p *ngIf="isLoading" class="loading-text">Carregando treinos...</p>
+  <p *ngIf="!isLoading && trainings.length === 0 && !errorMessage" class="empty-text">
+    Nenhum treino encontrado.
+  </p>
+
+  <!-- Training list -->
+  <div *ngIf="!isLoading && trainings.length > 0">
+    <table class="trainings-table">
+      <thead>
+        <tr>
+          <th>Data</th>
+          <th>Turma</th>
+          <th>Presença</th>
+          <th>Técnicas</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let t of trainings">
+          <td>{{ formatDate(t.session_date) }}</td>
+          <td>{{ t.turma_name }}</td>
+          <td>{{ getAttendanceLabel(t.present_count, t.total_count) }}</td>
+          <td>
+            <span *ngIf="t.technique_names && t.technique_names.length > 0">
+              {{ t.technique_names.slice(0, 2).join(', ') }}<span *ngIf="t.technique_names.length > 2">...</span>
+            </span>
+            <span *ngIf="!t.technique_names || t.technique_names.length === 0" class="empty-cell">—</span>
+          </td>
+          <td>
+            <button type="button" class="btn-link" (click)="viewDetails(t.session_id)">Ver detalhes</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Pagination -->
+    <div class="pagination" *ngIf="totalPages > 1">
+      <button class="btn-secondary" type="button" [disabled]="page === 1" (click)="prevPage()">Anterior</button>
+      <span>{{ page }} / {{ totalPages }}</span>
+      <button class="btn-secondary" type="button" [disabled]="page === totalPages" (click)="nextPage()">Próxima</button>
+    </div>
+  </div>
+
+  <!-- Detail panel -->
+  <div *ngIf="selectedTraining || isLoadingDetail || detailError" class="detail-overlay" (click)="closeDetail()">
+    <div class="detail-panel" (click)="$event.stopPropagation()">
+      <button type="button" class="btn-close" (click)="closeDetail()">✕</button>
+
+      <p *ngIf="isLoadingDetail">Carregando detalhes...</p>
+      <p *ngIf="detailError" class="error-message">{{ detailError }}</p>
+
+      <div *ngIf="selectedTraining && !isLoadingDetail">
+        <h3>Detalhes do Treino</h3>
+        <p><strong>Data:</strong> {{ formatDate(selectedTraining.session_date) }}</p>
+        <p><strong>Hora:</strong> {{ formatTime(selectedTraining.session_time) }}</p>
+        <p><strong>Turma:</strong> {{ selectedTraining.turma_name }}</p>
+        <p><strong>Duração:</strong> {{ selectedTraining.duration_minutes }} min</p>
+
+        <div class="detail-section">
+          <h4>Observações</h4>
+          <p *ngIf="selectedTraining.notes">{{ selectedTraining.notes }}</p>
+          <p *ngIf="!selectedTraining.notes" class="empty-cell">Nenhuma observação registrada.</p>
+        </div>
+
+        <div class="detail-section">
+          <h4>Presença ({{ selectedTraining.attendance?.length || 0 }})</h4>
+          <ul class="attendance-list" *ngIf="selectedTraining.attendance && selectedTraining.attendance.length > 0">
+            <li *ngFor="let a of selectedTraining.attendance" [class]="'status-' + a.status">
+              <span class="status-dot"></span> {{ a.student_name }}
+              <span class="status-label">{{ a.status === 'present' ? '(Presente)' : a.status === 'absent' ? '(Ausente)' : '(Justificado)' }}</span>
+            </li>
+          </ul>
+          <p *ngIf="!selectedTraining.attendance || selectedTraining.attendance.length === 0" class="empty-cell">Nenhum registro de presença.</p>
+        </div>
+
+        <div class="detail-section">
+          <h4>Técnicas ({{ selectedTraining.techniques?.length || 0 }})</h4>
+          <ul class="techniques-list" *ngIf="selectedTraining.techniques && selectedTraining.techniques.length > 0">
+            <li *ngFor="let tech of selectedTraining.techniques">{{ tech.name }}<span *ngIf="tech.category" class="tech-category"> — {{ tech.category }}</span></li>
+          </ul>
+          <p *ngIf="!selectedTraining.techniques || selectedTraining.techniques.length === 0" class="empty-cell">Nenhuma técnica registrada.</p>
+        </div>
+
+        <div class="detail-actions">
+          <button type="button" class="btn-primary" (click)="openEditModal()">Editar Observações</button>
+          <button type="button" class="btn-danger" (click)="openDeleteModal()">Excluir Treino</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit modal -->
+  <div *ngIf="showEditModal" class="modal-overlay" (click)="closeEditModal()">
+    <div class="modal-panel" (click)="$event.stopPropagation()">
+      <h3>Editar Observações</h3>
+      <div *ngIf="editError" class="status-message error">{{ editError }}</div>
+      <textarea
+        [(ngModel)]="editNotes"
+        rows="5"
+        placeholder="Digite as observações do treino..."
+        class="edit-textarea"
+      ></textarea>
+      <div class="modal-actions">
+        <button type="button" class="btn-primary" (click)="saveEdit()" [disabled]="isSavingEdit">
+          {{ isSavingEdit ? 'Salvando...' : 'Salvar' }}
+        </button>
+        <button type="button" class="btn-secondary" (click)="closeEditModal()" [disabled]="isSavingEdit">
+          Cancelar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete confirmation modal -->
+  <div *ngIf="showDeleteModal" class="modal-overlay" (click)="closeDeleteModal()">
+    <div class="modal-panel" (click)="$event.stopPropagation()">
+      <h3>Confirmar Exclusão</h3>
+      <p>Tem certeza que deseja excluir este treino? Você terá 30 segundos para desfazer a ação.</p>
+      <div *ngIf="deleteError" class="status-message error">{{ deleteError }}</div>
+      <div class="modal-actions">
+        <button type="button" class="btn-danger" (click)="confirmDelete()" [disabled]="isDeletingSession">
+          {{ isDeletingSession ? 'Excluindo...' : 'Confirmar Exclusão' }}
+        </button>
+        <button type="button" class="btn-secondary" (click)="closeDeleteModal()" [disabled]="isDeletingSession">
+          Cancelar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

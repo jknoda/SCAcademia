@@ -112,8 +112,11 @@
     <div *ngIf="errorMessage" class="error-alert">{{ errorMessage }}</div>
     <div *ngIf="successMessage" class="success-alert">{{ successMessage }}</div>
 
-    <button type="submit" [disabled]="isSaving || form.invalid" class="btn btn-primary">
-      {{ isSaving ? 'Salvando...' : 'Salvar Alterações' }}
-    </button>
+    <div class="actions-row">
+      <button type="button" class="btn-secondary" (click)="backToDashboard()">Voltar</button>
+      <button type="submit" [disabled]="isSaving || form.invalid" class="btn btn-primary">
+        {{ isSaving ? 'Salvando...' : 'Salvar Alterações' }}
+      </button>
+    </div>
   </form>
 </div>

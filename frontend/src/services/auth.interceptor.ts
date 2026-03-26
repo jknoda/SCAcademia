@@ -14,7 +14,7 @@ import { ApiService } from './api.service';
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
   private isRefreshing = false;
-  private refreshTokenSubject = new BehaviorSubject<string | null>(null);
+  private refreshTokenSubject = new BehaviorSubject<string | false | null>(null);
 
   constructor(
     private api: ApiService,
@@ -50,9 +50,15 @@ export class AuthInterceptor implements HttpInterceptor {
   private handle401Error(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     if (this.isRefreshing) {
       return this.refreshTokenSubject.pipe(
-        filter((token): token is string => token !== null),
+        filter((token): token is string | false => token !== null),
         take(1),
-        switchMap((token) => next.handle(this.setAuthHeader(req, token)))
+        switchMap((token) => {
+          if (token === false) {
+            return throwError(() => new HttpErrorResponse({ status: 401, statusText: 'Unauthorized' }));
+          }
+
+          return next.handle(this.setAuthHeader(req, token));
+        })
       );
     }
 
@@ -69,7 +75,7 @@ export class AuthInterceptor implements HttpInterceptor {
       catchError((refreshError) => {
         this.isRefreshing = false;
         this.api.clearTokens();
-        this.refreshTokenSubject.next(null);
+        this.refreshTokenSubject.next(false);
         this.router.navigate(['/login']);
         return throwError(() => refreshError);
       })

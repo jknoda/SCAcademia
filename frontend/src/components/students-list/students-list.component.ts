@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, NgZone, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { finalize, timeout } from 'rxjs/operators';
 import { ApiService } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
 import { StudentProfile } from '../../types';
@@ -12,7 +13,7 @@ import { StudentProfile } from '../../types';
 })
 export class StudentsListComponent implements OnInit {
   students: StudentProfile[] = [];
-  loading = false;
+  isLoading = false;
   errorMessage = '';
   successMessage = '';
   isMinorWithoutGuardianFilter = false;
@@ -29,7 +30,9 @@ export class StudentsListComponent implements OnInit {
     private api: ApiService,
     private auth: AuthService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private ngZone: NgZone,
+    private cdr: ChangeDetectorRef
   ) {
     const user = this.auth.getCurrentUser();
     this.isAdmin = user?.role === 'Admin';
@@ -45,14 +48,18 @@ export class StudentsListComponent implements OnInit {
   }
 
   loadStudents(): void {
-    this.loading = true;
+    this.setLoadingState(true);
     this.errorMessage = '';
     this.specialFilterTotal = 0;
 
     if (this.isMinorWithoutGuardianFilter) {
-      this.api.listMinorsWithoutGuardian().subscribe({
+      this.api.listMinorsWithoutGuardian().pipe(
+        timeout(12000),
+        finalize(() => {
+          this.setLoadingState(false);
+        })
+      ).subscribe({
         next: (res) => {
-          this.loading = false;
           this.specialFilterTotal = res.total || 0;
           this.students = (res.students || []).map((item) => ({
             id: item.studentId,
@@ -68,8 +75,10 @@ export class StudentsListComponent implements OnInit {
           }));
         },
         error: (error) => {
-          this.loading = false;
-          this.errorMessage = error?.error?.error || 'Erro ao carregar menores sem responsável.';
+          this.errorMessage =
+            error?.name === 'TimeoutError'
+              ? 'Tempo esgotado ao carregar menores sem responsável. Tente novamente.'
+              : error?.error?.error || 'Erro ao carregar menores sem responsável.';
           this.students = [];
         },
       });
@@ -77,9 +86,13 @@ export class StudentsListComponent implements OnInit {
     }
 
     if (this.isWithoutHealthScreeningFilter) {
-      this.api.listStudentsWithoutHealthScreening().subscribe({
+      this.api.listStudentsWithoutHealthScreening().pipe(
+        timeout(12000),
+        finalize(() => {
+          this.setLoadingState(false);
+        })
+      ).subscribe({
         next: (res) => {
-          this.loading = false;
           this.specialFilterTotal = res.total || 0;
           this.students = (res.students || []).map((item) => ({
             id: item.studentId,
@@ -96,8 +109,10 @@ export class StudentsListComponent implements OnInit {
           }));
         },
         error: (error) => {
-          this.loading = false;
-          this.errorMessage = error?.error?.error || 'Erro ao carregar alunos sem anamnese.';
+          this.errorMessage =
+            error?.name === 'TimeoutError'
+              ? 'Tempo esgotado ao carregar alunos sem anamnese. Tente novamente.'
+              : error?.error?.error || 'Erro ao carregar alunos sem anamnese.';
           this.students = [];
         },
       });
@@ -114,14 +129,20 @@ export class StudentsListComponent implements OnInit {
         status: this.filterStatus,
       });
 
-    request$.subscribe({
+    request$.pipe(
+      timeout(12000),
+      finalize(() => {
+        this.setLoadingState(false);
+      })
+    ).subscribe({
       next: (res) => {
-        this.loading = false;
         this.students = res.students || [];
       },
       error: (error) => {
-        this.loading = false;
-        this.errorMessage = error?.error?.error || 'Erro ao carregar alunos.';
+        this.errorMessage =
+          error?.name === 'TimeoutError'
+            ? 'Tempo esgotado ao carregar alunos. Verifique o backend e tente novamente.'
+            : error?.error?.error || 'Erro ao carregar alunos.';
         this.students = [];
       },
     });
@@ -220,5 +241,12 @@ export class StudentsListComponent implements OnInit {
     }
 
     this.router.navigate(['/admin/dashboard']);
+  }
+
+  private setLoadingState(value: boolean): void {
+    this.ngZone.run(() => {
+      this.isLoading = value;
+      this.cdr.detectChanges();
+    });
   }
 }

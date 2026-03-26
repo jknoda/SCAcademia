@@ -1,0 +1,491 @@
+.training-techniques-container {
+  position: relative;
+  min-height: 100vh;
+  padding: 24px;
+  background:
+    radial-gradient(circle at top right, rgba(21, 101, 192, 0.18), transparent 28%),
+    linear-gradient(180deg, #eef4ff 0%, #dfeaf8 100%);
+}
+
+.loading-overlay {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.78);
+  z-index: 1000;
+}
+
+.page-shell {
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.eyebrow {
+  margin: 0 0 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #1b5fbf;
+  font-weight: 700;
+  font-size: 0.72rem;
+}
+
+.page-header h2 {
+  margin: 0 0 6px;
+  color: #123a73;
+}
+
+.page-header p {
+  margin: 0;
+  color: #405b76;
+}
+
+.intro-card,
+.preset-panel,
+.ordered-selection,
+.summary-card,
+.custom-technique-section {
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid #d7e6fb;
+  border-radius: 16px;
+  box-shadow: 0 10px 28px rgba(13, 71, 161, 0.08);
+}
+
+.intro-card {
+  padding: 18px 20px;
+  margin-bottom: 16px;
+}
+
+.intro-card h3,
+.preset-panel-header h3,
+.section-header h3,
+.ordered-selection-header h3 {
+  margin: 0 0 6px;
+  color: #123a73;
+}
+
+.intro-card p,
+.preset-panel-header p,
+.section-header p,
+.hint-text {
+  margin: 0;
+  color: #455a64;
+  font-size: 0.93rem;
+}
+
+.status {
+  border-radius: 12px;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+.status.error {
+  background: #ffebee;
+  color: #b71c1c;
+  border: 1px solid #ffcdd2;
+}
+
+.status.success {
+  background: #e8f5e9;
+  color: #1b5e20;
+  border: 1px solid #c8e6c9;
+}
+
+.btn-primary,
+.btn-secondary {
+  border: 0;
+  border-radius: 10px;
+  min-height: 40px;
+  padding: 0 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-primary {
+  background: #1565c0;
+  color: #fff;
+}
+
+.btn-secondary {
+  background: #e3edf9;
+  color: #19457c;
+}
+
+.btn-primary:disabled,
+.btn-secondary:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.preset-panel {
+  padding: 16px 18px;
+  margin-bottom: 16px;
+}
+
+.preset-panel-header {
+  margin-bottom: 12px;
+}
+
+.preset-suggestion-inline {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 12px;
+  margin-bottom: 12px;
+  background: #fff7e8;
+  border: 1px solid #ffd591;
+  border-radius: 12px;
+}
+
+.preset-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.preset-chip {
+  border: 1px solid #b8d1f5;
+  background: #f4f9ff;
+  color: #0d47a1;
+  border-radius: 999px;
+  padding: 10px 14px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.preset-chip:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.ordered-selection {
+  padding: 16px 18px;
+  margin-bottom: 16px;
+}
+
+.ordered-selection-header {
+  margin-bottom: 10px;
+}
+
+.ordered-list {
+  display: grid;
+  gap: 8px;
+}
+
+.ordered-item {
+  display: grid;
+  grid-template-columns: 32px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid #d6e3f7;
+  border-radius: 12px;
+  background: #f7fbff;
+  cursor: grab;
+}
+
+.ordered-item.dragging {
+  opacity: 0.55;
+}
+
+.ordered-index {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: #1565c0;
+  color: #fff;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+}
+
+.ordered-name {
+  font-weight: 600;
+  color: #1e3a5f;
+}
+
+.ordered-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.order-btn {
+  width: 34px;
+  height: 34px;
+  border: 1px solid #bdd2ef;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #184f97;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.order-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.techniques-groups {
+  display: grid;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.group-card {
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid #dbe6f5;
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 10px 20px rgba(9, 30, 66, 0.05);
+}
+
+.group-header {
+  margin-bottom: 12px;
+}
+
+.group-header h4 {
+  margin: 0;
+  font-size: 1rem;
+  color: #163f79;
+}
+
+.group-header p {
+  margin: 4px 0 0;
+  color: #607d8b;
+  font-size: 0.85rem;
+}
+
+.techniques-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+}
+
+.technique-item {
+  border: 1px solid #cfdbef;
+  background: #f8fbff;
+  color: #17324d;
+  border-radius: 14px;
+  padding: 14px;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 62px;
+  transition: transform 0.12s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+
+.technique-item:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(21, 101, 192, 0.12);
+  border-color: #90caf9;
+}
+
+.technique-item.selected {
+  background: linear-gradient(135deg, #1565c0 0%, #1e88e5 100%);
+  border-color: #1565c0;
+  color: #ffffff;
+}
+
+.technique-item:disabled {
+  opacity: 0.75;
+  cursor: wait;
+}
+
+.technique-name {
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.technique-state {
+  font-size: 0.8rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.item-spinner {
+  flex: 0 0 auto;
+}
+
+.summary-card {
+  padding: 14px 16px;
+  margin-bottom: 18px;
+}
+
+.summary-title {
+  margin: 0 0 8px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #0d47a1;
+}
+
+.summary-list {
+  margin: 0;
+  color: #35556b;
+  line-height: 1.5;
+}
+
+.custom-technique-section {
+  position: relative;
+  padding: 16px;
+  margin-bottom: 16px;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid #dbe6f5;
+  border-radius: 16px;
+  box-shadow: 0 10px 20px rgba(9, 30, 66, 0.05);
+}
+
+.section-header {
+  margin-bottom: 10px;
+}
+
+.custom-input-wrapper {
+  position: relative;
+  margin-bottom: 12px;
+}
+
+.custom-input-wrapper label {
+  display: block;
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: #37506e;
+  margin-bottom: 6px;
+}
+
+.custom-input {
+  width: 100%;
+  min-height: 42px;
+  border: 1px solid #b7cde9;
+  border-radius: 10px;
+  padding: 8px 10px;
+  font-size: 0.95rem;
+  background: #fff;
+  color: #17324d;
+}
+
+.custom-input:disabled {
+  background: #eef3fa;
+  color: #6b7f93;
+}
+
+.custom-input-field,
+.preset-name-field {
+  width: 100%;
+}
+
+.autocomplete-dropdown {
+  position: absolute;
+  top: calc(100% - 4px);
+  left: 16px;
+  right: 16px;
+  background: #ffffff;
+  border: 1px solid #d7e6fb;
+  border-radius: 12px;
+  max-height: 220px;
+  overflow-y: auto;
+  z-index: 50;
+  box-shadow: 0 14px 24px rgba(9, 30, 66, 0.12);
+}
+
+.autocomplete-item {
+  padding: 12px 14px;
+  cursor: pointer;
+}
+
+.autocomplete-item:hover {
+  background: #f3f8ff;
+}
+
+.add-custom-button,
+.save-preset-button {
+  width: 100%;
+  min-height: 42px;
+}
+
+.save-preset-button {
+  margin-bottom: 18px;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(14, 30, 56, 0.46);
+  z-index: 2000;
+}
+
+.preset-modal {
+  width: min(92vw, 420px);
+  padding: 20px;
+  border-radius: 16px;
+}
+
+.preset-modal h3 {
+  margin: 0 0 14px;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.navigation-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.navigation-buttons button {
+  min-height: 46px;
+  border-radius: 12px;
+  font-weight: 600;
+  border: 1px solid transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.navigation-buttons .btn-secondary {
+  border-color: #b7cde9;
+  background: #e3edf9;
+  color: #19457c;
+}
+
+@media (max-width: 768px) {
+  .training-techniques-container {
+    padding: 16px;
+  }
+
+  .page-header {
+    flex-direction: column;
+  }
+
+  .techniques-list,
+  .navigation-buttons {
+    grid-template-columns: 1fr;
+  }
+
+  .preset-suggestion-inline,
+  .preset-list {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

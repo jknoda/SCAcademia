@@ -15,10 +15,18 @@ import { AuditLogComponent } from './components/audit-log/audit-log.component';
 import { ComplianceReportsSettingsComponent } from './components/compliance-reports-settings/compliance-reports-settings.component';
 import { TrainingAttendancePlaceholderComponent } from './components/training-attendance-placeholder/training-attendance-placeholder.component';
 import { TrainingAttendanceComponent } from './components/training-attendance/training-attendance.component';
+import { TrainingTechniquesComponent } from './components/training-techniques/training-techniques.component';
+import { TrainingNotesComponent } from './components/training-notes/training-notes.component';
+import { TrainingReviewComponent } from './components/training-review/training-review.component';
+import { TrainingSuccessComponent } from './components/training-success/training-success.component';
+import { TrainingHistoryComponent } from './components/training-history/training-history.component';
 import { AcademyProfileComponent } from './components/academy-profile/academy-profile.component';
 import { AdminProfileComponent } from './components/admin-profile/admin-profile.component';
 import { ProfessorsListComponent } from './components/professors-list/professors-list.component';
 import { ProfessorFormComponent } from './components/professor-form/professor-form.component';
+import { ProfessorTurmasComponent } from './components/professor-turmas/professor-turmas.component';
+import { ProfessorTurmaCreateComponent } from './components/professor-turma-create/professor-turma-create.component';
+import { ProfessorTechniquesComponent } from './components/professor-techniques/professor-techniques.component';
 import { StudentsListComponent } from './components/students-list/students-list.component';
 import { StudentFormComponent } from './components/student-form/student-form.component';
 import { StudentProfileComponent } from './components/student-profile/student-profile.component';
@@ -47,11 +55,20 @@ const routes: Routes = [
   { path: 'professores/meus-alunos/:id/editar', component: StudentFormComponent, canActivate: [AuthGuard] },
   { path: 'professores/meus-alunos/:id/ficha', component: StudentProfileComponent, canActivate: [AuthGuard] },
   { path: 'perfil', component: AdminProfileComponent, canActivate: [AuthGuard, RoleGuard] },
+  { path: 'professor/meu-perfil', component: AdminProfileComponent, canActivate: [AuthGuard] },
+  { path: 'professor/turmas/nova', component: ProfessorTurmaCreateComponent, canActivate: [AuthGuard] },
+  { path: 'professor/turmas', component: ProfessorTurmasComponent, canActivate: [AuthGuard] },
+  { path: 'professor/tecnicas', component: ProfessorTechniquesComponent, canActivate: [AuthGuard] },
+  { path: 'aluno/meu-perfil', component: AdminProfileComponent, canActivate: [AuthGuard] },
   { path: 'admin/consent-templates', component: ConsentTemplatesAdminComponent, canActivate: [AuthGuard, RoleGuard] },
   { path: 'admin/audit-logs', component: AuditLogComponent, canActivate: [AuthGuard, RoleGuard] },
   { path: 'admin/compliance-reports', component: ComplianceReportsSettingsComponent, canActivate: [AuthGuard, RoleGuard] },
   { path: 'training/session/:sessionId/attendance', component: TrainingAttendanceComponent, canActivate: [AuthGuard] },
-  { path: 'training/session/:sessionId/techniques', component: TrainingAttendancePlaceholderComponent, canActivate: [AuthGuard] },
+  { path: 'training/session/:sessionId/techniques', component: TrainingTechniquesComponent, canActivate: [AuthGuard] },
+  { path: 'training/session/:sessionId/notes', component: TrainingNotesComponent, canActivate: [AuthGuard] },
+  { path: 'training/session/:sessionId/review', component: TrainingReviewComponent, canActivate: [AuthGuard] },
+  { path: 'training/session/:sessionId/success', component: TrainingSuccessComponent, canActivate: [AuthGuard] },
+  { path: 'training/history', component: TrainingHistoryComponent, canActivate: [AuthGuard] },
   { path: 'home', component: HomeComponent, canActivate: [AuthGuard] },
   { path: 'health-screening/:studentId', component: HealthScreeningFormComponent, canActivate: [AuthGuard] },
   { path: 'consent/:token', component: ConsentWizardComponent },

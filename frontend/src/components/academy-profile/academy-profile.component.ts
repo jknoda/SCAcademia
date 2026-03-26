@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, NgZone, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { ApiService } from '../../services/api.service';
 import { AcademyProfile, UpdateAcademyProfilePayload } from '../../types';
 
@@ -17,7 +18,13 @@ export class AcademyProfileComponent implements OnInit {
   errorMessage = '';
   serverErrors: { [key: string]: string } = {};
 
-  constructor(private fb: FormBuilder, private api: ApiService) {
+  constructor(
+    private fb: FormBuilder,
+    private api: ApiService,
+    private router: Router,
+    private ngZone: NgZone,
+    private cdr: ChangeDetectorRef
+  ) {
     this.form = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(2)]],
       description: [''],
@@ -41,12 +48,12 @@ export class AcademyProfileComponent implements OnInit {
   }
 
   loadProfile(): void {
-    this.isLoading = true;
+    this.setLoadingState(true);
     this.errorMessage = '';
 
     this.api.getAdminAcademyProfile().subscribe({
       next: (profile: AcademyProfile) => {
-        this.isLoading = false;
+        this.setLoadingState(false);
         this.form.patchValue({
           name: profile.name || '',
           description: profile.description || '',
@@ -65,7 +72,7 @@ export class AcademyProfileComponent implements OnInit {
         });
       },
       error: (error) => {
-        this.isLoading = false;
+        this.setLoadingState(false);
         this.errorMessage = error?.error?.error || 'Erro ao carregar perfil da academia.';
       },
     });
@@ -135,6 +142,10 @@ export class AcademyProfileComponent implements OnInit {
     });
   }
 
+  backToDashboard(): void {
+    this.router.navigate(['/admin/dashboard']);
+  }
+
   getFieldError(fieldName: string): string | null {
     if (this.serverErrors[fieldName]) {
       return this.serverErrors[fieldName];
@@ -157,5 +168,12 @@ export class AcademyProfileComponent implements OnInit {
     }
 
     return null;
+  }
+
+  private setLoadingState(value: boolean): void {
+    this.ngZone.run(() => {
+      this.isLoading = value;
+      this.cdr.detectChanges();
+    });
   }
 }

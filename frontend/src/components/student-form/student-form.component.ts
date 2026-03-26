@@ -28,6 +28,8 @@ export class StudentFormComponent implements OnInit {
 
   calculatedAge: number | null = null;
   isMinorCalculated = false;
+  targetTurmaId = '';
+  returnTo = '';
 
   readonly isAdmin: boolean;
 
@@ -75,6 +77,12 @@ export class StudentFormComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.targetTurmaId = (this.route.snapshot.queryParamMap.get('turmaId') || '').trim();
+    this.returnTo = this.sanitizeReturnRoute(this.route.snapshot.queryParamMap.get('returnTo') || '');
+    if (this.targetTurmaId) {
+      this.form.get('turmaId')?.setValue(this.targetTurmaId);
+    }
+
     const routeId = this.route.snapshot.paramMap.get('id');
     if (routeId) {
       this.isEditMode = true;
@@ -131,6 +139,11 @@ export class StudentFormComponent implements OnInit {
   }
 
   goToList(): void {
+    if (this.returnTo) {
+      this.router.navigateByUrl(this.returnTo);
+      return;
+    }
+
     if (this.isAdmin) {
       this.router.navigate(['/admin/alunos']);
       return;
@@ -305,5 +318,18 @@ export class StudentFormComponent implements OnInit {
     if (Number.isNaN(date.getTime())) return '';
 
     return date.toISOString().slice(0, 10);
+  }
+
+  private sanitizeReturnRoute(value: string): string {
+    const trimmed = value.trim();
+    if (!trimmed.startsWith('/training/session/')) {
+      return '';
+    }
+
+    if (!trimmed.endsWith('/attendance')) {
+      return '';
+    }
+
+    return trimmed;
   }
 }

@@ -248,3 +248,86 @@ export const upsertTrainingAttendance = async (input: {
     client.release();
   }
 };
+
+export const enrollStudentInSessionTurma = async (input: {
+  academyId: string;
+  professorId: string;
+  sessionId: string;
+  studentId: string;
+}): Promise<TrainingAttendancePayload | null> => {
+  const client = await pool.connect();
+
+  try {
+    await client.query('BEGIN');
+
+    const sessionRes = await client.query(
+      `SELECT ts.session_id, ts.turma_id
+       FROM training_sessions ts
+       WHERE ts.session_id = $1
+         AND ts.academy_id = $2
+         AND ts.professor_id = $3
+         AND ts.deleted_at IS NULL
+       LIMIT 1`,
+      [input.sessionId, input.academyId, input.professorId]
+    );
+
+    if (sessionRes.rows.length === 0) {
+      await client.query('ROLLBACK');
+      return null;
+    }
+
+    const studentRes = await client.query(
+      `SELECT 1
+       FROM users u
+       WHERE u.user_id = $1
+         AND u.academy_id = $2
+         AND u.role = 'Aluno'
+         AND u.deleted_at IS NULL
+         AND u.is_active = true
+       LIMIT 1`,
+      [input.studentId, input.academyId]
+    );
+
+    if (studentRes.rows.length === 0) {
+      await client.query('ROLLBACK');
+      return null;
+    }
+
+    const turmaId = sessionRes.rows[0].turma_id as string;
+
+    await client.query(
+      `INSERT INTO turma_students (
+         enrollment_id,
+         turma_id,
+         student_id,
+         academy_id,
+         status,
+         enrolled_at,
+         dropped_at
+       ) VALUES (
+         gen_random_uuid(),
+         $1,
+         $2,
+         $3,
+         'active',
+         NOW(),
+         NULL
+       )
+       ON CONFLICT (turma_id, student_id)
+       DO UPDATE SET
+         academy_id = EXCLUDED.academy_id,
+         status = 'active',
+         dropped_at = NULL`,
+      [turmaId, input.studentId, input.academyId]
+    );
+
+    await client.query('COMMIT');
+
+    return await getTrainingAttendance(input.academyId, input.professorId, input.sessionId);
+  } catch (error) {
+    await client.query('ROLLBACK');
+    throw error;
+  } finally {
+    client.release();
+  }
+};

@@ -4,11 +4,17 @@ import cookieParser from 'cookie-parser';
 import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
 import authRoutes from './routes/auth';
+import {
+  createAcademyTechniqueHandler,
+  deleteAcademyTechniqueHandler,
+  getAcademyTechniquesHandler,
+} from './controllers/trainingTechniques';
 import usersRoutes from './routes/users';
 import adminRoutes from './routes/admin';
 import healthScreeningRoutes from './routes/healthScreening';
 import consentRoutes from './routes/consent';
 import trainingsRoutes from './routes/trainings';
+import { authMiddleware, requireRole } from './middleware/auth';
 
 dotenv.config();
 
@@ -119,6 +125,27 @@ app.use('/api/users', rateLimit({ windowMs: 60_000, max: 100, standardHeaders: t
 app.use('/api/admin', rateLimit({ windowMs: 60_000, max: 100, standardHeaders: true, legacyHeaders: false }), adminRoutes);
 app.use('/api/health-screening', rateLimit({ windowMs: 60_000, max: 60, standardHeaders: true, legacyHeaders: false }), healthScreeningRoutes);
 app.use('/api/consent', rateLimit({ windowMs: 60_000, max: 20, standardHeaders: true, legacyHeaders: false }), consentRoutes);
+app.get(
+  '/api/academies/:academyId/techniques',
+  rateLimit({ windowMs: 60_000, max: 120, standardHeaders: true, legacyHeaders: false }),
+  authMiddleware,
+  requireRole(['Professor']),
+  getAcademyTechniquesHandler
+);
+app.post(
+  '/api/academies/:academyId/techniques',
+  rateLimit({ windowMs: 60_000, max: 120, standardHeaders: true, legacyHeaders: false }),
+  authMiddleware,
+  requireRole(['Professor']),
+  createAcademyTechniqueHandler
+);
+app.delete(
+  '/api/academies/:academyId/techniques/:techniqueId',
+  rateLimit({ windowMs: 60_000, max: 120, standardHeaders: true, legacyHeaders: false }),
+  authMiddleware,
+  requireRole(['Professor']),
+  deleteAcademyTechniqueHandler
+);
 app.use('/api/trainings', rateLimit({ windowMs: 60_000, max: 120, standardHeaders: true, legacyHeaders: false }), trainingsRoutes);
 
 app.use((err: any, _req: Request, res: Response, next: NextFunction) => {

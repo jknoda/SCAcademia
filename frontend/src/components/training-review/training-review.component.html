@@ -1,0 +1,100 @@
+<section class="training-review" *ngIf="!isLoading; else loadingState">
+  <header class="review-header">
+    <div>
+      <p class="eyebrow">Revisão final do treino</p>
+      <h1>Confira o registro antes de confirmar</h1>
+      <p>O foco desta etapa é validar as técnicas e observações do treino. A frequência pode ser ajustada se necessário.</p>
+    </div>
+  </header>
+
+  <div class="feedback error" *ngIf="errorMessage">{{ errorMessage }}</div>
+  <div class="feedback info" *ngIf="!errorMessage && infoMessage">{{ infoMessage }}</div>
+  <div class="feedback success" *ngIf="successMessage">{{ successMessage }}</div>
+
+  <ng-container *ngIf="summary as data">
+    <article class="session-hero">
+      <div>
+        <p class="hero-label">Turma</p>
+        <h2>{{ data.session.turmaName }}</h2>
+        <p class="hero-meta">{{ data.session.sessionDate }} às {{ data.session.sessionTime }}</p>
+      </div>
+      <div class="hero-stat">
+        <span class="hero-stat-value">{{ data.session.durationMinutes }}</span>
+        <span class="hero-stat-label">minutos</span>
+      </div>
+    </article>
+
+    <section class="review-grid">
+      <article class="card techniques-card">
+        <div class="card-header">
+          <h3>Técnicas praticadas</h3>
+          <span class="count-badge">{{ data.techniques.count }}</span>
+        </div>
+        <p class="card-helper">Estas técnicas serão registradas como conteúdo principal do treino.</p>
+        <div class="technique-chips" *ngIf="data.techniques.names.length > 0; else noTechniques">
+          <span class="technique-chip" *ngFor="let technique of data.techniques.names">{{ technique }}</span>
+        </div>
+        <ng-template #noTechniques>
+          <p class="empty-text">Nenhuma técnica selecionada.</p>
+        </ng-template>
+      </article>
+
+      <article class="card notes-card">
+        <div class="card-header">
+          <h3>Observações do treino</h3>
+        </div>
+        <p class="card-helper">Resumo livre do que aconteceu na aula.</p>
+        <p class="notes-text">{{ data.notes.general || 'Sem observações registradas.' }}</p>
+      </article>
+
+      <article class="card attendance-card">
+        <div class="card-header">
+          <h3>Frequência</h3>
+          <span class="count-badge neutral">{{ data.attendance.present }}/{{ data.attendance.total }}</span>
+        </div>
+        <p class="card-helper">Use esta seção apenas para conferir ou ajustar presença antes de concluir.</p>
+        <div class="attendance-summary">
+          <div class="attendance-item">
+            <span class="attendance-number">{{ data.attendance.present }}</span>
+            <span class="attendance-label">presentes</span>
+          </div>
+          <div class="attendance-item">
+            <span class="attendance-number">{{ data.attendance.total - data.attendance.present }}</span>
+            <span class="attendance-label">não presentes</span>
+          </div>
+        </div>
+        <p class="absent-list" *ngIf="data.attendance.absentNames.length > 0">
+          <strong>Ausentes:</strong> {{ data.attendance.absentNames.join(', ') }}
+        </p>
+      </article>
+    </section>
+  </ng-container>
+
+  <footer class="actions">
+    <button type="button" class="btn-secondary" (click)="onBackToAttendance()">Ajustar frequência</button>
+    <button type="button" class="btn-secondary" (click)="onBackToNotes()">Voltar para notas</button>
+    <button
+      type="button"
+      class="btn-primary"
+      [disabled]="isConfirming"
+      (click)="onConfirm()"
+    >
+      {{ isConfirming ? 'Salvando...' : 'Confirmar treino' }}
+    </button>
+  </footer>
+
+  <div class="retry-actions" *ngIf="showRetry">
+    <button type="button" class="btn-outline" (click)="onRetryConfirm()">Tentar Novamente</button>
+  </div>
+
+  <div class="offline-actions" *ngIf="offlinePending">
+    <button type="button" class="btn-outline" (click)="onConnectNow()">Conectar Agora</button>
+    <button type="button" class="btn-outline" (click)="onContinueOffline()">Continuar Offline</button>
+  </div>
+</section>
+
+<ng-template #loadingState>
+  <section class="training-review loading-state">
+    <p>Carregando revisão da sessão...</p>
+  </section>
+</ng-template>

@@ -47,9 +47,9 @@
   <div *ngIf="successMessage" class="success-alert">{{ successMessage }}</div>
 
   <section class="card list-card">
-    <div *ngIf="loading" class="loading">Carregando alunos...</div>
+    <div *ngIf="isLoading" class="loading">Carregando alunos...</div>
 
-    <table *ngIf="!loading" class="students-table">
+    <table *ngIf="!isLoading" class="students-table">
       <thead>
         <tr>
           <th>Nome</th>
@@ -100,7 +100,7 @@
       </tbody>
     </table>
 
-    <p *ngIf="!loading && students.length === 0" class="empty-state">
+    <p *ngIf="!isLoading && students.length === 0" class="empty-state">
       Nenhum aluno encontrado para os filtros informados.
     </p>
   </section>

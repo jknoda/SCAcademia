@@ -16,13 +16,25 @@
         <strong>Detalhes:</strong> {{ context.currentOrNextClass.description }}
       </p>
 
+      <div class="date-time-fields">
+        <div class="field">
+          <label for="entry-date">Data do treino</label>
+          <input id="entry-date" type="date" [(ngModel)]="sessionDate" />
+        </div>
+        <div class="field">
+          <label for="entry-time">Hora</label>
+          <input id="entry-time" type="time" [(ngModel)]="sessionTime" />
+        </div>
+      </div>
+      <p class="date-hint">Deixe em branco para usar data/hora atual. Preencha para lançar treinos anteriores não cadastrados.</p>
+
       <div class="offline-hint" *ngIf="!isOnline">
         Você está offline. Pode iniciar o registro e sincronizar ao reconectar.
       </div>
 
       <div class="actions-row">
         <button class="btn-primary" (click)="startNow()" [disabled]="isStarting">
-          {{ isStarting ? 'Iniciando...' : 'Sim, registrar agora' }}
+          {{ isStarting ? 'Iniciando...' : 'Sim, escolher técnicas agora' }}
         </button>
         <button class="btn-secondary" (click)="maybeLater()">Talvez depois</button>
         <button class="btn-secondary" (click)="reloadForNextClass()">Próxima aula</button>
@@ -31,7 +43,13 @@
 
     <ng-template #noClass>
       <p class="empty">Nenhuma turma ativa atribuída no momento.</p>
-      <button class="btn-secondary" (click)="reloadForNextClass()">Atualizar</button>
+      <div class="actions-row">
+        <button class="btn-secondary" (click)="reloadForNextClass()">Atualizar</button>
+        <button class="btn-secondary" (click)="continueLastSession()" [disabled]="isContinuingLastSession">
+          {{ isContinuingLastSession ? 'Buscando...' : 'Continuar última sessão' }}
+        </button>
+        <button class="btn-secondary" (click)="goToHistory()">Ver histórico</button>
+      </div>
     </ng-template>
   </div>
 </div>

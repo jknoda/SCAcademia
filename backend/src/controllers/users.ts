@@ -94,6 +94,14 @@ const toUserProfileResponse = (user: any) => ({
   isActive: typeof user.isActive === 'boolean' ? user.isActive : true,
 });
 
+const toStudentListItemResponse = (student: any) => ({
+  ...toUserProfileResponse(student),
+  age: calculateAge(student.birthDate),
+  isMinor: student.necessitaConsentimentoResponsavel === true,
+  faixa: student.faixa || '-',
+  consentSignedAt: student.consentSignedAt || null,
+});
+
 const toStudentListItem = (student: any) => {
   const profile = toUserProfileResponse(student);
   const missingItems: string[] = [];

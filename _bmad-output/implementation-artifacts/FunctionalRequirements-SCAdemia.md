@@ -35,7 +35,7 @@
 
 ### Training Registration
 
-- FR25: Professor pode criar/registrar novo treino especificando: data, horário, turma, descrição
+- FR25: Professor pode criar/registrar novo treino especificando: data, horário da sessão, turma e observações gerais
 - FR26: Sistema pré-carrega lista de alunos já cadastrados para a turma (auto-complete)
 - FR27: Professor marca presença de cada aluno: "Presente" vs "Faltou"
 - FR28: Sistema registra dato e hora da criação do treino (auditoria)
@@ -44,43 +44,53 @@
 - FR31: Professor pode editar treino já registrado (até X dias depois)
 - FR32: Sistema não permite deletar treino (apenas soft-mark como "draft" se necessário)
 
+### Turmas & Técnicas
+
+- FR33: Professor deve possuir tela específica para cadastrar turma (separada da Home)
+- FR34: Cadastro de turma deve permitir dia da semana, horário inicial e horário final (com validação de intervalo)
+- FR35: Home do professor deve oferecer atalhos para "Cadastrar nova turma" e "Gerenciar turmas"
+- FR36: Professor pode criar técnicas do catálogo da academia com nome, categoria e descrição opcional
+- FR37: Técnicas cadastradas devem ser exibidas no catálogo por categoria (Básica/Avançada) com descrição quando informada
+- FR38: Professor pode excluir técnica do catálogo somente quando não estiver vinculada a treinos ativos
+- FR39: Técnicas customizadas adicionadas durante o treino entram diretamente no catálogo da academia e ficam disponíveis para uso imediato
+
 ### Performance Tracking & Visualization
 
-- FR33: Aluno pode visualizar dashboard pessoal com: frequência, últimas anotações, evolução gráfica
-- FR34: Sistema gera gráfico de frequência: participação ao longo dos meses
-- FR35: Sistema gera lista com ALL anotações de desempenho do professor (histórico completo)
-- FR36: Sistema exibe faixa atual do aluno e estrutura de faixas (referência)
-- FR37: Professor pode visualizar frequência e performance de cada aluno em sua turma
-- FR38: Admin pode visualizar frequência geral (todos alunos, por turma)
-- FR39: Gráficos e visualizações são renderizados em < 1 segundo mesmo com 100+ registros
+- FR40: Aluno pode visualizar dashboard pessoal com: frequência, últimas anotações, evolução gráfica
+- FR41: Sistema gera gráfico de frequência: participação ao longo dos meses
+- FR42: Sistema gera lista com ALL anotações de desempenho do professor (histórico completo)
+- FR43: Sistema exibe faixa atual do aluno e estrutura de faixas (referência)
+- FR44: Professor pode visualizar frequência e performance de cada aluno em sua turma
+- FR45: Admin pode visualizar frequência geral (todos alunos, por turma)
+- FR46: Gráficos e visualizações são renderizados em < 1 segundo mesmo com 100+ registros
 
 ### Reporting & Data Export
 
-- FR40: Admin pode gerar relatório de presenças (CSV ou PDF)
-- FR41: Admin pode filtrar presenças por período (data range)
-- FR42: Admin pode visualizar status de conformidade LGPD (% de alunos com consentimentos)
-- FR43: Professor pode visualizar anotações de um aluno específico (timeline)
-- FR44: Responsável pode visualizar relatório de progresso de seu filho (simples e visual)
+- FR47: Admin pode gerar relatório de presenças (CSV ou PDF)
+- FR48: Admin pode filtrar presenças por período (data range)
+- FR49: Admin pode visualizar status de conformidade LGPD (% de alunos com consentimentos)
+- FR50: Professor pode visualizar anotações de um aluno específico (timeline)
+- FR51: Responsável pode visualizar relatório de progresso de seu filho (simples e visual)
 
 ### System Auditoria & Monitoring
 
-- FR45: Sistema mantém logs estruturados de TODAS as ações: usuário, ação, recurso, timestamp, IP
-- FR46: Logs de acesso a dados sensíveis incluem: WHO, WHAT, WHEN, WHY (motivo do acesso)
-- FR47: Admin pode consultar auditoria por: usuário, período, tipo de ação
-- FR48: Sistema retem logs por mínimo 12 meses
-- FR49: Sistema monitora tentativas de acesso não autorizado (ex: usuário X tentando acessar dados de Y)
-- FR50: Sistema deve ter backup automático diário com teste de restore
+- FR52: Sistema mantém logs estruturados de TODAS as ações: usuário, ação, recurso, timestamp, IP
+- FR53: Logs de acesso a dados sensíveis incluem: WHO, WHAT, WHEN, WHY (motivo do acesso)
+- FR54: Admin pode consultar auditoria por: usuário, período, tipo de ação
+- FR55: Sistema retem logs por mínimo 12 meses
+- FR56: Sistema monitora tentativas de acesso não autorizado (ex: usuário X tentando acessar dados de Y)
+- FR57: Sistema deve ter backup automático diário com teste de restore
 
 ### Data Integrity & Offline Handling
 
-- FR51: Se Professor perde conexão enquanto preenchendo treino, dados são salvos localmente (browser cache)
-- FR52: quando reconectar, sistema sincroniza automaticamente dados locais com servidor
-- FR53: Sistema detecta conflitos (mesmo treino editado em 2 lugares) e implementa conflicto resolution
-- FR54: Usuário recebe notificação de status de sincronização: "Offline", "Sincronizando", "Em sincronia"
+- FR58: Se Professor perde conexão enquanto preenchendo treino, dados são salvos localmente (browser cache)
+- FR59: quando reconectar, sistema sincroniza automaticamente dados locais com servidor
+- FR60: Sistema detecta conflitos (mesmo treino editado em 2 lugares) e implementa conflicto resolution
+- FR61: Usuário recebe notificação de status de sincronização: "Offline", "Sincronizando", "Em sincronia"
 
 ### Accessibility & Localization
 
-- FR55: Todas interfaces seguem WCAG AA standards (color contrast, keyboard navigation, screen reader)
-- FR56: Gráficos incluem alternativa em tabela (para screen reader users)
-- FR57: Sistema é totalmente navegável via teclado (Tab, Arrow keys, Enter)
-- FR58: Sistema está em Português Brasileiro
+- FR62: Todas interfaces seguem WCAG AA standards (color contrast, keyboard navigation, screen reader)
+- FR63: Gráficos incluem alternativa em tabela (para screen reader users)
+- FR64: Sistema é totalmente navegável via teclado (Tab, Arrow keys, Enter)
+- FR65: Sistema está em Português Brasileiro

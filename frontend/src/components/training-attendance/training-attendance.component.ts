@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, NgZone, OnInit } from '@angular/core';
 import { Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
+import { finalize, timeout } from 'rxjs/operators';
 import { ApiService } from '../../services/api.service';
 import {
   TrainingAttendanceResponse,
@@ -16,6 +17,7 @@ import {
 })
 export class TrainingAttendanceComponent implements OnInit {
   sessionId = '';
+  turmaId = '';
   turmaName = '';
   students: TrainingAttendanceStudent[] = [];
   total = 0;
@@ -30,7 +32,9 @@ export class TrainingAttendanceComponent implements OnInit {
     private location: Location,
     private route: ActivatedRoute,
     private router: Router,
-    private api: ApiService
+    private api: ApiService,
+    private ngZone: NgZone,
+    private cdr: ChangeDetectorRef
   ) {}
 
   get isSaving(): boolean {
@@ -48,24 +52,31 @@ export class TrainingAttendanceComponent implements OnInit {
   }
 
   loadAttendance(): void {
-    this.isLoading = true;
+    this.setLoadingState(true);
     this.errorMessage = '';
     this.infoMessage = '';
 
-    this.api.getTrainingAttendance(this.sessionId).subscribe({
-      next: (response: TrainingAttendanceResponse) => {
-        this.applyAttendance(response);
-        this.isLoading = false;
-      },
-      error: (error) => {
-        this.errorMessage =
-          error?.error?.error || 'Não foi possível carregar a frequência da sessão.';
-        this.isLoading = false;
-      },
-    });
+    this.api
+      .getTrainingAttendance(this.sessionId)
+      .pipe(
+        timeout(10000),
+        finalize(() => {
+          this.setLoadingState(false);
+        })
+      )
+      .subscribe({
+        next: (response: TrainingAttendanceResponse) => {
+          this.applyAttendance(response);
+        },
+        error: (error) => {
+          this.errorMessage =
+            error?.error?.error || 'Não foi possível carregar a frequência da sessão.';
+        },
+      });
   }
 
   private applyAttendance(response: TrainingAttendanceResponse): void {
+    this.turmaId = response.turmaId;
     this.turmaName = response.turmaName;
     this.students = response.students;
     this.total = response.totals.total;
@@ -82,7 +93,7 @@ export class TrainingAttendanceComponent implements OnInit {
     // Feedback visual imediato (otimista)
     student.status = nextStatus;
     this.present = this.students.filter((item) => item.status === 'present').length;
-    this.savingStudentIds.add(student.studentId);
+    this.setStudentSavingState(student.studentId, true);
     this.errorMessage = '';
 
     const localWarning = nextStatus === 'present' && !student.hasHealthScreening
@@ -98,19 +109,23 @@ export class TrainingAttendanceComponent implements OnInit {
         studentId: student.studentId,
         status: nextStatus,
       })
+      .pipe(
+        timeout(10000),
+        finalize(() => {
+          this.setStudentSavingState(student.studentId, false);
+        })
+      )
       .subscribe({
         next: (response) => {
           this.total = response.totals.total;
           this.present = response.totals.present;
           this.infoMessage = response.warning || localWarning || '';
-          this.savingStudentIds.delete(student.studentId);
         },
         error: (error) => {
           student.status = previousStatus;
           this.present = this.students.filter((item) => item.status === 'present').length;
           this.errorMessage =
             error?.error?.error || 'Falha ao salvar frequência. Tente novamente.';
-          this.savingStudentIds.delete(student.studentId);
         },
       });
   }
@@ -121,6 +136,10 @@ export class TrainingAttendanceComponent implements OnInit {
 
   onBackToReview(): void {
     this.location.back();
+  }
+
+  onBackToHome(): void {
+    this.router.navigate(['/home']);
   }
 
   onNextTechniques(): void {
@@ -136,5 +155,23 @@ export class TrainingAttendanceComponent implements OnInit {
 
     this.infoMessage = '';
     this.router.navigate(['/training/session', this.sessionId, 'techniques']);
+  }
+
+  private setLoadingState(value: boolean): void {
+    this.ngZone.run(() => {
+      this.isLoading = value;
+      this.cdr.detectChanges();
+    });
+  }
+
+  private setStudentSavingState(studentId: string, value: boolean): void {
+    this.ngZone.run(() => {
+      if (value) {
+        this.savingStudentIds.add(studentId);
+      } else {
+        this.savingStudentIds.delete(studentId);
+      }
+      this.cdr.detectChanges();
+    });
   }
 }

@@ -28,7 +28,8 @@
       <div *ngIf="suggestions.length > 0" class="suggestions">
         <span *ngFor="let s of suggestions">
           <a *ngIf="s === 'Fazer login'" (click)="goToLogin()" href="#">{{ s }}</a>
-          <span *ngIf="s !== 'Fazer login'">{{ s }}</span>
+          <a *ngIf="s === 'Recuperar senha'" (click)="goToForgotPassword()" href="#">{{ s }}</a>
+          <span *ngIf="s !== 'Fazer login' && s !== 'Recuperar senha'">{{ s }}</span>
         </span>
       </div>
     </div>

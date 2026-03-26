@@ -1,0 +1,193 @@
+<div class="training-techniques-container">
+  <div *ngIf="isLoading" class="loading-overlay">
+    <mat-spinner diameter="40"></mat-spinner>
+  </div>
+
+  <div *ngIf="!isLoading" class="content">
+    <div class="flow-intro">
+      <div *ngIf="!isLoading" class="page-shell">
+        <header class="page-header">
+          <div>
+            <p class="eyebrow">Cadastro de treino</p>
+            <h2>Técnicas praticadas na aula</h2>
+            <p>Selecione as técnicas do treino, revise a ordem e siga para lançar notas.</p>
+          </div>
+          <button type="button" class="btn-secondary" (click)="goToProfessorTechniques()">
+            Gerenciar catálogo de técnicas
+          </button>
+        </header>
+
+        <section class="intro-card">
+          <h3>Quais técnicas foram praticadas neste treino?</h3>
+          <p class="hint-text">Ao selecionar uma técnica, ela entra automaticamente na lista de técnicas do treino.</p>
+        </section>
+
+        <div *ngIf="errorMessage" class="status error">{{ errorMessage }}</div>
+        <div *ngIf="infoMessage" class="status success">{{ infoMessage }}</div>
+
+        <section class="ordered-selection">
+          <div class="ordered-selection-header">
+            <h3>Técnicas do treino (ordem de seleção)</h3>
+            <p class="hint-text">Use as setas ou arraste para ajustar a ordem de execução.</p>
+          </div>
+
+          <p *ngIf="orderedSelectedTechniqueIds.length === 0" class="empty">
+            Nenhuma técnica selecionada ainda.
+          </p>
+
+          <div class="ordered-list" *ngIf="orderedSelectedTechniqueIds.length > 0">
+            <div
+              class="ordered-item"
+              *ngFor="let techniqueId of orderedSelectedTechniqueIds; let i = index"
+              [class.dragging]="draggingTechniqueId === techniqueId"
+              [draggable]="!reorderingTechniques"
+              (dragstart)="onTechniqueDragStart($event, techniqueId)"
+              (dragover)="onTechniqueDragOver($event)"
+              (drop)="onTechniqueDrop($event, i)"
+              (dragend)="onTechniqueDragEnd()"
+            >
+              <div class="ordered-index">{{ i + 1 }}</div>
+              <div class="ordered-name">{{ allTechniques[techniqueId]?.name }}</div>
+              <div class="ordered-actions">
+                <button
+                  type="button"
+                  class="order-btn"
+                  (click)="moveSelectedTechnique(i, -1)"
+                  [disabled]="reorderingTechniques || !canMoveSelected(i, -1)"
+                >↑</button>
+                <button
+                  type="button"
+                  class="order-btn"
+                  (click)="moveSelectedTechnique(i, 1)"
+                  [disabled]="reorderingTechniques || !canMoveSelected(i, 1)"
+                >↓</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="preset-panel" *ngIf="presets.length > 0 || (showPresetSuggestion && suggestedPreset)">
+          <div class="preset-panel-header">
+            <h3>Favoritos</h3>
+            <p>Use um conjunto salvo para preencher rapidamente este treino.</p>
+          </div>
+
+          <div class="preset-suggestion-inline" *ngIf="showPresetSuggestion && suggestedPreset">
+            <span>Sugestão:</span>
+            <strong>{{ suggestedPreset.name }}</strong>
+            <button type="button" class="btn-secondary" (click)="onAcceptPresetSuggestion()" [disabled]="applyingPreset">
+              Usar sugestão
+            </button>
+            <button type="button" class="btn-secondary" (click)="onRejectPresetSuggestion()" [disabled]="applyingPreset">
+              Ignorar
+            </button>
+          </div>
+
+          <div class="preset-list" *ngIf="presets.length > 0">
+            <button
+              type="button"
+              class="preset-chip"
+              *ngFor="let preset of presets"
+              (click)="applyPreset(preset)"
+              [disabled]="applyingPreset"
+            >
+              {{ preset.name }}
+            </button>
+          </div>
+        </section>
+
+        <div class="techniques-groups">
+          <div *ngFor="let group of techniqueGroups" class="technique-group">
+            <section class="group-card">
+              <div class="group-header">
+                <div>
+                  <h4>{{ group.category }}</h4>
+                  <p>{{ group.techniqueIds.length }} técnica(s)</p>
+                </div>
+              </div>
+
+              <div class="techniques-list">
+                <button
+                  type="button"
+                  *ngFor="let techniqueId of group.techniqueIds"
+                  class="technique-item"
+                  [class.selected]="isTechniqueSelected(techniqueId)"
+                  [disabled]="isTechniqueSaving(techniqueId)"
+                  (click)="toggleTechnique(techniqueId)"
+                >
+                  <span class="technique-name">{{ allTechniques[techniqueId]?.name }}</span>
+                  <span class="technique-state" *ngIf="!isTechniqueSaving(techniqueId)">
+                    {{ isTechniqueSelected(techniqueId) ? 'Selecionada' : 'Selecionar' }}
+                  </span>
+                  <mat-spinner
+                    *ngIf="isTechniqueSaving(techniqueId)"
+                    diameter="16"
+                    class="item-spinner"
+                  ></mat-spinner>
+                </button>
+              </div>
+            </section>
+          </div>
+        </div>
+
+        <div *ngIf="selectedSummary$.count > 0" class="summary-card">
+          <p class="summary-title">✓ {{ selectedSummary$.count }} técnica(s) selecionada(s)</p>
+          <p class="summary-list">{{ selectedSummary$.names.join(", ") }}</p>
+        </div>
+
+        <div class="custom-technique-section">
+          <div class="section-header">
+            <h3>Adicionar técnica personalizada</h3>
+            <p>Use esta opção quando a técnica ainda não existir na lista acima.</p>
+          </div>
+
+          <div class="custom-input-wrapper">
+              <label for="custom-technique-input">Nome da técnica</label>
+              <input
+                id="custom-technique-input"
+                class="custom-input"
+                type="text"
+                [(ngModel)]="customTechniqueInput"
+                (input)="onCustomTechniqueInput($event.target.value)"
+                placeholder="Digite a técnica"
+                [disabled]="addingCustom"
+                (keyup.enter)="addCustomTechnique()"
+              />
+          </div>
+
+          <div *ngIf="showAutoComplete" class="autocomplete-dropdown">
+            <div
+              *ngFor="let suggestion of customAutocomplete"
+              class="autocomplete-item"
+              (click)="selectFromAutocomplete(suggestion)"
+            >
+              {{ suggestion.name }}
+            </div>
+          </div>
+
+          <button
+            type="button"
+            class="btn-primary add-custom-button"
+            (click)="addCustomTechnique()"
+            [disabled]="!customTechniqueInput.trim() || addingCustom"
+          >
+            <span *ngIf="!addingCustom">+ Adicionar</span>
+            <span *ngIf="addingCustom">Salvando...</span>
+          </button>
+        </div>
+
+        <div class="navigation-buttons">
+          <button type="button" class="btn-secondary" (click)="onBackToAttendance()">
+            Anterior: Frequência
+          </button>
+
+          <button
+            type="button"
+            class="btn-primary"
+            (click)="onNextNotes()"
+            [disabled]="isSaving || selectedSummary$.count === 0"
+          >
+            Salvar técnicas e lançar notas sobre o treino
+          </button>
+        </div>
+      </div>

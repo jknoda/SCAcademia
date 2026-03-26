@@ -1,0 +1,152 @@
+<div class="turmas-page">
+  <div class="turmas-card">
+    <!-- Header -->
+    <div class="header-row">
+      <div>
+        <h2>Gerenciar Turmas</h2>
+        <p class="subtitle">Selecione uma turma para editar os dados.</p>
+      </div>
+      <button class="btn-secondary" (click)="goBack()">Voltar</button>
+    </div>
+
+    <!-- Loading / Error -->
+    <p *ngIf="isLoading" class="subtitle loading-text">Carregando turmas...</p>
+    <div *ngIf="loadErrorMessage" class="status-message error">{{ loadErrorMessage }}</div>
+
+    <!-- Empty state -->
+    <div class="empty-state" *ngIf="!isLoading && !loadErrorMessage && turmas.length === 0">
+      Você ainda não tem turmas cadastradas.
+    </div>
+
+    <!-- Grid list (hidden when a turma is selected) -->
+    <div class="turma-grid" *ngIf="!isLoading && !selectedRow && turmas.length > 0">
+      <div
+        class="turma-card"
+        *ngFor="let row of turmas"
+        (click)="selectTurma(row)"
+        [class.inactive]="!row.form.isActive"
+      >
+        <div class="turma-card-day">
+          <span class="day-abbrev">{{ dayAbbrev(row.form.day) }}</span>
+          <span class="day-full">{{ row.form.day }}</span>
+        </div>
+        <div class="turma-card-body">
+          <div class="turma-card-name">{{ row.turma.turmaName }}</div>
+          <div class="turma-card-time" *ngIf="row.form.startTime || row.form.endTime">
+            {{ row.form.startTime || '--:--' }} - {{ row.form.endTime || '--:--' }}
+          </div>
+          <div class="turma-card-desc" *ngIf="row.turma.description">{{ row.turma.description }}</div>
+        </div>
+        <div class="turma-card-badge" [class.active]="row.form.isActive" [class.inactive]="!row.form.isActive">
+          {{ row.form.isActive ? 'Ativa' : 'Inativa' }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Detail panel (shown when a turma is selected) -->
+    <div class="turma-detail" *ngIf="selectedRow">
+      <div class="detail-header">
+        <button class="btn-back" (click)="deselectTurma()">&#8592; Voltar à lista</button>
+        <h3>{{ selectedRow.turma.turmaName }}</h3>
+      </div>
+
+      <div class="field">
+        <label>Nome da turma</label>
+        <input type="text" [(ngModel)]="selectedRow.form.turmaName" />
+      </div>
+
+      <div class="field">
+        <label>Descrição</label>
+        <textarea rows="2" [(ngModel)]="selectedRow.form.description"></textarea>
+      </div>
+
+      <div class="field-grid">
+        <div class="field">
+          <label>Dia</label>
+          <select [(ngModel)]="selectedRow.form.day">
+            <option *ngFor="let day of weekdays" [value]="day">{{ day }}</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Horário inicial</label>
+          <input type="time" [(ngModel)]="selectedRow.form.startTime" />
+        </div>
+
+        <div class="field">
+          <label>Horário final</label>
+          <input type="time" [(ngModel)]="selectedRow.form.endTime" />
+        </div>
+
+      </div>
+
+      <div class="field">
+        <label>Alunos vinculados à turma</label>
+        <div class="linked-students-grid" *ngIf="linkedStudentsForSelectedRow.length > 0">
+          <div class="linked-student-card" *ngFor="let linked of linkedStudentsForSelectedRow">
+            <span class="linked-student-name">{{ linked.fullName }}</span>
+            <button
+              type="button"
+              class="btn-unlink"
+              (click)="unlinkStudentFromSelectedRow(linked.studentId)"
+              [disabled]="selectedRow.isSaving"
+            >
+              Desvincular
+            </button>
+          </div>
+        </div>
+        <p class="students-help" *ngIf="linkedStudentsForSelectedRow.length === 0">
+          Nenhum aluno vinculado nesta turma.
+        </p>
+      </div>
+
+      <div class="field">
+        <label>Vincular alunos (múltipla seleção)</label>
+        <p class="students-help">Lista com alunos ativos da academia.</p>
+        <input
+          type="text"
+          class="student-filter"
+          [(ngModel)]="studentFilter"
+          placeholder="Filtrar aluno por nome"
+          [disabled]="selectedRow.isSaving || isLoadingStudents"
+        />
+
+        <div class="students-list" *ngIf="!isLoadingStudents && filteredStudents.length > 0">
+          <label class="student-item" *ngFor="let student of filteredStudents">
+            <input
+              type="checkbox"
+              [checked]="isSelectedRowStudent(student.studentId)"
+              (change)="toggleSelectedRowStudent(student.studentId)"
+              [disabled]="selectedRow.isSaving"
+            />
+            <span>{{ student.fullName }}</span>
+          </label>
+        </div>
+
+        <p class="students-help" *ngIf="isLoadingStudents">Carregando alunos...</p>
+        <p class="students-help" *ngIf="!isLoadingStudents && availableStudents.length === 0">
+          Nenhum aluno ativo encontrado.
+        </p>
+        <p class="students-help" *ngIf="!isLoadingStudents && availableStudents.length > 0 && filteredStudents.length === 0">
+          Nenhum aluno encontrado para esse filtro.
+        </p>
+      </div>
+
+      <label class="checkbox-row">
+        <input type="checkbox" [(ngModel)]="selectedRow.form.isActive" />
+        <span>Turma ativa</span>
+      </label>
+
+      <div class="detail-actions">
+        <button class="btn-secondary" (click)="deselectTurma()">Cancelar</button>
+        <button class="btn-primary" (click)="saveTurma(selectedRow)" [disabled]="selectedRow.isSaving">
+          {{ selectedRow.isSaving ? 'Salvando...' : 'Salvar alterações' }}
+        </button>
+      </div>
+
+      <div *ngIf="selectedRow.successMessage" class="status-message success">{{ selectedRow.successMessage }}</div>
+      <div *ngIf="selectedRow.errorMessage" class="status-message error">{{ selectedRow.errorMessage }}</div>
+    </div>
+
+  </div>
+</div>

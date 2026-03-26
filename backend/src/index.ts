@@ -2,17 +2,25 @@ import dotenv from 'dotenv';
 import app from './app';
 import { testConnection } from './lib/db';
 import { initializeComplianceScheduler } from './lib/complianceSchedule';
+import { runStartupSchemaChecks } from './lib/startupSchema';
 
 dotenv.config();
 const PORT = process.env.PORT || 3000;
-initializeComplianceScheduler();
 
-// Start server
-app.listen(PORT, async () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
-  console.log(`📋 Setup wizard available at http://localhost:${PORT}/api/auth/setup/init`);
-  await testConnection().catch((err) => {
-    console.error('❌ Failed to connect to PostgreSQL:', err.message);
+const startServer = async (): Promise<void> => {
+  try {
+    await testConnection();
+    await runStartupSchemaChecks();
+    initializeComplianceScheduler();
+
+    app.listen(PORT, () => {
+      console.log(`🚀 Server running on http://localhost:${PORT}`);
+      console.log(`📋 Setup wizard available at http://localhost:${PORT}/api/auth/setup/init`);
+    });
+  } catch (err: any) {
+    console.error('❌ Startup failed:', err?.message || err);
     process.exit(1);
-  });
-});
+  }
+};
+
+void startServer();

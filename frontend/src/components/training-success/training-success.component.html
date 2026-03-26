@@ -1,0 +1,30 @@
+<section class="training-success" (click)="cancelRedirect()">
+  <div class="success-icon">✅</div>
+  <h1 class="success-title">REGISTRADO COM SUCESSO!</h1>
+  <p class="success-timestamp">{{ formattedTimestamp }}</p>
+  <p class="success-notification">{{ notificationText }}</p>
+
+  <div class="redirect-countdown" *ngIf="redirectCountdown > 0 && !redirectCancelled">
+    <p>Redirecionando em {{ redirectCountdown }}...</p>
+    <button type="button" class="btn-cancel" (click)="cancelRedirect(); $event.stopPropagation()">Cancelar</button>
+  </div>
+
+  <div class="cta-group" [class.cta-visible]="ctasVisible">
+    <button
+      type="button"
+      class="btn-painel"
+      [class.btn-highlight]="ctasVisible"
+      (click)="onVoltarPainel(); $event.stopPropagation()"
+    >
+      Voltar ao Painel
+    </button>
+    <button
+      type="button"
+      class="btn-proxima"
+      [class.btn-highlight]="ctasVisible"
+      (click)="onProximaAula(); $event.stopPropagation()"
+    >
+      Registrar Próxima Aula
+    </button>
+  </div>
+</section>

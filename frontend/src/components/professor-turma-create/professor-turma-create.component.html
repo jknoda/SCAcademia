@@ -1,0 +1,97 @@
+<div class="turma-create-page">
+  <div class="page-shell">
+    <header class="page-header">
+      <div>
+        <p class="eyebrow">Gestão de turmas</p>
+        <h2>Cadastrar nova turma</h2>
+        <p>Crie a turma com horário inicial e final para uso no fluxo de treinos.</p>
+      </div>
+      <button class="btn-secondary" (click)="goBack()">Voltar para início</button>
+    </header>
+
+    <div *ngIf="errorMessage" class="status error">{{ errorMessage }}</div>
+    <div *ngIf="successMessage" class="status success">{{ successMessage }}</div>
+
+    <section class="create-card">
+      <div class="field">
+        <label for="turma-name">Nome da turma</label>
+        <input
+          id="turma-name"
+          type="text"
+          [(ngModel)]="turmaName"
+          placeholder="Ex: Judô Juvenil - Terça e Quinta"
+          [disabled]="isSaving"
+        />
+      </div>
+
+      <div class="field">
+        <label for="turma-description">Descrição (opcional)</label>
+        <textarea
+          id="turma-description"
+          rows="3"
+          [(ngModel)]="turmaDescription"
+          placeholder="Objetivo da turma, faixa etária, observações"
+          [disabled]="isSaving"
+        ></textarea>
+      </div>
+
+      <div class="field-grid">
+        <div class="field">
+          <label for="turma-weekday">Dia</label>
+          <select id="turma-weekday" [(ngModel)]="weekday" [disabled]="isSaving">
+            <option *ngFor="let day of weekdays" [value]="day">{{ day }}</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="turma-start">Horário inicial (opcional)</label>
+          <input id="turma-start" type="time" [(ngModel)]="startTime" [disabled]="isSaving" />
+        </div>
+
+        <div class="field">
+          <label for="turma-end">Horário final (opcional)</label>
+          <input id="turma-end" type="time" [(ngModel)]="endTime" [disabled]="isSaving" />
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Vincular alunos já cadastrados (opcional)</label>
+        <p class="students-help">Um aluno pode estar vinculado em mais de uma turma.</p>
+        <input
+          type="text"
+          class="student-filter"
+          [(ngModel)]="studentFilter"
+          placeholder="Filtrar aluno por nome"
+          [disabled]="isSaving || isLoadingStudents"
+        />
+        <div class="students-list" *ngIf="!isLoadingStudents && filteredStudents.length > 0">
+          <label class="student-item" *ngFor="let student of filteredStudents">
+            <input
+              type="checkbox"
+              [checked]="isStudentSelected(student.studentId)"
+              (change)="toggleStudentSelection(student.studentId)"
+              [disabled]="isSaving"
+            />
+            <span>{{ student.fullName }}</span>
+          </label>
+        </div>
+        <p class="students-help" *ngIf="isLoadingStudents">Carregando alunos...</p>
+        <p class="students-help" *ngIf="!isLoadingStudents && availableStudents.length === 0">
+          Nenhum aluno ativo encontrado.
+        </p>
+        <p class="students-help" *ngIf="!isLoadingStudents && availableStudents.length > 0 && filteredStudents.length === 0">
+          Nenhum aluno encontrado para esse filtro.
+        </p>
+      </div>
+
+      <div class="actions">
+        <button class="btn-primary" (click)="createTurma()" [disabled]="isSaving || !turmaName.trim()">
+          {{ isSaving ? 'Salvando...' : 'Cadastrar turma' }}
+        </button>
+        <button class="btn-secondary" (click)="goToManageTurmas()" [disabled]="isSaving">
+          Gerenciar turmas
+        </button>
+      </div>
+    </section>
+  </div>
+</div>

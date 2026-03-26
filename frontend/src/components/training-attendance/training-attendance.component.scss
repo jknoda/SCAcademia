@@ -77,6 +77,33 @@ h2 {
   border-bottom: none;
 }
 
+.quick-enroll {
+  border-top: 1px solid #edf1f7;
+  padding: 12px 16px;
+  background: #f8fbff;
+}
+
+.quick-enroll p {
+  margin: 0 0 8px;
+  color: #34506f;
+  font-weight: 600;
+}
+
+.quick-enroll-controls {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.quick-enroll-controls select {
+  min-height: 40px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 0 10px;
+  min-width: 220px;
+  background: #fff;
+}
+
 .student-name {
   color: #1f2d3d;
   font-weight: 600;

@@ -1,0 +1,279 @@
+.training-notes {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 24px 16px 32px;
+  display: grid;
+  gap: 16px;
+}
+
+.notes-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+  padding: 20px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #eff6ff 0%, #f8fbff 100%);
+  border: 1px solid #d7e6fb;
+}
+
+.eyebrow {
+  margin: 0 0 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: #1565c0;
+}
+
+.notes-header h1 {
+  margin: 0;
+  font-size: 2rem;
+  line-height: 1.15;
+  color: #0f172a;
+}
+
+.notes-header p {
+  margin: 6px 0 0;
+  color: #64748b;
+  line-height: 1.5;
+}
+
+.header-meta {
+  display: grid;
+  gap: 10px;
+  justify-items: end;
+}
+
+.counter {
+  width: fit-content;
+  border: 1px solid #cbd5e1;
+  border-radius: 999px;
+  padding: 8px 12px;
+  background: #fff;
+  color: #334155;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.counter.limit {
+  border-color: #b91c1c;
+  color: #b91c1c;
+}
+
+.save-indicator {
+  min-height: 20px;
+  color: #0f766e;
+  font-weight: 600;
+}
+
+.feedback {
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+
+.feedback.error {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.feedback.info {
+  background: #ecfeff;
+  color: #155e75;
+}
+
+.notes-grid {
+  display: grid;
+  grid-template-columns: 1.25fr 0.95fr;
+  gap: 16px;
+  align-items: start;
+}
+
+.card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
+}
+
+.general-note {
+  padding: 18px;
+}
+
+.section-header {
+  margin-bottom: 12px;
+}
+
+.section-header h2,
+.students-summary h2 {
+  margin: 0 0 6px;
+  font-size: 1.15rem;
+  color: #0f172a;
+}
+
+.section-header p,
+.students-summary p {
+  margin: 0;
+  color: #64748b;
+  line-height: 1.5;
+}
+
+.general-note textarea,
+.student-editor textarea {
+  width: 100%;
+  resize: none;
+  line-height: 1.55;
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+  padding: 14px;
+  font-size: 1rem;
+  box-sizing: border-box;
+  background: #fbfdff;
+}
+
+.general-note textarea {
+  min-height: 260px;
+}
+
+.notes-side {
+  display: grid;
+  gap: 14px;
+}
+
+.students-summary {
+  padding: 16px 18px;
+}
+
+.student-notes {
+  display: grid;
+  gap: 12px;
+}
+
+.student-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 12px;
+  background: #fafcff;
+}
+
+.student-toggle {
+  width: 100%;
+  border: none;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  text-align: left;
+  padding: 4px 0;
+}
+
+.avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #0f766e;
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+  flex: 0 0 auto;
+}
+
+.student-meta {
+  display: grid;
+  gap: 2px;
+  flex: 1;
+}
+
+.name {
+  font-weight: 700;
+  color: #111827;
+}
+
+.hint {
+  color: #64748b;
+  font-size: 0.82rem;
+}
+
+.status {
+  color: #4b5563;
+  font-size: 0.85rem;
+}
+
+.student-editor {
+  margin-top: 12px;
+  display: grid;
+  gap: 6px;
+}
+
+.student-editor label {
+  font-weight: 600;
+  color: #334155;
+}
+
+.student-editor textarea {
+  min-height: 110px;
+}
+
+.student-editor small {
+  color: #6b7280;
+  text-align: right;
+}
+
+.actions {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 12px;
+}
+
+.actions button {
+  min-height: 48px;
+  border-radius: 12px;
+  border: none;
+  padding: 0 18px;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.btn-secondary {
+  background: #f3f4f6;
+  color: #111827;
+}
+
+.btn-primary {
+  background: #0f766e;
+  color: #fff;
+}
+
+.loading-state {
+  text-align: center;
+  color: #4b5563;
+}
+
+@media (max-width: 768px) {
+  .training-notes {
+    padding: 16px 12px 24px;
+  }
+
+  .notes-header,
+  .notes-grid,
+  .actions {
+    grid-template-columns: 1fr;
+    flex-direction: column;
+  }
+
+  .header-meta {
+    justify-items: start;
+  }
+
+  .notes-header h1 {
+    font-size: 1.6rem;
+  }
+
+  .actions button {
+    width: 100%;
+  }
+}

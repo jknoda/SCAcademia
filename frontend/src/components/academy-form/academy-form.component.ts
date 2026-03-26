@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, NgZone, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ApiService } from '../../services/api.service';
 
@@ -16,7 +16,7 @@ export class AcademyFormComponent {
   errorMessage = '';
   serverErrors: { [key: string]: string } = {};
 
-  constructor(private fb: FormBuilder, private api: ApiService) {
+  constructor(private fb: FormBuilder, private api: ApiService, private ngZone: NgZone, private cdr: ChangeDetectorRef) {
     this.academyForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(2)]],
       location: ['', [Validators.required, Validators.minLength(2)]],
@@ -30,13 +30,13 @@ export class AcademyFormComponent {
       return;
     }
 
-    this.isLoading = true;
+    this.setLoadingState(true);
     this.errorMessage = '';
     this.serverErrors = {};
 
     this.api.createAcademy(this.academyForm.value).subscribe(
       (response: any) => {
-        this.isLoading = false;
+        this.setLoadingState(false);
         this.academyCreated.emit({
           academyId: response.academyId,
           name: this.academyForm.get('name')?.value,
@@ -44,7 +44,7 @@ export class AcademyFormComponent {
         });
       },
       (error: any) => {
-        this.isLoading = false;
+        this.setLoadingState(false);
         if (error.error?.details) {
           error.error.details.forEach((detail: any) => {
             this.serverErrors[detail.field] = detail.message;
@@ -71,5 +71,12 @@ export class AcademyFormComponent {
     if (field.errors['pattern']) return 'Formato inválido';
 
     return null;
+  }
+
+  private setLoadingState(value: boolean): void {
+    this.ngZone.run(() => {
+      this.isLoading = value;
+      this.cdr.detectChanges();
+    });
   }
 }

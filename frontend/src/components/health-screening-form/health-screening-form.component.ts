@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, NgZone, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { timeout } from 'rxjs/operators';
 import { ApiService } from '../../services/api.service';
 
 @Component({
@@ -25,7 +26,9 @@ export class HealthScreeningFormComponent implements OnInit {
     private fb: FormBuilder,
     private route: ActivatedRoute,
     private router: Router,
-    private api: ApiService
+    private api: ApiService,
+    private ngZone: NgZone,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -56,10 +59,12 @@ export class HealthScreeningFormComponent implements OnInit {
   }
 
   private loadExistingRecord(): void {
-    this.isFetchingRecord = true;
-    this.api.getHealthScreening(this.studentId).subscribe({
+    this.setFetchingRecordState(true);
+    this.errorMessage = '';
+
+    this.api.getHealthScreening(this.studentId).pipe(timeout(10000)).subscribe({
       next: (response: any) => {
-        this.isFetchingRecord = false;
+        this.setFetchingRecordState(false);
         if (response?.healthRecord) {
           this.isEditMode = true;
           const r = response.healthRecord;
@@ -84,7 +89,7 @@ export class HealthScreeningFormComponent implements OnInit {
         }
       },
       error: (error: any) => {
-        this.isFetchingRecord = false;
+        this.setFetchingRecordState(false);
         // 404 = no record yet, that's fine — stays in create mode
         if (error.status !== 404) {
           this.errorMessage = error.error?.error || 'Erro ao carregar anamnese';
@@ -126,7 +131,7 @@ export class HealthScreeningFormComponent implements OnInit {
       return;
     }
 
-    this.isLoading = true;
+    this.setLoadingState(true);
     this.errorMessage = '';
 
     const payload = { ...this.form.value };
@@ -135,15 +140,15 @@ export class HealthScreeningFormComponent implements OnInit {
       ? this.api.updateHealthScreening(this.studentId, payload)
       : this.api.createHealthScreening(this.studentId, payload);
 
-    request$.subscribe({
+    request$.pipe(timeout(10000)).subscribe({
       next: (response: any) => {
-        this.isLoading = false;
+        this.setLoadingState(false);
         this.successMessage = response.message || '✓ Anamnese salva com sucesso';
         this.isEditMode = true;
         setTimeout(() => this.navigateBack(), 1500);
       },
       error: (error: any) => {
-        this.isLoading = false;
+        this.setLoadingState(false);
         if (error.status === 403) {
           this.errorMessage = error.error?.error || 'Sem permissão para realizar esta ação';
         } else if (error.status === 409) {
@@ -154,6 +159,20 @@ export class HealthScreeningFormComponent implements OnInit {
           this.errorMessage = error.error?.error || 'Erro ao salvar anamnese. Tente novamente.';
         }
       },
+    });
+  }
+
+  private setFetchingRecordState(value: boolean): void {
+    this.ngZone.run(() => {
+      this.isFetchingRecord = value;
+      this.cdr.detectChanges();
+    });
+  }
+
+  private setLoadingState(value: boolean): void {
+    this.ngZone.run(() => {
+      this.isLoading = value;
+      this.cdr.detectChanges();
     });
   }
 }

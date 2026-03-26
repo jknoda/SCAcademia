@@ -1,0 +1,300 @@
+.training-review {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 24px 16px 32px;
+  display: grid;
+  gap: 16px;
+}
+
+.review-header {
+  background: linear-gradient(135deg, #e8f1ff 0%, #f8fbff 100%);
+  border: 1px solid #d6e4fb;
+  border-radius: 18px;
+  padding: 20px;
+}
+
+.eyebrow {
+  margin: 0 0 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: #1565c0;
+}
+
+.review-header h1 {
+  margin: 0;
+  font-size: 2rem;
+  color: #0f172a;
+}
+
+.review-header p {
+  margin: 6px 0 0;
+  color: #52606d;
+  line-height: 1.5;
+}
+
+.feedback {
+  border-radius: 10px;
+  padding: 12px 14px;
+}
+
+.feedback.error {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.feedback.info {
+  background: #ecfeff;
+  color: #155e75;
+}
+
+.feedback.success {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.session-hero {
+  background: linear-gradient(135deg, #0f766e 0%, #0d9488 100%);
+  color: #ffffff;
+  border-radius: 18px;
+  padding: 22px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+}
+
+.hero-label {
+  margin: 0 0 6px;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0.82;
+}
+
+.session-hero h2 {
+  margin: 0;
+  font-size: 1.8rem;
+}
+
+.hero-meta {
+  margin: 8px 0 0;
+  opacity: 0.9;
+}
+
+.hero-stat {
+  min-width: 120px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.14);
+  text-align: center;
+}
+
+.hero-stat-value {
+  display: block;
+  font-size: 2rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.hero-stat-label {
+  display: block;
+  margin-top: 6px;
+  font-size: 0.82rem;
+  opacity: 0.88;
+}
+
+.review-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 16px;
+}
+
+.card {
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 18px;
+  background: #ffffff;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
+}
+
+.techniques-card {
+  grid-column: 1 / 2;
+}
+
+.notes-card {
+  grid-column: 2 / 3;
+}
+
+.attendance-card {
+  grid-column: 1 / 3;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.card-header h3 {
+  margin: 0;
+  color: #0f172a;
+}
+
+.count-badge {
+  min-width: 34px;
+  height: 34px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 999px;
+  background: #dbeafe;
+  color: #1d4ed8;
+  font-weight: 700;
+}
+
+.count-badge.neutral {
+  background: #f3f4f6;
+  color: #334155;
+}
+
+.card-helper {
+  margin: 0 0 14px;
+  color: #64748b;
+  line-height: 1.45;
+}
+
+.technique-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.technique-chip {
+  padding: 10px 12px;
+  border-radius: 999px;
+  background: #eff6ff;
+  color: #1e40af;
+  font-weight: 600;
+}
+
+.notes-text,
+.absent-list,
+.empty-text {
+  margin: 0;
+  color: #334155;
+  line-height: 1.6;
+}
+
+.attendance-summary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.attendance-item {
+  padding: 14px;
+  border-radius: 14px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  text-align: center;
+}
+
+.attendance-number {
+  display: block;
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.attendance-label {
+  display: block;
+  margin-top: 4px;
+  color: #64748b;
+}
+
+.actions {
+  margin-top: 8px;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.2fr;
+  gap: 12px;
+}
+
+.actions button,
+.retry-actions button,
+.offline-actions button {
+  min-height: 48px;
+  border-radius: 12px;
+  padding: 0 16px;
+  border: none;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-secondary {
+  background: #f3f4f6;
+  color: #111827;
+}
+
+.btn-primary {
+  background: #0f766e;
+  color: #fff;
+}
+
+.btn-primary:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.btn-outline {
+  border: 1px solid #9ca3af;
+  background: #fff;
+  color: #111827;
+}
+
+.retry-actions,
+.offline-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.loading-state {
+  text-align: center;
+  color: #4b5563;
+}
+
+@media (max-width: 768px) {
+  .training-review {
+    padding: 16px 12px 24px;
+  }
+
+  .session-hero,
+  .review-grid,
+  .actions,
+  .retry-actions,
+  .offline-actions,
+  .attendance-summary {
+    grid-template-columns: 1fr;
+    flex-direction: column;
+  }
+
+  .session-hero {
+    align-items: flex-start;
+  }
+
+  .techniques-card,
+  .notes-card,
+  .attendance-card {
+    grid-column: auto;
+  }
+
+  .actions button,
+  .retry-actions button,
+  .offline-actions button {
+    width: 100%;
+  }
+}

@@ -47,10 +47,13 @@
         </div>
       </div>
 
-      <p class="empty" *ngIf="students.length === 0">Nenhum aluno ativo encontrado para a turma.</p>
+      <div class="empty" *ngIf="students.length === 0">
+        <p>Nenhum aluno ativo vinculado à turma. Faça o vínculo em Gerenciar Turmas.</p>
+      </div>
     </div>
 
     <div class="actions">
+      <button class="btn secondary" (click)="onBackToHome()">Voltar</button>
       <button class="btn secondary" (click)="onBackToReview()">Revisar</button>
       <button
         class="btn primary"

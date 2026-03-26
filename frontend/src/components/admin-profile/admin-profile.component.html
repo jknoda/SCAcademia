@@ -106,7 +106,7 @@
     </div>
   </form>
 
-  <form [formGroup]="passwordForm" (ngSubmit)="changePassword()" class="card">
+  <form *ngIf="!isLoading" [formGroup]="passwordForm" (ngSubmit)="changePassword()" class="card">
     <h3>Trocar Senha</h3>
 
     <div class="grid two-columns">

@@ -1,0 +1,92 @@
+<section class="training-notes" *ngIf="!isLoading; else loadingState">
+  <header class="notes-header">
+    <div>
+      <p class="eyebrow">Etapa de observações</p>
+      <h1>Registre o contexto do treino</h1>
+      <p>Adicione observações gerais e, se quiser, notas rápidas por aluno presente.</p>
+    </div>
+
+    <div class="header-meta">
+      <button class="counter" type="button" (click)="toggleCounterMode()" [class.limit]="charCount >= 400">
+        <span *ngIf="counterMode === 'chars'">{{ charCount }} / 400 caracteres</span>
+        <span *ngIf="counterMode === 'words'">{{ wordsCount }} palavras</span>
+      </button>
+
+      <div class="save-indicator" *ngIf="showSaveIcon || isSavedLocally">
+        <span *ngIf="showSaveIcon">💾 salvo</span>
+        <span *ngIf="!showSaveIcon && isSavedLocally">💾 rascunho local</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="feedback error" *ngIf="errorMessage">{{ errorMessage }}</div>
+  <div class="feedback info" *ngIf="!errorMessage && infoMessage">{{ infoMessage }}</div>
+
+  <section class="notes-grid">
+    <article class="general-note card">
+      <div class="section-header">
+        <div>
+          <h2>Observação geral do treino</h2>
+          <p>Resumo opcional da aula, progresso percebido, dificuldades ou pontos de atenção.</p>
+        </div>
+      </div>
+
+      <textarea
+        #generalTextarea
+        rows="12"
+        [value]="generalNotes"
+        placeholder="Ex: Houve boa evolução nas projeções básicas e dificuldade na entrada do golpe em dupla..."
+        maxlength="400"
+        (input)="onGeneralNotesInput(generalTextarea.value, generalTextarea)"
+      ></textarea>
+    </article>
+
+    <aside class="notes-side" *ngIf="presentStudents.length > 0">
+      <article class="students-summary card">
+        <h2>Notas por aluno</h2>
+        <p>{{ presentStudents.length }} aluno(s) presente(s) disponíveis para observações individuais.</p>
+      </article>
+
+      <section class="student-notes">
+        <article class="student-card" *ngFor="let student of presentStudents">
+          <button
+            class="student-toggle"
+            type="button"
+            (click)="toggleStudentSection(student.userId)"
+          >
+            <span class="avatar">{{ student.avatarInitials }}</span>
+            <span class="student-meta">
+              <span class="name">{{ student.fullName }}</span>
+              <span class="hint">{{ isStudentExpanded(student.userId) ? 'Ocultar anotação' : 'Adicionar anotação' }}</span>
+            </span>
+            <span class="status" *ngIf="isStudentSaving(student.userId)">salvando...</span>
+          </button>
+
+          <div class="student-editor" *ngIf="isStudentExpanded(student.userId)">
+            <label>Anotação para {{ student.fullName }}</label>
+            <textarea
+              #studentTextarea
+              rows="4"
+              [value]="studentNoteMap[student.userId] || ''"
+              [attr.maxlength]="200"
+              [placeholder]="student.fullName + ' apresentou evolução, dificuldade ou observação importante...'"
+              (input)="onStudentNotesInput(student.userId, studentTextarea.value, studentTextarea)"
+            ></textarea>
+            <small>{{ getStudentCharCount(student.userId) }} / 200 caracteres</small>
+          </div>
+        </article>
+      </section>
+    </aside>
+  </section>
+
+  <footer class="actions">
+    <button type="button" class="btn-secondary" (click)="onBackToTechniques()">Voltar para técnicas</button>
+    <button type="button" class="btn-primary" (click)="onNextToReview()">Revisar treino</button>
+  </footer>
+</section>
+
+<ng-template #loadingState>
+  <section class="training-notes loading-state">
+    <p>Carregando notas da sessão...</p>
+  </section>
+</ng-template>

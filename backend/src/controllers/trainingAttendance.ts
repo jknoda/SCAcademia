@@ -3,6 +3,7 @@ import { AuthenticatedRequest } from '../types';
 import { logAudit } from '../lib/audit';
 import {
   AttendanceStatus,
+  enrollStudentInSessionTurma,
   getTrainingAttendance,
   upsertTrainingAttendance,
 } from '../lib/trainingAttendance';
@@ -109,5 +110,56 @@ export const upsertTrainingAttendanceHandler = async (req: AuthenticatedRequest,
   } catch (error) {
     console.error('Erro ao salvar frequência da sessão:', error);
     return res.status(500).json({ error: 'Erro ao salvar frequência da sessão' });
+  }
+};
+
+export const enrollStudentInSessionTurmaHandler = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const requester = req.user!;
+    if (requester.role !== 'Professor') {
+      return res.status(403).json({ error: 'Acesso negado. Papel insuficiente.' });
+    }
+
+    const sessionId = asString(req.params.sessionId);
+    const studentId = asString(req.body?.studentId);
+
+    if (!sessionId || !uuidRegex.test(sessionId)) {
+      return res.status(400).json({ error: 'sessionId deve ser um UUID válido' });
+    }
+
+    if (!studentId || !uuidRegex.test(studentId)) {
+      return res.status(400).json({ error: 'studentId deve ser um UUID válido' });
+    }
+
+    const attendance = await enrollStudentInSessionTurma({
+      academyId: requester.academyId,
+      professorId: requester.userId,
+      sessionId,
+      studentId,
+    });
+
+    if (!attendance) {
+      return res.status(404).json({
+        error: 'Sessão ou aluno não encontrado para o professor atual',
+      });
+    }
+
+    logAudit(
+      requester.userId,
+      'TRAINING_STUDENT_ENROLLED_IN_TURMA',
+      'TrainingAttendance',
+      sessionId,
+      requester.academyId,
+      req.ip,
+      { studentId }
+    );
+
+    return res.status(200).json({
+      message: 'Aluno vinculado à turma com sucesso',
+      attendance,
+    });
+  } catch (error) {
+    console.error('Erro ao vincular aluno na turma da sessão:', error);
+    return res.status(500).json({ error: 'Erro ao vincular aluno na turma da sessão' });
   }
 };

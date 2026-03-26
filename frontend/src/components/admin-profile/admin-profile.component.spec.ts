@@ -157,4 +157,14 @@ describe('AdminProfileComponent', () => {
     expect(component.errorMessage).toBe('Falha ao carregar');
     expect(component.isLoading).toBeFalse();
   });
+
+  it('nao renderiza trocar senha enquanto perfil principal esta carregando', () => {
+    component.isLoading = true;
+
+    fixture.detectChanges();
+
+    const content = fixture.nativeElement.textContent as string;
+    expect(content).toContain('Carregando perfil...');
+    expect(content).not.toContain('Trocar Senha');
+  });
 });

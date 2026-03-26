@@ -44,11 +44,47 @@ import {
   ComplianceReportSchedule,
   GenerateComplianceReportResponse,
   TrainingEntryPointResponse,
+  CreateProfessorTurmaPayload,
+  CreateProfessorTurmaResponse,
+  ListTurmaEligibleStudentsResponse,
+  ListProfessorTurmasResponse,
   StartTrainingSessionResponse,
   TrainingAttendanceResponse,
   SaveTrainingAttendancePayload,
   SaveTrainingAttendanceResponse,
+  EnrollTrainingStudentResponse,
+  GetSessionNotesResponse,
+  SaveNotesPayload,
+  SaveStudentNotePayload,
+  SaveNotesResponse,
+  TrainingReviewSummaryResponse,
+  ConfirmTrainingResponse,
   UpdateAcademyProfilePayload,
+  GetTechniquesResponse,
+  GetSessionTechniquesResponse,
+  SelectTechniqueResponse,
+  DeselectTechniqueResponse,
+  AddCustomTechniqueResponse,
+  CreateAcademyTechniquePayload,
+  CreateAcademyTechniqueResponse,
+  DeleteAcademyTechniqueResponse,
+  TechniquePreset,
+  SaveTechniquePresetPayload,
+  SaveTechniquePresetResponse,
+  GetPresetsResponse,
+  ApplyPresetResponse,
+  ReorderSessionTechniquesResponse,
+  RecentTrainingSummary,
+  GetRecentTrainingsResponse,
+  TrainingHistoryFilters,
+  TrainingHistoryResponse,
+  TrainingDetailsResponse,
+  UpdateTrainingPayload,
+  UpdateTrainingResponse,
+  DeleteTrainingResponse,
+  RestoreTrainingResponse,
+  UpdateProfessorTurmaPayload,
+  UpdateProfessorTurmaResponse,
 } from '../types';
 
 @Injectable({
@@ -465,10 +501,49 @@ export class ApiService {
     });
   }
 
-  startTrainingSession(turmaId: string): Observable<StartTrainingSessionResponse> {
+  createProfessorTurma(payload: CreateProfessorTurmaPayload): Observable<CreateProfessorTurmaResponse> {
+    return this.http.post<CreateProfessorTurmaResponse>(
+      `${this.apiUrl}/trainings/turmas`,
+      payload,
+      { headers: this.getHeaders() }
+    );
+  }
+
+  listProfessorTurmas(): Observable<ListProfessorTurmasResponse> {
+    return this.http.get<ListProfessorTurmasResponse>(
+      `${this.apiUrl}/trainings/turmas`,
+      { headers: this.getHeaders() }
+    );
+  }
+
+  listEligibleTurmaStudents(filters?: { name?: string }): Observable<ListTurmaEligibleStudentsResponse> {
+    const params: Record<string, string> = {};
+    if (filters?.name) params['name'] = filters.name;
+
+    return this.http.get<ListTurmaEligibleStudentsResponse>(
+      `${this.apiUrl}/trainings/turmas/eligible-students`,
+      { headers: this.getHeaders(), params }
+    );
+  }
+
+  updateProfessorTurma(
+    turmaId: string,
+    payload: UpdateProfessorTurmaPayload
+  ): Observable<UpdateProfessorTurmaResponse> {
+    return this.http.put<UpdateProfessorTurmaResponse>(
+      `${this.apiUrl}/trainings/turmas/${turmaId}`,
+      payload,
+      { headers: this.getHeaders() }
+    );
+  }
+
+  startTrainingSession(turmaId: string, sessionDate?: string, sessionTime?: string): Observable<StartTrainingSessionResponse> {
+    const body: Record<string, string> = { turmaId };
+    if (sessionDate) body['sessionDate'] = sessionDate;
+    if (sessionTime) body['sessionTime'] = sessionTime;
     return this.http.post<StartTrainingSessionResponse>(
       `${this.apiUrl}/trainings/start`,
-      { turmaId },
+      body,
       { headers: this.getHeaders() }
     );
   }
@@ -487,6 +562,147 @@ export class ApiService {
     return this.http.post<SaveTrainingAttendanceResponse>(
       `${this.apiUrl}/trainings/${sessionId}/attendance`,
       payload,
+      { headers: this.getHeaders() }
+    );
+  }
+
+  enrollStudentInTrainingTurma(
+    sessionId: string,
+    studentId: string
+  ): Observable<EnrollTrainingStudentResponse> {
+    return this.http.post<EnrollTrainingStudentResponse>(
+      `${this.apiUrl}/trainings/${sessionId}/enroll-student`,
+      { studentId },
+      { headers: this.getHeaders() }
+    );
+  }
+
+  getSessionNotes(sessionId: string): Observable<GetSessionNotesResponse> {
+    return this.http.get<GetSessionNotesResponse>(
+      `${this.apiUrl}/trainings/${sessionId}/notes`,
+      { headers: this.getHeaders() }
+    );
+  }
+
+  saveSessionNotes(sessionId: string, notes: string): Observable<SaveNotesResponse> {
+    return this.http.put<SaveNotesResponse>(
+      `${this.apiUrl}/trainings/${sessionId}/notes`,
+      { notes } as SaveNotesPayload,
+      { headers: this.getHeaders() }
+    );
+  }
+
+  saveStudentNote(sessionId: string, studentId: string, content: string): Observable<SaveNotesResponse> {
+    return this.http.put<SaveNotesResponse>(
+      `${this.apiUrl}/trainings/${sessionId}/notes/${studentId}`,
+      { content } as SaveStudentNotePayload,
+      { headers: this.getHeaders() }
+    );
+  }
+
+  getTrainingReviewSummary(sessionId: string): Observable<TrainingReviewSummaryResponse> {
+    return this.http.get<TrainingReviewSummaryResponse>(
+      `${this.apiUrl}/trainings/${sessionId}/review`,
+      { headers: this.getHeaders() }
+    );
+  }
+
+  confirmTrainingSession(sessionId: string): Observable<ConfirmTrainingResponse> {
+    return this.http.post<ConfirmTrainingResponse>(
+      `${this.apiUrl}/trainings/${sessionId}/confirm`,
+      {},
+      { headers: this.getHeaders() }
+    );
+  }
+
+  // ── Técnicas de Treinamento ────────────────────────────────────────────────
+
+  getAcademyTechniques(academyId: string): Observable<GetTechniquesResponse> {
+    return this.http.get<GetTechniquesResponse>(`${this.apiUrl}/academies/${academyId}/techniques`, {
+      headers: this.getHeaders(),
+    });
+  }
+
+  createAcademyTechnique(
+    academyId: string,
+    payload: CreateAcademyTechniquePayload
+  ): Observable<CreateAcademyTechniqueResponse> {
+    return this.http.post<CreateAcademyTechniqueResponse>(
+      `${this.apiUrl}/academies/${academyId}/techniques`,
+      payload,
+      { headers: this.getHeaders() }
+    );
+  }
+
+  deleteAcademyTechnique(
+    academyId: string,
+    techniqueId: string
+  ): Observable<DeleteAcademyTechniqueResponse> {
+    return this.http.delete<DeleteAcademyTechniqueResponse>(
+      `${this.apiUrl}/academies/${academyId}/techniques/${techniqueId}`,
+      { headers: this.getHeaders() }
+    );
+  }
+
+  getSessionTechniques(sessionId: string): Observable<GetSessionTechniquesResponse> {
+    return this.http.get<GetSessionTechniquesResponse>(
+      `${this.apiUrl}/trainings/${sessionId}/techniques`,
+      { headers: this.getHeaders() }
+    );
+  }
+
+  selectTechnique(sessionId: string, techniqueId: string): Observable<SelectTechniqueResponse> {
+    return this.http.post<SelectTechniqueResponse>(
+      `${this.apiUrl}/trainings/${sessionId}/techniques`,
+      { techniqueId },
+      { headers: this.getHeaders() }
+    );
+  }
+
+  deselectTechnique(sessionId: string, techniqueId: string): Observable<DeselectTechniqueResponse> {
+    return this.http.delete<DeselectTechniqueResponse>(
+      `${this.apiUrl}/trainings/${sessionId}/techniques/${techniqueId}`,
+      { headers: this.getHeaders() }
+    );
+  }
+
+  addCustomTechnique(sessionId: string, name: string): Observable<AddCustomTechniqueResponse> {
+    return this.http.post<AddCustomTechniqueResponse>(
+      `${this.apiUrl}/trainings/${sessionId}/techniques/custom`,
+      { name },
+      { headers: this.getHeaders() }
+    );
+  }
+
+  getProfessorTechniquePresets(): Observable<GetPresetsResponse> {
+    return this.http.get<GetPresetsResponse>(`${this.apiUrl}/trainings/presets`, {
+      headers: this.getHeaders(),
+    });
+  }
+
+  saveTechniquePreset(payload: SaveTechniquePresetPayload): Observable<SaveTechniquePresetResponse> {
+    return this.http.post<SaveTechniquePresetResponse>(
+      `${this.apiUrl}/trainings/presets`,
+      payload,
+      { headers: this.getHeaders() }
+    );
+  }
+
+  applyTechniquePreset(sessionId: string, presetId: string): Observable<ApplyPresetResponse> {
+    return this.http.post<ApplyPresetResponse>(
+      `${this.apiUrl}/trainings/${sessionId}/apply-preset/${presetId}`,
+      {},
+      { headers: this.getHeaders() }
+    );
+  }
+
+  reorderSessionTechniques(
+    sessionId: string,
+    techniqueIds: string[]
+  ): Observable<ReorderSessionTechniquesResponse> {
+    return this.http.post<ReorderSessionTechniquesResponse>(
+      `${this.apiUrl}/trainings/${sessionId}/techniques/reorder`,
+      { techniqueIds },
       { headers: this.getHeaders() }
     );
   }
@@ -596,6 +812,106 @@ export class ApiService {
     return this.http.post<{ message: string; schedule: ComplianceReportSchedule }>(
       `${this.apiUrl}/admin/compliance-report/schedule`,
       payload,
+      { headers: this.getHeaders() }
+    );
+  }
+
+  getRecentTrainings(limit: number = 3): Observable<GetRecentTrainingsResponse> {
+    return this.http.get<GetRecentTrainingsResponse>(
+      `${this.apiUrl}/trainings/recent`,
+      { headers: this.getHeaders(), params: { limit: String(limit) } }
+    );
+  }
+
+  // Story 3-7: Training History
+  getTrainingHistory(filters?: TrainingHistoryFilters, limit = 20, offset = 0): Observable<{ success: boolean; data: TrainingHistoryResponse }> {
+    const params: Record<string, string> = { limit: String(limit), offset: String(offset) };
+    if (filters?.dateFrom) params['dateFrom'] = filters.dateFrom;
+    if (filters?.dateTo) params['dateTo'] = filters.dateTo;
+    if (filters?.turmaId) params['turmaId'] = filters.turmaId;
+    if (filters?.keyword) params['keyword'] = filters.keyword;
+    return this.http.get<{ success: boolean; data: TrainingHistoryResponse }>(
+      `${this.apiUrl}/trainings/history`,
+      { headers: this.getHeaders(), params }
+    );
+  }
+
+  getTrainingDetails(sessionId: string): Observable<{ success: boolean; data: TrainingDetailsResponse }> {
+    return this.http.get<{ success: boolean; data: TrainingDetailsResponse }>(
+      `${this.apiUrl}/trainings/${sessionId}`,
+      { headers: this.getHeaders() }
+    );
+  }
+
+  updateTraining(sessionId: string, payload: UpdateTrainingPayload): Observable<UpdateTrainingResponse> {
+    return this.http.put<UpdateTrainingResponse>(
+      `${this.apiUrl}/trainings/${sessionId}`,
+      payload,
+      { headers: this.getHeaders() }
+    );
+  }
+
+  deleteTraining(sessionId: string): Observable<DeleteTrainingResponse> {
+    return this.http.delete<DeleteTrainingResponse>(
+      `${this.apiUrl}/trainings/${sessionId}`,
+      { headers: this.getHeaders() }
+    );
+  }
+
+  restoreTraining(sessionId: string): Observable<RestoreTrainingResponse> {
+    return this.http.patch<RestoreTrainingResponse>(
+      `${this.apiUrl}/trainings/${sessionId}/restore`,
+      {},
+      { headers: this.getHeaders() }
+    );
+  }
+
+  // Offline Sync Endpoints
+  syncBatch(payload: {
+    batch: Array<{
+      id?: string;
+      action: string;
+      resource: string;
+      resourceId?: string;
+      payload: Record<string, unknown>;
+      timestamp: number;
+    }>;
+    clientTimestamp: number;
+  }): Observable<{
+    success: boolean;
+    batchId: string;
+    synced: number;
+    failed: number;
+    conflicts: number;
+    data: Array<{
+      id: string;
+      batchId: string;
+      result: 'synced' | 'conflict' | 'failed';
+      resolvedWith?: 'server_version' | 'client_version';
+      serverVersion?: Record<string, unknown>;
+      error?: string;
+    }>;
+    durationMs: number;
+  }> {
+    return this.http.post<any>(
+      `${this.apiUrl}/trainings/sync-queue`,
+      payload,
+      { headers: this.getHeaders() }
+    );
+  }
+
+  getAdminSyncQueue(): Observable<{
+    success: boolean;
+    data: Array<{
+      professor_id: string;
+      academy_id: string;
+      pending_count: number;
+      failed_count: number;
+      oldest_pending: string | null;
+    }>;
+  }> {
+    return this.http.get<any>(
+      `${this.apiUrl}/trainings/admin/sync-queue/pending`,
       { headers: this.getHeaders() }
     );
   }

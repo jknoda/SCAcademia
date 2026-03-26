@@ -1,0 +1,110 @@
+<div class="professor-techniques-page">
+  <div class="page-shell">
+    <header class="page-header">
+      <div>
+        <p class="eyebrow">Gestão de técnicas</p>
+        <h2>Cadastro exclusivo de técnicas</h2>
+        <p>Cadastre técnicas Básicas e Avançadas para aparecerem no cadastro de treino.</p>
+      </div>
+      <button class="btn-secondary" (click)="goBackHome()">Voltar para início</button>
+    </header>
+
+    <div *ngIf="errorMessage" class="status error">{{ errorMessage }}</div>
+    <div *ngIf="successMessage" class="status success">{{ successMessage }}</div>
+
+    <section class="create-card">
+      <h3>Nova técnica</h3>
+      <div class="form-grid">
+        <div class="field">
+          <label for="new-technique-name">Nome da técnica</label>
+          <input
+            id="new-technique-name"
+            type="text"
+            [(ngModel)]="newTechniqueName"
+            placeholder="Ex: O Soto Gari"
+            [disabled]="isSaving"
+            (keyup.enter)="createTechnique()"
+          />
+        </div>
+
+        <div class="field field-description">
+          <label for="new-technique-description">Descrição (opcional)</label>
+          <textarea
+            id="new-technique-description"
+            rows="2"
+            [(ngModel)]="newTechniqueDescription"
+            placeholder="Ex: Projeção de base com foco em desequilíbrio e entrada"
+            [disabled]="isSaving"
+          ></textarea>
+        </div>
+
+        <div class="field">
+          <label for="new-technique-category">Categoria</label>
+          <select
+            id="new-technique-category"
+            [(ngModel)]="newTechniqueCategory"
+            [disabled]="isSaving"
+          >
+            <option value="Básica">Básica</option>
+            <option value="Avançada">Avançada</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn-primary" (click)="createTechnique()" [disabled]="isSaving || !newTechniqueName.trim()">
+          {{ isSaving ? 'Salvando...' : 'Cadastrar técnica' }}
+        </button>
+        <button class="btn-secondary" (click)="loadTechniques()" [disabled]="isLoading">Atualizar lista</button>
+      </div>
+    </section>
+
+    <div *ngIf="isLoading" class="loading">Carregando técnicas...</div>
+
+    <section class="lists-grid" *ngIf="!isLoading">
+      <article class="list-card">
+        <h3>Básicas</h3>
+        <p class="helper">Fundamentos e base técnica.</p>
+        <p *ngIf="basicTechniques.length === 0" class="empty">Nenhuma técnica básica cadastrada.</p>
+        <ul *ngIf="basicTechniques.length > 0">
+          <li *ngFor="let technique of basicTechniques" class="technique-row">
+            <div class="technique-info">
+              <span>{{ technique.name }}</span>
+              <small *ngIf="technique.description">{{ technique.description }}</small>
+            </div>
+            <button
+              type="button"
+              class="btn-danger"
+              (click)="deleteTechnique(technique)"
+              [disabled]="isDeletingTechnique(technique.techniqueId)"
+            >
+              {{ isDeletingTechnique(technique.techniqueId) ? 'Excluindo...' : 'Excluir' }}
+            </button>
+          </li>
+        </ul>
+      </article>
+
+      <article class="list-card">
+        <h3>Avançadas</h3>
+        <p class="helper">Aplicações avançadas e variações.</p>
+        <p *ngIf="advancedTechniques.length === 0" class="empty">Nenhuma técnica avançada cadastrada.</p>
+        <ul *ngIf="advancedTechniques.length > 0">
+          <li *ngFor="let technique of advancedTechniques" class="technique-row">
+            <div class="technique-info">
+              <span>{{ technique.name }}</span>
+              <small *ngIf="technique.description">{{ technique.description }}</small>
+            </div>
+            <button
+              type="button"
+              class="btn-danger"
+              (click)="deleteTechnique(technique)"
+              [disabled]="isDeletingTechnique(technique.techniqueId)"
+            >
+              {{ isDeletingTechnique(technique.techniqueId) ? 'Excluindo...' : 'Excluir' }}
+            </button>
+          </li>
+        </ul>
+      </article>
+    </section>
+  </div>
+</div>

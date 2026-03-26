@@ -23,10 +23,19 @@ import { ComplianceReportsSettingsComponent } from './components/compliance-repo
 import { TrainingEntryPointComponent } from './components/training-entry-point/training-entry-point.component';
 import { TrainingAttendancePlaceholderComponent } from './components/training-attendance-placeholder/training-attendance-placeholder.component';
 import { TrainingAttendanceComponent } from './components/training-attendance/training-attendance.component';
+import { TrainingTechniquesComponent } from './components/training-techniques/training-techniques.component';
+import { TrainingNotesComponent } from './components/training-notes/training-notes.component';
+import { TrainingReviewPlaceholderComponent } from './components/training-review-placeholder/training-review-placeholder.component';
+import { TrainingReviewComponent } from './components/training-review/training-review.component';
+import { TrainingSuccessComponent } from './components/training-success/training-success.component';
+import { TrainingHistoryComponent } from './components/training-history/training-history.component';
 import { AcademyProfileComponent } from './components/academy-profile/academy-profile.component';
 import { AdminProfileComponent } from './components/admin-profile/admin-profile.component';
 import { ProfessorsListComponent } from './components/professors-list/professors-list.component';
 import { ProfessorFormComponent } from './components/professor-form/professor-form.component';
+import { ProfessorTurmasComponent } from './components/professor-turmas/professor-turmas.component';
+import { ProfessorTurmaCreateComponent } from './components/professor-turma-create/professor-turma-create.component';
+import { ProfessorTechniquesComponent } from './components/professor-techniques/professor-techniques.component';
 import { StudentsListComponent } from './components/students-list/students-list.component';
 import { StudentFormComponent } from './components/student-form/student-form.component';
 import { StudentProfileComponent } from './components/student-profile/student-profile.component';
@@ -54,10 +63,19 @@ import { AuthInterceptor } from './services/auth.interceptor';
     TrainingEntryPointComponent,
     TrainingAttendancePlaceholderComponent,
     TrainingAttendanceComponent,
+    TrainingTechniquesComponent,
+    TrainingNotesComponent,
+    TrainingReviewPlaceholderComponent,
+    TrainingReviewComponent,
+    TrainingSuccessComponent,
+    TrainingHistoryComponent,
     AcademyProfileComponent,
     AdminProfileComponent,
     ProfessorsListComponent,
     ProfessorFormComponent,
+    ProfessorTurmasComponent,
+    ProfessorTurmaCreateComponent,
+    ProfessorTechniquesComponent,
     StudentsListComponent,
     StudentFormComponent,
     StudentProfileComponent,

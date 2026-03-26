@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, NgZone, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ApiService } from '../../services/api.service';
@@ -29,7 +29,9 @@ export class AdminProfileComponent implements OnInit {
     private fb: FormBuilder,
     private api: ApiService,
     private auth: AuthService,
-    private router: Router
+    private router: Router,
+    private ngZone: NgZone,
+    private cdr: ChangeDetectorRef
   ) {
     this.profileForm = this.fb.group({
       fullName: ['', [Validators.required, Validators.minLength(2)]],
@@ -64,7 +66,7 @@ export class AdminProfileComponent implements OnInit {
 
   ngOnInit(): void {
     this.currentUser = this.auth.getCurrentUser();
-    if (!this.currentUser || this.currentUser.role !== 'Admin') {
+    if (!this.currentUser || !['Admin', 'Professor', 'Aluno'].includes(this.currentUser.role)) {
       this.router.navigate(['/login']);
       return;
     }
@@ -75,12 +77,12 @@ export class AdminProfileComponent implements OnInit {
   loadProfile(): void {
     if (!this.currentUser) return;
 
-    this.isLoading = true;
+    this.setLoadingState(true);
     this.errorMessage = '';
 
     this.api.getUserProfile(this.currentUser.id).subscribe({
       next: (profile) => {
-        this.isLoading = false;
+        this.setLoadingState(false);
         this.profileForm.patchValue({
           fullName: profile.fullName || '',
           email: profile.email || '',
@@ -97,8 +99,8 @@ export class AdminProfileComponent implements OnInit {
         });
       },
       error: (error) => {
-        this.isLoading = false;
-        this.errorMessage = error?.error?.error || 'Erro ao carregar perfil do administrador.';
+        this.setLoadingState(false);
+        this.errorMessage = error?.error?.error || 'Erro ao carregar perfil.';
       },
     });
   }
@@ -193,7 +195,12 @@ export class AdminProfileComponent implements OnInit {
   }
 
   backToDashboard(): void {
-    this.router.navigate(['/admin/dashboard']);
+    if (this.currentUser?.role === 'Admin') {
+      this.router.navigate(['/admin/dashboard']);
+      return;
+    }
+
+    this.router.navigate(['/home']);
   }
 
   getProfileFieldError(fieldName: string): string | null {
@@ -238,5 +245,12 @@ export class AdminProfileComponent implements OnInit {
     }
 
     return date.toISOString().slice(0, 10);
+  }
+
+  private setLoadingState(value: boolean): void {
+    this.ngZone.run(() => {
+      this.isLoading = value;
+      this.cdr.detectChanges();
+    });
   }
 }

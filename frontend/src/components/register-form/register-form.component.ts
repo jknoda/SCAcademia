@@ -145,6 +145,10 @@ export class RegisterFormComponent implements OnInit {
     this.router.navigate(['/login']);
   }
 
+  goToForgotPassword(): void {
+    this.router.navigate(['/forgot-password']);
+  }
+
   copyLink(): void {
     if (this.consentLink) {
       navigator.clipboard.writeText(this.consentLink);
@@ -184,17 +188,24 @@ export class RegisterFormComponent implements OnInit {
   }
 
   private handleRegisterError(error: any): void {
+    const apiError = error?.error;
+    const normalizedMessage =
+      (typeof apiError === 'string' ? apiError : apiError?.error) ||
+      error?.message ||
+      'Erro ao registrar. Dados não foram salvos. Tente novamente';
+
+    this.suggestions = Array.isArray(apiError?.suggestions) ? apiError.suggestions : [];
+
     if (error.status === 0) {
       this.errorMessage = 'Servidor indisponível. Verifique se o backend está rodando.';
     } else if (error.status === 409) {
-      this.errorMessage = error.error?.error || 'Email já registrado';
-      this.suggestions = error.error?.suggestions || [];
+      this.errorMessage = normalizedMessage || 'Email já registrado';
     } else if (error.status === 400) {
-      this.errorMessage = error.error?.error || 'Dados inválidos';
+      this.errorMessage = normalizedMessage || 'Dados inválidos';
     } else if (error.status === 404) {
-      this.errorMessage = error.error?.error || 'Academia não encontrada. Verifique se a URL está correta.';
+      this.errorMessage = normalizedMessage || 'Academia não encontrada. Verifique se a URL está correta.';
     } else {
-      this.errorMessage = error.error?.error || 'Erro ao registrar. Dados não foram salvos. Tente novamente';
+      this.errorMessage = normalizedMessage;
     }
   }
 

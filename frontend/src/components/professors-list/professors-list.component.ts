@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, NgZone, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { finalize, timeout } from 'rxjs/operators';
 import { ApiService } from '../../services/api.service';
 import { ProfessorProfile } from '../../types';
 
@@ -11,21 +12,26 @@ import { ProfessorProfile } from '../../types';
 })
 export class ProfessorsListComponent implements OnInit {
   professors: ProfessorProfile[] = [];
-  loading = false;
+  isLoading = false;
   errorMessage = '';
   successMessage = '';
 
   filterName = '';
   filterStatus: 'all' | 'active' | 'inactive' = 'all';
 
-  constructor(private api: ApiService, private router: Router) {}
+  constructor(
+    private api: ApiService,
+    private router: Router,
+    private ngZone: NgZone,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
     this.loadProfessors();
   }
 
   loadProfessors(): void {
-    this.loading = true;
+    this.setLoadingState(true);
     this.errorMessage = '';
 
     this.api
@@ -33,14 +39,21 @@ export class ProfessorsListComponent implements OnInit {
         name: this.filterName.trim() || undefined,
         status: this.filterStatus,
       })
+      .pipe(
+        timeout(12000),
+        finalize(() => {
+          this.setLoadingState(false);
+        })
+      )
       .subscribe({
         next: (res) => {
-          this.loading = false;
           this.professors = res.professors || [];
         },
         error: (error) => {
-          this.loading = false;
-          this.errorMessage = error?.error?.error || 'Erro ao carregar professores.';
+          this.errorMessage =
+            error?.name === 'TimeoutError'
+              ? 'Tempo esgotado ao carregar professores. Verifique o backend e tente novamente.'
+              : error?.error?.error || 'Erro ao carregar professores.';
           this.professors = [];
         },
       });
@@ -88,5 +101,12 @@ export class ProfessorsListComponent implements OnInit {
     const date = typeof value === 'string' ? new Date(value) : value;
     if (Number.isNaN(date.getTime())) return '-';
     return date.toLocaleDateString('pt-BR');
+  }
+
+  private setLoadingState(value: boolean): void {
+    this.ngZone.run(() => {
+      this.isLoading = value;
+      this.cdr.detectChanges();
+    });
   }
 }

@@ -94,3 +94,35 @@
   background: #fff8e1;
   color: #7c5e10;
 }
+
+.date-time-fields {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+.date-time-fields .field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.date-time-fields .field label {
+  font-size: 0.82rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.date-time-fields .field input {
+  padding: 6px 10px;
+  border: 1px solid #b0bec5;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
+.date-hint {
+  margin: 6px 0 0;
+  font-size: 0.8rem;
+  color: #78909c;
+}

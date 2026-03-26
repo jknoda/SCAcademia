@@ -1,6 +1,6 @@
 # SCAcademia Sprint Status Tracking
 # Generated: 2026-03-20T14:30:00Z
-# Last Updated: 2026-03-24T21:15:00-03:00
+# Last Updated: 2026-03-25T16:00:00-03:00
 # Project: SCAcademia
 # Project Key: SCACAD
 # Tracking System: file-system
@@ -115,12 +115,12 @@ development_status:
   
   3-1-entry-point-conversacional: done
   3-2-marcar-frequencia: done
-  3-3-adicionar-tecnicas: backlog
-  3-4-anotacoes-notas: backlog
-  3-5-revisar-confirmar: backlog
-  3-6-sucesso-continuidade: backlog
-  3-7-historico-treinos: backlog
-  3-8-sincronizacao-offline: backlog
+  3-3-adicionar-tecnicas: done
+  3-4-anotacoes-notas: done
+  3-5-revisar-confirmar: done
+  3-6-sucesso-continuidade: done
+  3-7-historico-treinos: done
+  3-8-sincronizacao-offline: done
   
   epic-3-retrospective: optional
   
