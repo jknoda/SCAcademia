@@ -30,7 +30,7 @@ export class StudentProfileComponent implements OnInit {
     isPrimary: true,
   };
   createdGuardianTemporaryPassword = '';
-  private isProfessorView = false;
+  isProfessorView = false;
 
   constructor(private api: ApiService, private route: ActivatedRoute, private router: Router) {}
 
@@ -73,6 +73,16 @@ export class StudentProfileComponent implements OnInit {
 
   canManageHealth(): boolean {
     return !this.isProfessorView;
+  }
+
+  getPageTitle(): string {
+    return this.isProfessorView ? 'Ficha operacional do aluno' : 'Ficha completa do aluno';
+  }
+
+  getPageSubtitle(): string {
+    return this.isProfessorView
+      ? 'Consulte dados cadastrais, vínculo responsável e status operacional do aluno.'
+      : 'Revise dados pessoais, saúde, LGPD, responsável e turmas vinculadas em um único painel.';
   }
 
   goToHealthScreening(): void {

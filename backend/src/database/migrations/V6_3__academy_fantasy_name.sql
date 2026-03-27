@@ -1,0 +1,2 @@
+ALTER TABLE academies
+ADD COLUMN IF NOT EXISTS fantasy_name TEXT;

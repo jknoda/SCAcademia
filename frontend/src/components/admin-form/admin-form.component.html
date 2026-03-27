@@ -3,6 +3,15 @@
   <p>Defina as credenciais do primeiro administrador da academia</p>
 
   <form [formGroup]="adminForm" (ngSubmit)="onSubmit()">
+    <div class="photo-section">
+      <img [src]="getPhotoPreview()" alt="Foto do administrador" class="photo-preview" />
+      <div class="photo-actions">
+        <label for="adminPhoto" class="btn btn-secondary">Selecionar foto</label>
+        <input id="adminPhoto" type="file" accept="image/*" class="hidden-input" (change)="onPhotoSelected($event)" />
+        <button type="button" class="btn btn-secondary" (click)="clearPhoto()">Usar imagem padrão</button>
+      </div>
+    </div>
+
     <div class="form-group">
       <label for="fullName">Nome Completo *</label>
       <input

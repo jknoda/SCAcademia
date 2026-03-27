@@ -1,5 +1,11 @@
 <div class="training-card">
-  <h3>Entry Point Conversacional</h3>
+  <div class="entry-header">
+    <div>
+      <h3>Entry Point Conversacional</h3>
+      <p class="entry-subtitle">Use o contexto da aula para decidir rapidamente se inicia um novo registro ou continua uma sessão recente.</p>
+    </div>
+    <span class="entry-badge" [class.offline]="!isOnline">{{ isOnline ? 'Online' : 'Offline' }}</span>
+  </div>
 
   <div class="loading" *ngIf="isLoading">Carregando contexto da aula...</div>
   <div class="error" *ngIf="errorMessage">{{ errorMessage }}</div>
@@ -9,12 +15,21 @@
     <p class="greeting">{{ context.greeting }}</p>
 
     <div *ngIf="context.currentOrNextClass; else noClass" class="class-context">
-      <p><strong>Turma:</strong> {{ context.currentOrNextClass.turmaName }}</p>
-      <p><strong>Contexto:</strong> {{ context.currentOrNextClass.label }}</p>
-      <p><strong>Agenda:</strong> {{ context.currentOrNextClass.scheduledAtText }}</p>
-      <p *ngIf="context.currentOrNextClass.description">
-        <strong>Detalhes:</strong> {{ context.currentOrNextClass.description }}
-      </p>
+      <div class="context-grid">
+        <div class="context-card">
+          <span class="context-label">Turma</span>
+          <strong>{{ context.currentOrNextClass.turmaName }}</strong>
+        </div>
+        <div class="context-card">
+          <span class="context-label">Contexto</span>
+          <strong>{{ context.currentOrNextClass.label }}</strong>
+        </div>
+        <div class="context-card wide">
+          <span class="context-label">Agenda</span>
+          <strong>{{ context.currentOrNextClass.scheduledAtText }}</strong>
+          <p *ngIf="context.currentOrNextClass.description">{{ context.currentOrNextClass.description }}</p>
+        </div>
+      </div>
 
       <div class="date-time-fields">
         <div class="field">
@@ -42,7 +57,10 @@
     </div>
 
     <ng-template #noClass>
-      <p class="empty">Nenhuma turma ativa atribuída no momento.</p>
+      <div class="empty-state">
+        <p class="empty">Nenhuma turma ativa atribuída no momento.</p>
+        <p class="empty-hint">Você ainda pode atualizar o contexto, retomar a última sessão ou navegar direto para o histórico.</p>
+      </div>
       <div class="actions-row">
         <button class="btn-secondary" (click)="reloadForNextClass()">Atualizar</button>
         <button class="btn-secondary" (click)="continueLastSession()" [disabled]="isContinuingLastSession">

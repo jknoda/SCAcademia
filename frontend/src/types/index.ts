@@ -1,9 +1,11 @@
 export interface Academy {
   id: string;
   name: string;
+  fantasyName?: string;
   location: string;
   email: string;
   phone: string;
+  logoUrl?: string;
   description?: string;
   documentId?: string;
   contactEmail?: string;
@@ -25,6 +27,8 @@ export interface Academy {
 export interface AcademyProfile {
   academyId: string;
   name: string;
+  fantasyName?: string;
+  logoUrl?: string;
   description: string;
   documentId: string;
   contactEmail: string;
@@ -45,6 +49,8 @@ export interface AcademyProfile {
 
 export interface UpdateAcademyProfilePayload {
   name: string;
+  fantasyName?: string;
+  logoUrl?: string;
   description?: string;
   documentId: string;
   contactEmail: string;
@@ -62,6 +68,7 @@ export interface User {
   id: string;
   email: string;
   fullName: string;
+  photoUrl?: string;
   role: string;
   documentId?: string;
   birthDate?: string | Date | null;
@@ -76,11 +83,14 @@ export interface User {
   academy: {
     id: string;
     name: string;
+    fantasyName?: string;
+    logoUrl?: string;
   };
 }
 
 export interface AdminProfileUpdatePayload {
   fullName: string;
+  photoUrl?: string;
   documentId?: string;
   birthDate?: string;
   phone?: string;
@@ -97,6 +107,7 @@ export interface ProfessorProfile {
   id: string;
   email: string;
   fullName: string;
+  photoUrl?: string;
   role: 'Professor';
   academyId: string;
   documentId?: string;
@@ -127,6 +138,7 @@ export interface CreateProfessorPayload {
   email: string;
   password: string;
   fullName: string;
+  photoUrl?: string;
   documentId?: string;
   birthDate?: string;
   phone?: string;
@@ -142,6 +154,7 @@ export interface CreateProfessorPayload {
 
 export interface UpdateProfessorPayload {
   fullName: string;
+  photoUrl?: string;
   documentId?: string;
   birthDate?: string;
   phone?: string;
@@ -174,6 +187,7 @@ export interface StudentProfile {
   id: string;
   email: string;
   fullName: string;
+  photoUrl?: string;
   role: 'Aluno';
   academyId: string;
   documentId?: string;
@@ -213,6 +227,7 @@ export interface CreateStudentPayload {
   email: string;
   password: string;
   fullName: string;
+  photoUrl?: string;
   birthDate: string;
   documentId?: string;
   phone?: string;
@@ -230,6 +245,7 @@ export interface CreateStudentPayload {
 
 export interface UpdateStudentPayload {
   fullName: string;
+  photoUrl?: string;
   birthDate: string;
   documentId?: string;
   phone?: string;

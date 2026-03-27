@@ -4,9 +4,11 @@ import { pool } from './db';
 export interface Academy {
   id: string;
   name: string;
+  fantasyName?: string;
   location: string;
   email: string;
   phone: string;
+  logoUrl?: string;
   description?: string;
   documentId?: string;
   contactEmail?: string;
@@ -28,6 +30,8 @@ export interface Academy {
 
 export interface AcademyProfileUpdateInput {
   name: string;
+  fantasyName?: string;
+  logoUrl?: string;
   description?: string;
   documentId: string;
   contactEmail: string;
@@ -48,6 +52,7 @@ export interface User {
   passwordHash: string;
   academyId: string;
   role: string; // 'Admin' | 'Professor' | 'Aluno'
+  photoUrl?: string;
   documentId?: string;
   birthDate?: Date;
   phone?: string;
@@ -84,9 +89,11 @@ export interface AuthTokenRecord {
 const rowToAcademy = (row: any): Academy => ({
   id: row.academy_id,
   name: row.name,
+  fantasyName: row.fantasy_name || undefined,
   location: row.description || '',
   email: row.contact_email,
   phone: row.contact_phone || '',
+  logoUrl: row.logo_url || undefined,
   description: row.description || '',
   documentId: row.document_id || undefined,
   contactEmail: row.contact_email,
@@ -114,6 +121,7 @@ const rowToUser = (row: any): User => ({
   passwordHash: row.password_hash,
   academyId: row.academy_id,
   role: row.role,
+  photoUrl: row.photo_url || undefined,
   documentId: row.document_id || undefined,
   birthDate: row.birth_date ? new Date(row.birth_date) : undefined,
   phone: row.phone || undefined,
@@ -152,14 +160,16 @@ export const createAcademy = async (
   name: string,
   location: string,
   email: string,
-  phone: string
+  phone: string,
+  logoUrl?: string,
+  fantasyName?: string
 ): Promise<Academy> => {
   const id = randomUUID();
   const res = await pool.query(
-    `INSERT INTO academies (academy_id, name, description, contact_email, contact_phone, created_at, updated_at)
-     VALUES ($1, $2, $3, $4, $5, NOW(), NOW())
+    `INSERT INTO academies (academy_id, name, description, contact_email, contact_phone, logo_url, fantasy_name, created_at, updated_at)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), NOW())
      RETURNING *`,
-    [id, name, location, email, phone]
+    [id, name, location, email, phone, logoUrl || null, fantasyName || name]
   );
   return rowToAcademy(res.rows[0]);
 };
@@ -180,17 +190,19 @@ export const updateAcademyProfile = async (
     `UPDATE academies
      SET
        name = $2,
-       description = $3,
-       document_id = $4,
-       contact_email = $5,
-       contact_phone = $6,
-       address_street = $7,
-       address_number = $8,
-       address_complement = $9,
-       address_neighborhood = $10,
-       address_postal_code = $11,
-       address_city = $12,
-       address_state = $13,
+       logo_url = $3,
+       description = $4,
+       document_id = $5,
+       contact_email = $6,
+       contact_phone = $7,
+       address_street = $8,
+       address_number = $9,
+       address_complement = $10,
+       address_neighborhood = $11,
+       address_postal_code = $12,
+       address_city = $13,
+       address_state = $14,
+       fantasy_name = $15,
        updated_at = NOW()
      WHERE academy_id = $1
        AND deleted_at IS NULL
@@ -198,6 +210,7 @@ export const updateAcademyProfile = async (
     [
       academyId,
       input.name,
+      input.logoUrl || null,
       input.description || null,
       input.documentId,
       input.contactEmail,
@@ -209,6 +222,7 @@ export const updateAcademyProfile = async (
       input.addressPostalCode || null,
       input.addressCity || null,
       input.addressState || null,
+      input.fantasyName !== undefined ? input.fantasyName : input.name,
     ]
   );
 
@@ -238,7 +252,8 @@ export const createUser = async (
   role: string = 'Aluno',
   birthDate?: Date,
   responsavelEmail?: string,
-  dataEntrada?: Date
+  dataEntrada?: Date,
+  photoUrl?: string
 ): Promise<User> => {
   const id = randomUUID();
   const age = birthDate
@@ -248,10 +263,10 @@ export const createUser = async (
 
   const res = await pool.query(
     `INSERT INTO users (user_id, academy_id, email, password_hash, full_name, role, birth_date,
-                        is_minor, minor_consent_signed, is_active, data_entrada, created_at, updated_at)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, false, true, $9, NOW(), NOW())
+                        photo_url, is_minor, minor_consent_signed, is_active, data_entrada, created_at, updated_at)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, false, true, $10, NOW(), NOW())
      RETURNING *`,
-    [id, academyId, email, passwordHash, fullName, role, birthDate || null, isMinor, dataEntrada || null]
+    [id, academyId, email, passwordHash, fullName, role, birthDate || null, photoUrl || null, isMinor, dataEntrada || null]
   );
 
   const user = rowToUser(res.rows[0]);
@@ -375,6 +390,7 @@ export const updateUserPassword = async (userId: string, passwordHash: string): 
 
 export interface UserProfileUpdateInput {
   fullName: string;
+  photoUrl?: string;
   documentId?: string;
   birthDate?: string;
   phone?: string;
@@ -394,6 +410,7 @@ export interface ProfessorListFilters {
 
 export interface ProfessorUpdateInput {
   fullName: string;
+  photoUrl?: string;
   documentId?: string;
   birthDate?: string;
   phone?: string;
@@ -414,6 +431,7 @@ export interface StudentListFilters {
 
 export interface StudentCreateInput {
   fullName: string;
+  photoUrl?: string;
   documentId?: string;
   birthDate: string;
   phone?: string;
@@ -429,6 +447,7 @@ export interface StudentCreateInput {
 
 export interface StudentUpdateInput {
   fullName: string;
+  photoUrl?: string;
   documentId?: string;
   birthDate: string;
   phone?: string;
@@ -507,16 +526,17 @@ export const updateUserProfile = async (
     `UPDATE users
      SET
        full_name = $3,
-       document_id = $4,
-       birth_date = $5,
-       phone = $6,
-       address_street = $7,
-       address_number = $8,
-       address_complement = $9,
-       address_neighborhood = $10,
-       address_postal_code = $11,
-       address_city = $12,
-       address_state = $13,
+      photo_url = $4,
+      document_id = $5,
+      birth_date = $6,
+      phone = $7,
+      address_street = $8,
+      address_number = $9,
+      address_complement = $10,
+      address_neighborhood = $11,
+      address_postal_code = $12,
+      address_city = $13,
+      address_state = $14,
        updated_at = NOW()
      WHERE user_id = $1
        AND academy_id = $2
@@ -526,6 +546,7 @@ export const updateUserProfile = async (
       userId,
       academyId,
       input.fullName,
+      input.photoUrl || null,
       input.documentId || null,
       input.birthDate || null,
       input.phone || null,
@@ -598,17 +619,18 @@ export const updateProfessorProfile = async (
     `UPDATE users
      SET
        full_name = $3,
-       document_id = $4,
-       birth_date = $5,
-       phone = $6,
-       address_street = $7,
-       address_number = $8,
-       address_complement = $9,
-       address_neighborhood = $10,
-       address_postal_code = $11,
-       address_city = $12,
-       address_state = $13,
-       data_entrada = $14,
+      photo_url = $4,
+      document_id = $5,
+      birth_date = $6,
+      phone = $7,
+      address_street = $8,
+      address_number = $9,
+      address_complement = $10,
+      address_neighborhood = $11,
+      address_postal_code = $12,
+      address_city = $13,
+      address_state = $14,
+      data_entrada = $15,
        updated_at = NOW()
      WHERE user_id = $1
        AND academy_id = $2
@@ -619,6 +641,7 @@ export const updateProfessorProfile = async (
       userId,
       academyId,
       input.fullName,
+      input.photoUrl || null,
       input.documentId || null,
       input.birthDate || null,
       input.phone || null,
@@ -1127,18 +1150,19 @@ export const updateStudentProfile = async (
     `UPDATE users
      SET
        full_name = $3,
-       document_id = $4,
-       birth_date = $5,
-       phone = $6,
-       address_street = $7,
-       address_number = $8,
-       address_complement = $9,
-       address_neighborhood = $10,
-       address_postal_code = $11,
-       address_city = $12,
-       address_state = $13,
-       data_entrada = $14,
-       is_minor = CASE WHEN $5::date > (CURRENT_DATE - INTERVAL '18 years') THEN true ELSE false END,
+      photo_url = $4,
+      document_id = $5,
+      birth_date = $6,
+      phone = $7,
+      address_street = $8,
+      address_number = $9,
+      address_complement = $10,
+      address_neighborhood = $11,
+      address_postal_code = $12,
+      address_city = $13,
+      address_state = $14,
+      data_entrada = $15,
+      is_minor = CASE WHEN $6::date > (CURRENT_DATE - INTERVAL '18 years') THEN true ELSE false END,
        updated_at = NOW()
      WHERE user_id = $1
        AND academy_id = $2
@@ -1149,6 +1173,7 @@ export const updateStudentProfile = async (
       userId,
       academyId,
       input.fullName,
+      input.photoUrl || null,
       input.documentId || null,
       input.birthDate,
       input.phone || null,

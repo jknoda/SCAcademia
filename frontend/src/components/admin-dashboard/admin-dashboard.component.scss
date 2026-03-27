@@ -25,10 +25,34 @@
   font-size: 24px;
 }
 
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.banner-logo {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  object-fit: cover;
+  background: #ffffff;
+}
+
 .header-info {
   display: flex;
   gap: 20px;
   align-items: center;
+}
+
+.user-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  border: 2px solid rgba(255, 255, 255, 0.6);
+  object-fit: cover;
+  background: #ffffff;
 }
 
 .welcome {
@@ -44,6 +68,9 @@
   cursor: pointer;
   font-weight: 500;
   transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .btn-logout:hover {
@@ -342,4 +369,41 @@ section {
   min-height: 100vh;
   font-size: 18px;
   color: #666;
+}
+
+.btn-logout {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+@media (max-width: 600px) {
+  .dashboard-header {
+    padding: 12px;
+  }
+  .header-content {
+    flex-wrap: nowrap;
+    gap: 8px;
+  }
+  .logo h1 {
+    display: none;
+  }
+  .welcome {
+    display: none;
+  }
+  .btn-label {
+    display: none;
+  }
+  .btn-logout {
+    padding: 8px;
+    border-radius: 8px;
+    flex-shrink: 0;
+  }
+  .header-info {
+    gap: 8px;
+    flex-wrap: nowrap;
+  }
+  .user-avatar {
+    flex-shrink: 0;
+  }
 }

@@ -1,186 +1,230 @@
-<div class="home-container">
-  <div class="home-card" *ngIf="currentUser">
-    <div class="welcome-header">
-      <div class="avatar">{{ currentUser.fullName.charAt(0).toUpperCase() }}</div>
-      <div>
-        <h2>Bem-vindo, {{ currentUser.fullName }}!</h2>
-        <span class="role-badge">{{ getRoleLabel() }}</span>
+<div class="dashboard-container" *ngIf="currentUser">
+  <header class="dashboard-header">
+    <div class="header-content">
+      <div class="logo">
+        <img [src]="getAcademyLogo()" alt="Logotipo da academia" class="banner-logo" />
+        <h1>{{ currentUser.academy.fantasyName || currentUser.academy.name }}</h1>
+      </div>
+      <div class="header-info">
+        <img [src]="getUserPhoto()" alt="Foto do usuário" class="user-avatar" />
+        <span class="welcome">Bem-vindo, {{ currentUser.fullName }}</span>
+        <button (click)="logout()" class="btn-logout">
+          <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          <span class="btn-label">Sair</span>
+        </button>
       </div>
     </div>
+  </header>
 
-    <div class="info-section">
-      <p><strong>Academia:</strong> {{ currentUser.academy.name }}</p>
-      <p><strong>Email:</strong> {{ currentUser.email }}</p>
-    </div>
-
-    <div class="actions">
-      <div *ngIf="isProfessor()" class="professor-dashboard">
-        <section class="professor-section hero-section">
-          <app-training-entry-point></app-training-entry-point>
-        </section>
-
-        <section class="professor-section">
-          <div class="section-title-row">
-            <div>
-              <p class="section-eyebrow">Treinos</p>
-              <h3>Início rápido</h3>
-            </div>
-          </div>
-
-          <div class="dashboard-grid dashboard-grid-primary">
-            <div class="recent-trainings-card dashboard-panel action-panel">
-              <div class="panel-header">
-                <h3>Cadastrar treino</h3>
-                <p class="lgpd-note">Selecione a turma e comece pela escolha das técnicas praticadas.</p>
-              </div>
-
-              <button
-                *ngIf="!showTrainingStarter"
-                class="btn-primary"
-                (click)="openTrainingStarter()"
-              >Cadastrar treino (selecionar técnicas)</button>
-
-              <div class="training-starter" *ngIf="showTrainingStarter">
-                <p class="lgpd-note">Selecione a turma para este treino:</p>
-
-                <p *ngIf="isLoadingTurmasForTraining" class="lgpd-note">Carregando turmas...</p>
-
-                <div *ngIf="!isLoadingTurmasForTraining && turmasForTraining.length === 0 && !trainingStarterError"
-                    class="starter-empty">
-                  Nenhuma turma ativa encontrada. Cadastre uma turma primeiro.
-                </div>
-
-                <div class="field" *ngIf="!isLoadingTurmasForTraining && turmasForTraining.length > 0">
-                  <select [(ngModel)]="selectedTurmaIdForTraining">
-                    <option value="" disabled>Selecione uma turma...</option>
-                    <option *ngFor="let t of turmasForTraining" [value]="t.turmaId">{{ t.turmaName }}</option>
-                  </select>
-                </div>
-
-                <div class="fields-row" *ngIf="!isLoadingTurmasForTraining && turmasForTraining.length > 0">
-                  <div class="field">
-                    <label for="starter-date">Data do treino</label>
-                    <input id="starter-date" type="date" [(ngModel)]="trainingSessionDate" />
-                  </div>
-                  <div class="field">
-                    <label for="starter-time">Hora</label>
-                    <input id="starter-time" type="time" [(ngModel)]="trainingSessionTime" />
-                  </div>
-                </div>
-                <p class="lgpd-note" *ngIf="!isLoadingTurmasForTraining && turmasForTraining.length > 0">
-                  Deixe em branco para usar data/hora atual.
-                </p>
-
-                <p *ngIf="trainingStarterError" class="error-message">{{ trainingStarterError }}</p>
-
-                <div class="starter-actions">
-                  <button
-                    class="btn-primary"
-                    (click)="confirmStartTraining()"
-                    [disabled]="isStartingTraining || isLoadingTurmasForTraining || !selectedTurmaIdForTraining"
-                  >{{ isStartingTraining ? 'Iniciando...' : 'Iniciar e selecionar técnicas' }}</button>
-                  <button class="btn-secondary" (click)="cancelTrainingStarter()" [disabled]="isStartingTraining">
-                    Cancelar
-                  </button>
-                </div>
-              </div>
-
-              <p *ngIf="!showTrainingStarter && startTrainingErrorMessage" class="error-message">{{ startTrainingErrorMessage }}</p>
-            </div>
-
-            <div class="recent-trainings-card dashboard-panel summary-panel">
-              <div class="panel-header">
-                <h3>Histórico recente</h3>
-                <p class="lgpd-note">Acompanhe os últimos treinos registrados e acesse o histórico completo.</p>
-              </div>
-
-              <p *ngIf="isLoadingRecentTrainings" class="lgpd-note">Carregando treinos recentes...</p>
-              <p *ngIf="hasRecentTrainingsError" class="error-message">Erro ao carregar treinos. Tente novamente mais tarde.</p>
-              <p *ngIf="!isLoadingRecentTrainings && !hasRecentTrainingsError && recentTrainings.length === 0" class="lgpd-note">Nenhum treino registrado ainda.</p>
-              <div class="recent-training-item" *ngFor="let treino of recentTrainings">
-                <p><strong>{{ treino.turmaName }}</strong> — {{ formatTrainingDate(treino.sessionDate) }}</p>
-                <p class="lgpd-note">{{ treino.presentCount }} aluno(s) presente(s) · {{ treino.techniquePreview.join(', ') || 'Sem técnicas' }}</p>
-              </div>
-              <div class="history-link-row">
-                <a routerLink="/training/history" class="btn-link-text">Ver histórico completo →</a>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section class="professor-section">
-          <div class="section-title-row">
-            <div>
-              <p class="section-eyebrow">Gestão</p>
-              <h3>Turmas e cadastro</h3>
-            </div>
-          </div>
-
-          <div class="dashboard-grid dashboard-grid-secondary">
-            <div class="profile-card dashboard-panel turma-panel">
-              <div class="panel-header">
-                <h3>Cadastrar turma</h3>
-                <p class="lgpd-note">Use a tela exclusiva para cadastrar novas turmas com horário inicial e final.</p>
-              </div>
-
-              <div class="profile-actions">
-                <button class="btn-primary" (click)="goToCreateProfessorTurma()">Cadastrar nova turma</button>
-                <button class="btn-secondary" (click)="goToProfessorTurmas()">Gerenciar turmas</button>
-              </div>
-            </div>
-
-            <div class="profile-card dashboard-panel profile-panel">
-              <div class="panel-header">
-                <h3>Técnicas da academia</h3>
-                <p class="lgpd-note">Acesse o catálogo de técnicas básicas e avançadas usado no cadastro de treino.</p>
-              </div>
-              <button class="btn-primary" (click)="goToProfessorTechniques()">Gerenciar técnicas</button>
-            </div>
-
-            <div class="profile-card dashboard-panel profile-panel">
-              <div class="panel-header">
-                <h3>Meu cadastro</h3>
-                <p class="lgpd-note">Atualize seus dados pessoais e senha quando necessário.</p>
-              </div>
-              <button class="btn-primary" (click)="goToProfessorProfile()">Editar meu cadastro</button>
-            </div>
-          </div>
-        </section>
+  <main class="dashboard-main">
+    <section class="hero">
+      <h2>{{ getHomeTitle() }}</h2>
+      <p>{{ getHomeSubtitle() }}</p>
+      <div class="academy-info">
+        <p><strong>Nome da Academia:</strong> {{ currentUser.academy.name }}</p>
+        <p><strong>Email de Contato:</strong> {{ currentUser.email }}</p>
+        <p><strong>Seu Perfil:</strong> {{ getRoleLabel() }}</p>
       </div>
+    </section>
 
-      <div class="health-card" *ngIf="isResponsavel()">
-        <h3>Saude dos Filhos</h3>
-        <p class="lgpd-note">Preencha a anamnese pendente para manter o onboarding do aluno completo.</p>
+    <section class="status-badge-section" *ngIf="isProfessor() || isAluno() || isResponsavel()">
+      <span class="badge success">{{ getRoleLabel() }} ativo</span>
+    </section>
 
-        <p *ngIf="isLoadingLinkedStudents" class="lgpd-note">Carregando filhos vinculados...</p>
-        <div *ngIf="linkedStudentsErrorMessage" class="status-message error">{{ linkedStudentsErrorMessage }}</div>
+    <section class="actions" *ngIf="isProfessor()">
+      <h3>Próximas Ações</h3>
+      <div class="action-buttons">
+        <button class="action-btn" (click)="openTrainingStarter()">Cadastrar treino</button>
+        <button class="action-btn" (click)="goToTrainingHistory()">Histórico de treinos</button>
+        <button class="action-btn" (click)="goToProfessorTurmas()">Gerenciar turmas</button>
+        <button class="action-btn" (click)="goToCreateProfessorTurma()">Cadastrar turma</button>
+        <button class="action-btn" (click)="goToProfessorTechniques()">Técnicas da academia</button>
+        <button class="action-btn" (click)="goToProfessorProfile()">Meu cadastro</button>
+      </div>
+    </section>
 
-        <div *ngIf="!isLoadingLinkedStudents && studentsWithoutHealthScreening.length === 0" class="status-message success">
-          Nenhum filho com anamnese pendente no momento.
+    <section *ngIf="isProfessor()">
+      <div class="section-heading">
+        <div>
+          <h3>Entry Point Conversacional</h3>
+          <p class="muted">Retome rapidamente o contexto da próxima aula ou continue um treino em andamento.</p>
         </div>
+      </div>
+      <app-training-entry-point></app-training-entry-point>
+    </section>
 
-        <div class="health-student-card" *ngFor="let student of studentsWithoutHealthScreening">
-          <div>
-            <p><strong>{{ student.studentName }}</strong></p>
-            <p class="lgpd-note">Anamnese pendente. Recomendamos preencher antes do próximo treino.</p>
-          </div>
-          <button class="btn-primary" (click)="goToStudentHealthScreening(student.studentId)">Preencher Saude</button>
+    <section *ngIf="isProfessor()">
+      <div class="section-heading">
+        <div>
+          <h3>Registro de Treino</h3>
+          <p class="muted">Selecione a turma e avance para o fluxo de técnicas e presença.</p>
         </div>
       </div>
 
-      <div class="lgpd-card" *ngIf="isResponsavel()">
-        <h3>Direito ao Esquecimento (LGPD)</h3>
-        <p class="lgpd-note">
-          Solicite a exclusao dos dados de um filho vinculado. O processamento ocorre apos o periodo de carencia.
+      <button *ngIf="!showTrainingStarter" class="action-btn primary" (click)="openTrainingStarter()">
+        Cadastrar treino
+      </button>
+
+      <div class="training-starter" *ngIf="showTrainingStarter">
+        <p class="muted">Selecione a turma para este treino:</p>
+
+        <p *ngIf="isLoadingTurmasForTraining" class="muted">Carregando turmas...</p>
+
+        <div *ngIf="!isLoadingTurmasForTraining && turmasForTraining.length === 0 && !trainingStarterError" class="starter-empty">
+          Nenhuma turma ativa encontrada. Cadastre uma turma primeiro.
+        </div>
+
+        <div class="field" *ngIf="!isLoadingTurmasForTraining && turmasForTraining.length > 0">
+          <select [(ngModel)]="selectedTurmaIdForTraining">
+            <option value="" disabled>Selecione uma turma...</option>
+            <option *ngFor="let t of turmasForTraining" [value]="t.turmaId">{{ t.turmaName }}</option>
+          </select>
+        </div>
+
+        <div class="field-row" *ngIf="!isLoadingTurmasForTraining && turmasForTraining.length > 0">
+          <div class="field">
+            <label for="starter-date">Data do treino</label>
+            <input id="starter-date" type="date" [(ngModel)]="trainingSessionDate" />
+          </div>
+          <div class="field">
+            <label for="starter-time">Hora</label>
+            <input id="starter-time" type="time" [(ngModel)]="trainingSessionTime" />
+          </div>
+        </div>
+
+        <p class="muted" *ngIf="!isLoadingTurmasForTraining && turmasForTraining.length > 0">
+          Deixe em branco para usar data/hora atual.
         </p>
 
+        <p *ngIf="trainingStarterError" class="status-message error">{{ trainingStarterError }}</p>
+
+        <div class="deletion-actions">
+          <button class="action-btn primary" (click)="confirmStartTraining()" [disabled]="isStartingTraining || isLoadingTurmasForTraining || !selectedTurmaIdForTraining">
+            {{ isStartingTraining ? 'Iniciando...' : 'Iniciar e selecionar técnicas' }}
+          </button>
+          <button class="action-btn" (click)="cancelTrainingStarter()" [disabled]="isStartingTraining">Cancelar</button>
+        </div>
+      </div>
+
+      <div *ngIf="!showTrainingStarter && startTrainingErrorMessage" class="status-message error">{{ startTrainingErrorMessage }}</div>
+    </section>
+
+    <section *ngIf="isProfessor()">
+      <div class="section-heading">
+        <div>
+          <h3>Histórico recente</h3>
+          <p class="muted">Acompanhe os últimos treinos registrados e acesse o histórico completo.</p>
+        </div>
+        <button class="action-btn" (click)="goToTrainingHistory()">Ver histórico completo</button>
+      </div>
+
+      <p *ngIf="isLoadingRecentTrainings" class="muted">Carregando treinos recentes...</p>
+      <p *ngIf="hasRecentTrainingsError" class="status-message error">Erro ao carregar treinos. Tente novamente mais tarde.</p>
+      <p *ngIf="!isLoadingRecentTrainings && !hasRecentTrainingsError && recentTrainings.length === 0" class="muted">Nenhum treino registrado ainda.</p>
+
+      <div class="history-list" *ngIf="recentTrainings.length > 0">
+        <div class="history-item" *ngFor="let treino of recentTrainings">
+          <div>
+            <p><strong>{{ treino.turmaName }}</strong></p>
+            <p>{{ formatTrainingDate(treino.sessionDate) }}</p>
+            <p class="muted">{{ treino.presentCount }} aluno(s) presente(s) · {{ treino.techniquePreview.join(', ') || 'Sem técnicas' }}</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section *ngIf="isAluno()" class="actions">
+      <h3>Próximas Ações</h3>
+      <div class="action-buttons">
+        <button class="action-btn" (click)="goToMyProfile()">Editar meu cadastro</button>
+        <button class="action-btn" (click)="goToMyHealthScreening()">Atualizar anamnese</button>
+      </div>
+    </section>
+
+    <section *ngIf="isAluno()">
+      <div class="section-heading">
+        <div>
+          <h3>Minha Jornada</h3>
+          <p class="muted">Mantenha seu cadastro e seus dados de saúde sempre atualizados.</p>
+        </div>
+      </div>
+      <div class="dashboard-grid dashboard-grid-secondary">
+        <div class="feature-card">
+          <h4>Meu Cadastro</h4>
+          <p class="muted">Atualize seus dados pessoais e senha a qualquer momento.</p>
+          <button class="action-btn primary" (click)="goToMyProfile()">Editar cadastro</button>
+        </div>
+        <div class="feature-card">
+          <h4>Anamnese</h4>
+          <p class="muted">Revise suas informações de saúde antes dos próximos treinos.</p>
+          <button class="action-btn" (click)="goToMyHealthScreening()">Atualizar anamnese</button>
+        </div>
+      </div>
+    </section>
+
+    <section *ngIf="isResponsavel()" class="actions">
+      <h3>Próximas Ações</h3>
+      <div class="action-buttons">
+        <button class="action-btn" (click)="loadLinkedStudents()">Atualizar filhos vinculados</button>
+        <button class="action-btn" (click)="loadDeletionStatus()" [disabled]="!selectedStudentId">Consultar status LGPD</button>
+      </div>
+    </section>
+
+    <section *ngIf="isResponsavel()">
+      <div class="section-heading">
+        <div>
+          <h3>Saúde dos Filhos</h3>
+          <p class="muted">Preencha a anamnese pendente para manter o onboarding do aluno completo.</p>
+        </div>
+        <button class="action-btn" (click)="loadLinkedStudents()">Atualizar</button>
+      </div>
+
+      <div class="dashboard-grid dashboard-grid-secondary summary-grid">
+        <div class="feature-card feature-card-soft">
+          <h4>Filhos vinculados</h4>
+          <p class="summary-number">{{ linkedStudents.length }}</p>
+          <p class="muted">Total de alunos associados ao responsável.</p>
+        </div>
+        <div class="feature-card feature-card-warn">
+          <h4>Anamneses pendentes</h4>
+          <p class="summary-number">{{ studentsWithoutHealthScreening.length }}</p>
+          <p class="muted">Alunos que ainda precisam concluir a anamnese.</p>
+        </div>
+      </div>
+
+      <p *ngIf="isLoadingLinkedStudents" class="muted">Carregando filhos vinculados...</p>
+      <div *ngIf="linkedStudentsErrorMessage" class="status-message error">{{ linkedStudentsErrorMessage }}</div>
+      <div *ngIf="!isLoadingLinkedStudents && studentsWithoutHealthScreening.length === 0" class="status-message success">
+        Nenhum filho com anamnese pendente no momento.
+      </div>
+
+      <div class="history-list">
+        <div class="history-item" *ngFor="let student of studentsWithoutHealthScreening">
+          <div>
+            <p><strong>{{ student.studentName }}</strong></p>
+            <p class="muted">Anamnese pendente. Recomendamos preencher antes do próximo treino.</p>
+          </div>
+          <button class="action-btn primary" (click)="goToStudentHealthScreening(student.studentId)">Preencher saúde</button>
+        </div>
+      </div>
+    </section>
+
+    <section *ngIf="isResponsavel()" class="deletion-lgpd">
+      <div class="section-heading">
+        <div>
+          <h3>Direito ao Esquecimento (LGPD)</h3>
+          <p class="muted">Solicite a exclusão dos dados de um filho vinculado e acompanhe o processamento.</p>
+        </div>
+        <button class="action-btn" (click)="loadDeletionStatus()" [disabled]="isLoadingStatus || !selectedStudentId">
+          {{ isLoadingStatus ? 'Consultando...' : 'Consultar status' }}
+        </button>
+      </div>
+      <p class="deletion-warning">Solicite a exclusão dos dados de um filho vinculado. O processamento ocorre após o período de carência.</p>
+
+      <div class="deletion-form">
         <div class="field">
           <label for="student-id">Filho vinculado</label>
-          <select
-            id="student-id"
-            [(ngModel)]="selectedStudentId"
-            [disabled]="linkedStudents.length === 0"
-          >
+          <select id="student-id" [(ngModel)]="selectedStudentId" [disabled]="linkedStudents.length === 0">
             <option value="" disabled>Selecione um aluno</option>
             <option *ngFor="let student of linkedStudents" [value]="student.studentId">
               {{ student.studentName }}
@@ -188,64 +232,56 @@
           </select>
         </div>
 
-        <p class="lgpd-note" *ngIf="linkedStudents.length === 0">
-          Nenhum filho vinculado encontrado para este perfil.
-        </p>
+        <p class="muted" *ngIf="linkedStudents.length === 0">Nenhum filho vinculado encontrado para este perfil.</p>
 
         <div class="field">
           <label for="deletion-reason">Motivo (opcional)</label>
-          <textarea
-            id="deletion-reason"
-            rows="3"
-            [(ngModel)]="deletionReason"
-            placeholder="Descreva o motivo da solicitacao"
-          ></textarea>
+          <textarea id="deletion-reason" rows="3" [(ngModel)]="deletionReason" placeholder="Descreva o motivo da solicitação"></textarea>
         </div>
 
         <label class="confirm-row">
           <input type="checkbox" [(ngModel)]="confirmDeletionRequest" />
           <span>
-            Confirmo a solicitacao de exclusao para
-            <strong>{{ selectedStudentName }}</strong>
-            e entendo que essa acao pode ser irreversivel apos o processamento.
+            Confirmo a solicitação de exclusão para <strong>{{ selectedStudentName }}</strong> e entendo que essa ação pode ser irreversível após o processamento.
           </span>
         </label>
 
-        <div class="lgpd-actions">
-          <button class="btn-primary" (click)="requestDeletion()" [disabled]="isSubmittingDeletion">
-            {{ isSubmittingDeletion ? 'Solicitando...' : 'Solicitar exclusao' }}
+        <div class="deletion-actions">
+          <button class="action-btn primary" (click)="requestDeletion()" [disabled]="isSubmittingDeletion">
+            {{ isSubmittingDeletion ? 'Solicitando...' : 'Solicitar exclusão' }}
           </button>
-          <button class="btn-secondary" (click)="loadDeletionStatus()" [disabled]="isLoadingStatus">
+          <button class="action-btn" (click)="loadDeletionStatus()" [disabled]="isLoadingStatus || !selectedStudentId">
             {{ isLoadingStatus ? 'Consultando...' : 'Consultar status' }}
           </button>
         </div>
 
         <div *ngIf="deletionSuccessMessage" class="status-message success">{{ deletionSuccessMessage }}</div>
         <div *ngIf="deletionErrorMessage" class="status-message error">{{ deletionErrorMessage }}</div>
-
-        <div class="status-card" *ngIf="deletionStatus">
-          <p><strong>Status:</strong> {{ deletionStatus.status }}</p>
-          <p><strong>Solicitado em:</strong> {{ deletionStatus.requestedAt | date: 'short' }}</p>
-          <p><strong>Execucao prevista:</strong> {{ deletionStatus.deletionScheduledAt | date: 'short' }}</p>
-          <p *ngIf="deletionStatus.processedAt">
-            <strong>Processado em:</strong> {{ deletionStatus.processedAt | date: 'short' }}
-          </p>
-        </div>
       </div>
 
-      <div class="profile-card" *ngIf="isAluno()">
-        <h3>Meu Cadastro</h3>
-        <p class="lgpd-note">Você pode atualizar seus dados pessoais e senha a qualquer momento.</p>
-        <div class="profile-actions">
-          <button class="btn-primary" (click)="goToMyProfile()">Editar meu cadastro</button>
-          <button class="btn-secondary" (click)="goToMyHealthScreening()">Atualizar anamnese</button>
+      <div class="pending-list" *ngIf="deletionStatus">
+        <div class="pending-item">
+          <div>
+            <p><strong>Status:</strong> {{ deletionStatus.status }}</p>
+            <p><strong>Solicitado em:</strong> {{ deletionStatus.requestedAt | date: 'short' }}</p>
+            <p><strong>Execução prevista:</strong> {{ deletionStatus.deletionScheduledAt | date: 'short' }}</p>
+            <p *ngIf="deletionStatus.processedAt"><strong>Processado em:</strong> {{ deletionStatus.processedAt | date: 'short' }}</p>
+          </div>
         </div>
       </div>
+    </section>
 
-      <p class="coming-soon" *ngIf="!isResponsavel() && !isProfessor() && !isAluno()">
-        Funcionalidades do seu perfil estao sendo implementadas.
-      </p>
-      <button class="btn-logout" (click)="logout()">Sair</button>
-    </div>
-  </div>
+    <section *ngIf="!isResponsavel() && !isProfessor() && !isAluno()">
+      <h3>Em breve</h3>
+      <p class="muted">Funcionalidades do seu perfil estão sendo implementadas.</p>
+    </section>
+  </main>
+
+  <footer class="dashboard-footer">
+    <p>&copy; 2026 SCAcademia. Sistema de Gerenciamento de Treinamentos com Conformidade LGPD.</p>
+  </footer>
+</div>
+
+<div class="loading" *ngIf="!currentUser">
+  <p>Carregando...</p>
 </div>

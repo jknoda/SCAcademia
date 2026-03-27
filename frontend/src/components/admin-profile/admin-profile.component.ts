@@ -2,6 +2,7 @@ import { ChangeDetectorRef, Component, NgZone, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ApiService } from '../../services/api.service';
+import { compressImage } from '../../utils/image.utils';
 import { AuthService } from '../../services/auth.service';
 import { AdminProfileUpdatePayload, User } from '../../types';
 
@@ -24,6 +25,7 @@ export class AdminProfileComponent implements OnInit {
   errorMessage = '';
   passwordSuccessMessage = '';
   passwordErrorMessage = '';
+  cepLookupMessage = '';
 
   constructor(
     private fb: FormBuilder,
@@ -35,6 +37,7 @@ export class AdminProfileComponent implements OnInit {
   ) {
     this.profileForm = this.fb.group({
       fullName: ['', [Validators.required, Validators.minLength(2)]],
+      photoUrl: [''],
       email: [{ value: '', disabled: true }],
       documentId: ['', [Validators.pattern(/^$|^\d{3}\.\d{3}\.\d{3}-\d{2}$/)]],
       birthDate: [''],
@@ -85,6 +88,7 @@ export class AdminProfileComponent implements OnInit {
         this.setLoadingState(false);
         this.profileForm.patchValue({
           fullName: profile.fullName || '',
+          photoUrl: profile.photoUrl || '',
           email: profile.email || '',
           documentId: profile.documentId || '',
           birthDate: this.toDateInput(profile.birthDate),
@@ -119,6 +123,7 @@ export class AdminProfileComponent implements OnInit {
     const raw = this.profileForm.getRawValue();
     const payload: AdminProfileUpdatePayload = {
       fullName: raw.fullName,
+      photoUrl: raw.photoUrl || '',
       documentId: raw.documentId || '',
       birthDate: raw.birthDate || '',
       phone: raw.phone || '',
@@ -135,7 +140,10 @@ export class AdminProfileComponent implements OnInit {
       next: (res) => {
         this.isSaving = false;
         this.successMessage = 'Perfil atualizado';
-        this.auth.updateCurrentUserProfile({ fullName: res.user.fullName });
+        this.auth.updateCurrentUserProfile({
+          fullName: res.user.fullName,
+          photoUrl: res.user.photoUrl,
+        });
       },
       error: (error) => {
         this.isSaving = false;
@@ -185,6 +193,34 @@ export class AdminProfileComponent implements OnInit {
     const digits = (input.value || '').replace(/\D/g, '').slice(0, 8);
     input.value = digits.length > 5 ? `${digits.slice(0, 5)}-${digits.slice(5)}` : digits;
     this.profileForm.get('addressPostalCode')?.setValue(input.value, { emitEvent: false });
+    this.cepLookupMessage = '';
+  }
+
+  onPostalCodeBlur(): void {
+    this.cepLookupMessage = '';
+    const cepValue = String(this.profileForm.get('addressPostalCode')?.value || '');
+    const sanitizedCep = cepValue.replace(/\D/g, '');
+    if (sanitizedCep.length !== 8) {
+      return;
+    }
+
+    this.api.lookupAddressByCep(sanitizedCep).subscribe({
+      next: (result) => {
+        const notFound = result?.erro === true || result?.erro === 'true';
+        if (!result || notFound) {
+          this.cepLookupMessage = 'CEP não encontrado';
+          return;
+        }
+
+        this.patchAddressField('addressStreet', result.logradouro || '');
+        this.patchAddressField('addressNeighborhood', result.bairro || '');
+        this.patchAddressField('addressCity', result.localidade || '');
+        this.patchAddressField('addressState', (result.uf || '').toUpperCase());
+      },
+      error: () => {
+        // If ViaCEP fails, keep the form unchanged.
+      },
+    });
   }
 
   onAddressStateInput(event: Event): void {
@@ -201,6 +237,65 @@ export class AdminProfileComponent implements OnInit {
     }
 
     this.router.navigate(['/home']);
+  }
+
+  getAcademyLogo(): string {
+    return this.currentUser?.academy?.logoUrl || 'assets/default-academy-logo.svg';
+  }
+
+  getCurrentUserPhoto(): string {
+    return this.profileForm.get('photoUrl')?.value || this.currentUser?.photoUrl || 'assets/default-user-photo.svg';
+  }
+
+  onUserPhotoSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) {
+      return;
+    }
+
+    if (!file.type.startsWith('image/')) {
+      this.errorMessage = 'Selecione um arquivo de imagem válido para a foto do usuário.';
+      input.value = '';
+      return;
+    }
+
+    compressImage(file).then(
+      (dataUrl) => {
+        this.profileForm.get('photoUrl')?.setValue(dataUrl);
+        this.errorMessage = '';
+        this.successMessage = 'Foto carregada. Clique em salvar para confirmar.';
+        this.cdr.detectChanges();
+      },
+      () => {
+        this.errorMessage = 'Não foi possível processar a imagem selecionada.';
+        this.cdr.detectChanges();
+      }
+    );
+  }
+
+  clearUserPhoto(): void {
+    this.profileForm.get('photoUrl')?.setValue('');
+  }
+
+  getProfileTitle(): string {
+    if (this.currentUser?.role === 'Professor') {
+      return 'Perfil do Professor';
+    }
+    if (this.currentUser?.role === 'Aluno') {
+      return 'Perfil do Aluno';
+    }
+    return 'Meu Perfil';
+  }
+
+  getProfileSubtitle(): string {
+    if (this.currentUser?.role === 'Professor') {
+      return 'Atualize seus dados de contato e mantenha suas informações profissionais preparadas para o dia a dia da academia.';
+    }
+    if (this.currentUser?.role === 'Aluno') {
+      return 'Mantenha seus dados pessoais e de contato atualizados para acompanhar sua jornada na academia.';
+    }
+    return 'Atualize seus dados de contato e segurança de acesso.';
   }
 
   getProfileFieldError(fieldName: string): string | null {
@@ -252,5 +347,14 @@ export class AdminProfileComponent implements OnInit {
       this.isLoading = value;
       this.cdr.detectChanges();
     });
+  }
+
+  private patchAddressField(controlName: string, nextValue: string): void {
+    const control = this.profileForm.get(controlName);
+    if (!control) {
+      return;
+    }
+
+    control.setValue(nextValue, { emitEvent: false });
   }
 }

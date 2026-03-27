@@ -25,6 +25,15 @@
     </div>
 
     <h3>Dados pessoais</h3>
+    <div class="photo-section">
+      <img [src]="getPhotoPreview()" alt="Foto do professor" class="photo-preview" />
+      <div class="photo-actions">
+        <label for="professorPhoto" class="btn btn-secondary">Selecionar foto</label>
+        <input id="professorPhoto" type="file" accept="image/*" class="hidden-input" (change)="onPhotoSelected($event)" />
+        <button type="button" class="btn btn-secondary" (click)="clearPhoto()">Usar imagem padrão</button>
+      </div>
+    </div>
+
     <div class="grid two-columns">
       <div class="form-group">
         <label for="fullName">Nome completo *</label>
@@ -52,6 +61,21 @@
     </div>
 
     <h3>Endereco</h3>
+    <div class="form-group">
+      <label for="addressPostalCode">CEP</label>
+      <input
+        id="addressPostalCode"
+        type="text"
+        formControlName="addressPostalCode"
+        class="form-control"
+        placeholder="00000-000"
+        (input)="onPostalCodeInput($event)"
+        (blur)="onPostalCodeBlur()"
+      />
+      <div class="error-message" *ngIf="getFieldError('addressPostalCode')">{{ getFieldError('addressPostalCode') }}</div>
+      <div class="error-message" *ngIf="!getFieldError('addressPostalCode') && cepLookupMessage">{{ cepLookupMessage }}</div>
+    </div>
+
     <div class="grid two-columns">
       <div class="form-group">
         <label for="addressStreet">Logradouro</label>
@@ -76,20 +100,7 @@
       </div>
     </div>
 
-    <div class="grid three-columns">
-      <div class="form-group">
-        <label for="addressPostalCode">CEP</label>
-        <input
-          id="addressPostalCode"
-          type="text"
-          formControlName="addressPostalCode"
-          class="form-control"
-          placeholder="00000-000"
-          (input)="onPostalCodeInput($event)"
-        />
-        <div class="error-message" *ngIf="getFieldError('addressPostalCode')">{{ getFieldError('addressPostalCode') }}</div>
-      </div>
-
+    <div class="grid two-columns">
       <div class="form-group">
         <label for="addressCity">Cidade</label>
         <input id="addressCity" type="text" formControlName="addressCity" class="form-control" />

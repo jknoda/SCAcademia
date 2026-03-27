@@ -202,6 +202,44 @@ export class HomeComponent implements OnInit, OnDestroy {
     return this.currentUser ? (roleMap[this.currentUser.role] ?? this.currentUser.role) : '';
   }
 
+  getAcademyLogo(): string {
+    return this.currentUser?.academy?.logoUrl || 'assets/default-academy-logo.svg';
+  }
+
+  getUserPhoto(): string {
+    return this.currentUser?.photoUrl || 'assets/default-user-photo.svg';
+  }
+
+  getHomeTitle(): string {
+    if (this.isProfessor()) {
+      return 'Painel do Professor';
+    }
+    if (this.isAluno()) {
+      return 'Área do Aluno';
+    }
+    if (this.isResponsavel()) {
+      return 'Área do Responsável';
+    }
+    return 'Painel inicial';
+  }
+
+  getHomeSubtitle(): string {
+    if (this.isProfessor()) {
+      return 'Acompanhe seus treinos, organize turmas e acesse o histórico recente em um só lugar.';
+    }
+    if (this.isAluno()) {
+      return 'Atualize seu cadastro, revise sua anamnese e acompanhe as próximas ações do seu perfil.';
+    }
+    if (this.isResponsavel()) {
+      return 'Gerencie pendências de saúde e acompanhe solicitações LGPD dos alunos vinculados.';
+    }
+    return 'Consulte os recursos disponíveis para o seu perfil.';
+  }
+
+  goToTrainingHistory(): void {
+    this.router.navigate(['/training/history']);
+  }
+
   private getApiError(error: any, fallback: string): string {
     return error?.error?.error || error?.error?.message || fallback;
   }

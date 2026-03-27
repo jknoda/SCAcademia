@@ -37,9 +37,9 @@ export const checkSetupNeeded = async (req: any, res: Response) => {
 
 export const createAcademyHandler = async (req: any, res: Response) => {
   try {
-    const { name, location, email, phone } = req.body as AcademyCreateRequest;
+    const { name, fantasyName, location, email, phone, logoUrl } = req.body as AcademyCreateRequest;
 
-    const academy = await createAcademy(name, location, email, phone);
+    const academy = await createAcademy(name, location, email, phone, logoUrl, fantasyName);
 
     logAudit(undefined, 'ACADEMY_CREATED', 'Academy', academy.id, academy.id, undefined, {
       name,
@@ -61,7 +61,7 @@ export const createAcademyHandler = async (req: any, res: Response) => {
 export const initAdminHandler = async (req: any, res: Response) => {
   try {
     const { academyId } = req.params;
-    const { email, password, fullName } = req.body as AdminRegistrationRequest;
+    const { email, password, fullName, photoUrl } = req.body as AdminRegistrationRequest;
 
     const academy = await getAcademyById(academyId);
     if (!academy) {
@@ -82,7 +82,7 @@ export const initAdminHandler = async (req: any, res: Response) => {
     }
 
     const passwordHash = await hashPassword(password);
-    const user = await createUser(email, fullName, passwordHash, academyId, 'Admin');
+    const user = await createUser(email, fullName, passwordHash, academyId, 'Admin', undefined, undefined, undefined, photoUrl);
 
     logAudit(user.id, 'USER_CREATED', 'User', user.id, academyId, undefined, {
       email,
@@ -204,10 +204,13 @@ export const loginHandler = async (req: any, res: Response) => {
         id: user.id,
         email: user.email,
         fullName: user.fullName,
+        photoUrl: user.photoUrl || '',
         role: user.role,
         academy: {
           id: academy.id,
           name: academy.name,
+          fantasyName: academy.fantasyName || '',
+          logoUrl: academy.logoUrl || '',
         },
       },
     });
@@ -294,10 +297,12 @@ export const getCurrentUserHandler = async (req: AuthenticatedRequest, res: Resp
       id: user.id,
       email: user.email,
       fullName: user.fullName,
+      photoUrl: user.photoUrl || '',
       role: user.role,
       academy: {
         id: academy.id,
         name: academy.name,
+        logoUrl: academy.logoUrl || '',
       },
     });
   } catch (error) {
@@ -337,7 +342,7 @@ export const logoutHandler = async (req: any, res: Response) => {
 
 export const registerUserHandler = async (req: any, res: Response) => {
   try {
-    const { email, password, fullName, role, academyId, birthDate, responsavelEmail } = req.body;
+    const { email, password, fullName, role, academyId, birthDate, responsavelEmail, photoUrl } = req.body;
 
     const academy = await getAcademyById(academyId);
     if (!academy) {
@@ -363,7 +368,7 @@ export const registerUserHandler = async (req: any, res: Response) => {
     const passwordHash = await hashPassword(password);
     const parsedBirthDate = birthDate ? new Date(birthDate) : undefined;
 
-    const user = await createUser(email, fullName, passwordHash, academyId, role, parsedBirthDate, responsavelEmail);
+    const user = await createUser(email, fullName, passwordHash, academyId, role, parsedBirthDate, responsavelEmail, undefined, photoUrl);
 
     logAudit(user.id, 'USER_REGISTERED', 'User', user.id, academyId, undefined, {
       email,
@@ -430,8 +435,9 @@ export const registerUserHandler = async (req: any, res: Response) => {
           id: user.id,
           email: user.email,
           fullName: user.fullName,
+          photoUrl: user.photoUrl || '',
           role: user.role,
-          academy: { id: academy.id, name: academy.name },
+          academy: { id: academy.id, name: academy.name, logoUrl: academy.logoUrl || '' },
         },
         requiresConsent: false,
       });

@@ -2,6 +2,7 @@ import { ChangeDetectorRef, Component, NgZone, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ApiService } from '../../services/api.service';
+import { compressImage } from '../../utils/image.utils';
 import { AcademyProfile, UpdateAcademyProfilePayload } from '../../types';
 
 @Component({
@@ -17,6 +18,7 @@ export class AcademyProfileComponent implements OnInit {
   successMessage = '';
   errorMessage = '';
   serverErrors: { [key: string]: string } = {};
+  cepLookupMessage = '';
 
   constructor(
     private fb: FormBuilder,
@@ -27,6 +29,8 @@ export class AcademyProfileComponent implements OnInit {
   ) {
     this.form = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(2)]],
+      fantasyName: [''],
+      logoUrl: [''],
       description: [''],
       documentId: ['', [Validators.required, Validators.pattern(/^(\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}|\d{3}\.\d{3}\.\d{3}-\d{2})$/)]],
       contactEmail: ['', [Validators.required, Validators.email]],
@@ -56,6 +60,8 @@ export class AcademyProfileComponent implements OnInit {
         this.setLoadingState(false);
         this.form.patchValue({
           name: profile.name || '',
+          fantasyName: profile.fantasyName || '',
+          logoUrl: profile.logoUrl || '',
           description: profile.description || '',
           documentId: profile.documentId || '',
           contactEmail: profile.contactEmail || '',
@@ -83,6 +89,34 @@ export class AcademyProfileComponent implements OnInit {
     const digits = (input.value || '').replace(/\D/g, '').slice(0, 8);
     input.value = digits.length > 5 ? `${digits.slice(0, 5)}-${digits.slice(5)}` : digits;
     this.form.get('addressPostalCode')?.setValue(input.value, { emitEvent: false });
+    this.cepLookupMessage = '';
+  }
+
+  onPostalCodeBlur(): void {
+    this.cepLookupMessage = '';
+    const cepValue = String(this.form.get('addressPostalCode')?.value || '');
+    const sanitizedCep = cepValue.replace(/\D/g, '');
+    if (sanitizedCep.length !== 8) {
+      return;
+    }
+
+    this.api.lookupAddressByCep(sanitizedCep).subscribe({
+      next: (result) => {
+        const notFound = result?.erro === true || result?.erro === 'true';
+        if (!result || notFound) {
+          this.cepLookupMessage = 'CEP não encontrado';
+          return;
+        }
+
+        this.patchAddressField('addressStreet', result.logradouro || '');
+        this.patchAddressField('addressNeighborhood', result.bairro || '');
+        this.patchAddressField('addressCity', result.localidade || '');
+        this.patchAddressField('addressState', (result.uf || '').toUpperCase());
+      },
+      error: () => {
+        // If ViaCEP fails, keep the form unchanged.
+      },
+    });
   }
 
   onAddressStateInput(event: Event): void {
@@ -106,6 +140,8 @@ export class AcademyProfileComponent implements OnInit {
     const raw = this.form.getRawValue();
     const payload: UpdateAcademyProfilePayload = {
       name: raw.name,
+      fantasyName: raw.fantasyName || '',
+      logoUrl: raw.logoUrl || '',
       description: raw.description || '',
       documentId: raw.documentId,
       contactEmail: raw.contactEmail,
@@ -146,6 +182,42 @@ export class AcademyProfileComponent implements OnInit {
     this.router.navigate(['/admin/dashboard']);
   }
 
+  getAcademyLogoPreview(): string {
+    return this.form.get('logoUrl')?.value || 'assets/default-academy-logo.svg';
+  }
+
+  onLogoFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) {
+      return;
+    }
+
+    if (!file.type.startsWith('image/')) {
+      this.errorMessage = 'Selecione um arquivo de imagem válido para o logotipo.';
+      input.value = '';
+      return;
+    }
+
+    compressImage(file).then(
+      (dataUrl) => {
+        this.form.get('logoUrl')?.setValue(dataUrl);
+        this.successMessage = 'Logotipo carregado. Clique em salvar para confirmar.';
+        this.errorMessage = '';
+        this.cdr.detectChanges();
+      },
+      () => {
+        this.errorMessage = 'Não foi possível processar a imagem selecionada.';
+        this.cdr.detectChanges();
+      }
+    );
+  }
+
+  clearLogo(): void {
+    this.form.get('logoUrl')?.setValue('');
+    this.successMessage = '';
+  }
+
   getFieldError(fieldName: string): string | null {
     if (this.serverErrors[fieldName]) {
       return this.serverErrors[fieldName];
@@ -175,5 +247,14 @@ export class AcademyProfileComponent implements OnInit {
       this.isLoading = value;
       this.cdr.detectChanges();
     });
+  }
+
+  private patchAddressField(controlName: string, nextValue: string): void {
+    const control = this.form.get(controlName);
+    if (!control) {
+      return;
+    }
+
+    control.setValue(nextValue, { emitEvent: false });
   }
 }

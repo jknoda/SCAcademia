@@ -6,12 +6,12 @@
         <h2>Gerenciar Turmas</h2>
         <p class="subtitle">Selecione uma turma para editar os dados.</p>
       </div>
-      <button class="btn-secondary" (click)="goBack()">Voltar</button>
+      <button class="app-btn app-btn-secondary" type="button" (click)="goBack()">Voltar</button>
     </div>
 
     <!-- Loading / Error -->
     <p *ngIf="isLoading" class="subtitle loading-text">Carregando turmas...</p>
-    <div *ngIf="loadErrorMessage" class="status-message error">{{ loadErrorMessage }}</div>
+    <div *ngIf="loadErrorMessage" class="app-status-message error">{{ loadErrorMessage }}</div>
 
     <!-- Empty state -->
     <div class="empty-state" *ngIf="!isLoading && !loadErrorMessage && turmas.length === 0">
@@ -46,7 +46,7 @@
     <!-- Detail panel (shown when a turma is selected) -->
     <div class="turma-detail" *ngIf="selectedRow">
       <div class="detail-header">
-        <button class="btn-back" (click)="deselectTurma()">&#8592; Voltar à lista</button>
+        <button class="btn-back" type="button" (click)="deselectTurma()">&#8592; Voltar à lista</button>
         <h3>{{ selectedRow.turma.turmaName }}</h3>
       </div>
 
@@ -138,14 +138,14 @@
       </label>
 
       <div class="detail-actions">
-        <button class="btn-secondary" (click)="deselectTurma()">Cancelar</button>
-        <button class="btn-primary" (click)="saveTurma(selectedRow)" [disabled]="selectedRow.isSaving">
+        <button class="app-btn app-btn-secondary" type="button" (click)="deselectTurma()">Cancelar</button>
+        <button class="app-btn app-btn-primary" type="button" (click)="saveTurma(selectedRow)" [disabled]="selectedRow.isSaving">
           {{ selectedRow.isSaving ? 'Salvando...' : 'Salvar alterações' }}
         </button>
       </div>
 
-      <div *ngIf="selectedRow.successMessage" class="status-message success">{{ selectedRow.successMessage }}</div>
-      <div *ngIf="selectedRow.errorMessage" class="status-message error">{{ selectedRow.errorMessage }}</div>
+      <div *ngIf="selectedRow.successMessage" class="app-status-message success">{{ selectedRow.successMessage }}</div>
+      <div *ngIf="selectedRow.errorMessage" class="app-status-message error">{{ selectedRow.errorMessage }}</div>
     </div>
 
   </div>

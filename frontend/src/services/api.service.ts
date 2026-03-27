@@ -103,15 +103,34 @@ export class ApiService {
     });
   }
 
+  lookupAddressByCep(cep: string): Observable<{
+    logradouro?: string;
+    bairro?: string;
+    localidade?: string;
+    uf?: string;
+    erro?: boolean | string;
+  }> {
+    const sanitizedCep = (cep || '').replace(/\D/g, '').slice(0, 8);
+    return this.http.get<{
+      logradouro?: string;
+      bairro?: string;
+      localidade?: string;
+      uf?: string;
+      erro?: boolean | string;
+    }>(`https://viacep.com.br/ws/${sanitizedCep}/json/`);
+  }
+
   checkSetupNeeded(): Observable<{ needsSetup: boolean; academyId?: string }> {
     return this.http.get<{ needsSetup: boolean; academyId?: string }>(`${this.apiUrl}/auth/setup/init`);
   }
 
   createAcademy(data: {
     name: string;
+    fantasyName?: string;
     location: string;
     email: string;
     phone: string;
+    logoUrl?: string;
   }): Observable<{ academyId: string; message: string; nextStep: string }> {
     return this.http.post<any>(`${this.apiUrl}/auth/academies`, data);
   }
@@ -290,6 +309,7 @@ export class ApiService {
       email: string;
       password: string;
       fullName: string;
+      photoUrl?: string;
     }
   ): Observable<{ userId: string; email: string; message: string }> {
     return this.http.post<any>(`${this.apiUrl}/auth/academies/${academyId}/init-admin`, data);
@@ -342,6 +362,7 @@ export class ApiService {
     academyId: string;
     birthDate?: string;
     responsavelEmail?: string;
+    photoUrl?: string;
   }): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/auth/register`, data, {
       withCredentials: true,

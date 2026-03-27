@@ -18,6 +18,8 @@ export const academyFormSchema = Joi.object({
     'string.pattern.base': 'Telefone deve ter entre 10-15 dígitos',
     'any.required': 'Telefone é obrigatório',
   }),
+  fantasyName: Joi.string().max(255).allow('').optional(),
+  logoUrl: Joi.string().max(4000000).allow('').optional(),
 });
 
 export const adminRegistrationSchema = Joi.object({
@@ -33,6 +35,7 @@ export const adminRegistrationSchema = Joi.object({
     'string.min': 'Nome completo deve ter ao menos 2 caracteres',
     'any.required': 'Nome completo é obrigatório',
   }),
+  photoUrl: Joi.string().max(4000000).allow('').optional(),
 });
 
 export const loginSchema = Joi.object({
@@ -195,12 +198,15 @@ export const userRegistrationSchema = Joi.object({
 const documentIdRegex = /^(\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}|\d{3}\.\d{3}\.\d{3}-\d{2})$/;
 const postalCodeRegex = /^\d{5}-?\d{3}$/;
 const stateRegex = /^[A-Z]{2}$/;
+const imageDataSchema = Joi.string().max(4000000).allow('').optional();
 
 export const academyProfileUpdateSchema = Joi.object({
   name: Joi.string().min(2).max(255).required().messages({
     'string.min': 'Nome deve ter ao menos 2 caracteres',
     'any.required': 'Nome é obrigatório',
   }),
+  fantasyName: Joi.string().max(255).allow('').optional(),
+  logoUrl: imageDataSchema,
   description: Joi.string().max(2000).allow('').optional(),
   documentId: Joi.string().pattern(documentIdRegex).required().messages({
     'string.pattern.base': 'Documento deve estar no formato CNPJ ou CPF válido',
@@ -234,6 +240,7 @@ export const userProfileUpdateSchema = Joi.object({
     'string.min': 'Nome completo deve ter ao menos 2 caracteres',
     'any.required': 'Nome completo é obrigatório',
   }),
+  photoUrl: imageDataSchema,
   documentId: Joi.string().pattern(cpfRegex).allow('').optional().messages({
     'string.pattern.base': 'CPF deve estar no formato 000.000.000-00',
   }),
@@ -296,6 +303,7 @@ export const professorCreateSchema = Joi.object({
     'string.min': 'Nome completo deve ter ao menos 2 caracteres',
     'any.required': 'Nome completo é obrigatório',
   }),
+  photoUrl: imageDataSchema,
   documentId: Joi.string().pattern(cpfRegex).allow('').optional().messages({
     'string.pattern.base': 'CPF inválido',
   }),
@@ -323,6 +331,7 @@ export const professorUpdateSchema = Joi.object({
     'string.min': 'Nome completo deve ter ao menos 2 caracteres',
     'any.required': 'Nome completo é obrigatório',
   }),
+  photoUrl: imageDataSchema,
   documentId: Joi.string().pattern(cpfRegex).allow('').optional().messages({
     'string.pattern.base': 'CPF inválido',
   }),
@@ -389,6 +398,7 @@ export const studentCreateSchema = Joi.object({
     'string.min': 'Nome completo deve ter ao menos 2 caracteres',
     'any.required': 'Nome completo é obrigatório',
   }),
+  photoUrl: imageDataSchema,
   isMinor: Joi.boolean().optional(),
   documentId: Joi.string().pattern(cpfRegex).allow('').optional().messages({
     'string.pattern.base': 'CPF inválido',
@@ -422,6 +432,7 @@ export const studentUpdateSchema = Joi.object({
     'string.min': 'Nome completo deve ter ao menos 2 caracteres',
     'any.required': 'Nome completo é obrigatório',
   }),
+  photoUrl: imageDataSchema,
   isMinor: Joi.boolean().optional(),
   documentId: Joi.string().pattern(cpfRegex).allow('').optional().messages({
     'string.pattern.base': 'CPF inválido',

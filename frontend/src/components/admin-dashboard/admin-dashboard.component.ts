@@ -60,6 +60,14 @@ export class AdminDashboardComponent implements OnInit {
     this.router.navigate(['/login']);
   }
 
+  getAcademyLogo(): string {
+    return this.currentUser?.academy?.logoUrl || 'assets/default-academy-logo.svg';
+  }
+
+  getUserPhoto(): string {
+    return this.currentUser?.photoUrl || 'assets/default-user-photo.svg';
+  }
+
   goToConsentTemplates(): void {
     this.router.navigate(['/admin/consent-templates']);
   }

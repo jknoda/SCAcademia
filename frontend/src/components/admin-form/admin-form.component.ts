@@ -1,6 +1,7 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ApiService } from '../../services/api.service';
+import { compressImage } from '../../utils/image.utils';
 import { PasswordValidatorService } from '../../services/password-validator.service';
 
 @Component({
@@ -27,6 +28,7 @@ export class AdminFormComponent {
     this.adminForm = this.fb.group({
       fullName: ['', [Validators.required, Validators.minLength(2)]],
       email: ['', [Validators.required, Validators.email]],
+      photoUrl: [''],
       password: ['', [Validators.required, Validators.minLength(8)]],
       confirmPassword: ['', Validators.required],
     });
@@ -77,6 +79,7 @@ export class AdminFormComponent {
     const payload = {
       fullName: this.adminForm.get('fullName')?.value,
       email: this.adminForm.get('email')?.value,
+      photoUrl: this.adminForm.get('photoUrl')?.value || '',
       password: password,
     };
 
@@ -98,6 +101,37 @@ export class AdminFormComponent {
         this.errorMessage = error.error?.error || 'Erro ao registrar admin. Tente novamente.';
       }
     );
+  }
+
+  getPhotoPreview(): string {
+    return this.adminForm.get('photoUrl')?.value || 'assets/default-user-photo.svg';
+  }
+
+  onPhotoSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) {
+      return;
+    }
+
+    if (!file.type.startsWith('image/')) {
+      this.errorMessage = 'Selecione um arquivo de imagem válido para a foto do administrador.';
+      input.value = '';
+      return;
+    }
+
+    compressImage(file).then(
+      (dataUrl) => {
+        this.adminForm.get('photoUrl')?.setValue(dataUrl);
+      },
+      () => {
+        this.errorMessage = 'Não foi possível processar a imagem selecionada.';
+      }
+    );
+  }
+
+  clearPhoto(): void {
+    this.adminForm.get('photoUrl')?.setValue('');
   }
 
   getFieldError(fieldName: string): string | null {

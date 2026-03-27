@@ -8,13 +8,17 @@ export interface AuthenticatedRequest extends Request {
 
 export interface AcademyCreateRequest {
   name: string;
+  fantasyName?: string;
   location: string;
   email: string;
   phone: string;
+  logoUrl?: string;
 }
 
 export interface AcademyProfileUpdateRequest {
   name: string;
+  fantasyName?: string;
+  logoUrl?: string;
   description?: string;
   documentId: string;
   contactEmail: string;
@@ -30,6 +34,7 @@ export interface AcademyProfileUpdateRequest {
 
 export interface UserProfileUpdateRequest {
   fullName: string;
+  photoUrl?: string;
   documentId?: string;
   birthDate?: string;
   phone?: string;
@@ -52,6 +57,7 @@ export interface ProfessorCreateRequest {
   email: string;
   password: string;
   fullName: string;
+  photoUrl?: string;
   documentId?: string;
   birthDate?: string;
   phone?: string;
@@ -67,6 +73,7 @@ export interface ProfessorCreateRequest {
 
 export interface ProfessorUpdateRequest {
   fullName: string;
+  photoUrl?: string;
   documentId?: string;
   birthDate?: string;
   phone?: string;
@@ -93,6 +100,7 @@ export interface StudentCreateRequest {
   email: string;
   password: string;
   fullName: string;
+  photoUrl?: string;
   isMinor?: boolean;
   documentId?: string;
   birthDate: string;
@@ -111,6 +119,7 @@ export interface StudentCreateRequest {
 
 export interface StudentUpdateRequest {
   fullName: string;
+  photoUrl?: string;
   isMinor?: boolean;
   documentId?: string;
   birthDate: string;
@@ -152,6 +161,7 @@ export interface AdminRegistrationRequest {
   email: string;
   password: string;
   fullName: string;
+  photoUrl?: string;
 }
 
 export interface LoginRequest {
@@ -166,9 +176,11 @@ export interface JWTResponse {
     id: string;
     email: string;
     fullName: string;
+    photoUrl?: string;
     academy: {
       id: string;
       name: string;
+      logoUrl?: string;
     };
   };
 }

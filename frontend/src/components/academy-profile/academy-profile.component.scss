@@ -31,6 +31,38 @@
   gap: 0.35rem;
 }
 
+.logo-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.logo-preview {
+  width: 96px;
+  height: 96px;
+  border-radius: 14px;
+  border: 1px solid #d0d5dd;
+  background: #ffffff;
+  object-fit: cover;
+}
+
+.logo-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.logo-upload-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hidden-input {
+  display: none;
+}
+
 .form-control {
   border: 1px solid #c6c8cc;
   border-radius: 8px;
@@ -98,6 +130,11 @@
   .two-columns,
   .three-columns {
     grid-template-columns: 1fr;
+  }
+
+  .logo-section {
+    flex-direction: column;
+    align-items: flex-start;
   }
 
   .actions-row {

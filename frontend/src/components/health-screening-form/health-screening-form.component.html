@@ -1,120 +1,98 @@
-<div class="screening-container">
-  <div class="screening-card">
-    <div class="screening-header">
-      <div class="logo">🥋</div>
-      <h1>Anamnese do Aluno</h1>
-      <p>Triagem de saúde para prática de judô (LGPD)</p>
-    </div>
+<div class="health-screening-container">
+  <h2>{{ isEditMode ? 'Editar Anamnese do Aluno' : 'Anamnese do Aluno' }}</h2>
+  <p>
+    Registre as informacoes de saude no mesmo padrao operacional do cadastro e perfil do aluno.
+  </p>
 
-    <!-- Loading existing record -->
-    <div class="info-banner" *ngIf="isFetchingRecord">
-      <span>⏳</span> Carregando dados de saúde...
-    </div>
+  <div class="info-alert" *ngIf="isFetchingRecord">Carregando dados de saude...</div>
+  <div class="success-alert" *ngIf="successMessage">{{ successMessage }}</div>
+  <div class="error-alert" *ngIf="errorMessage">{{ errorMessage }}</div>
 
-    <!-- Success message -->
-    <div class="success-banner" *ngIf="successMessage">
-      <span class="success-icon">✓</span>
-      {{ successMessage }}
-    </div>
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="card" *ngIf="!successMessage">
+    <h3>Dados Basicos</h3>
 
-    <!-- Error message -->
-    <div class="error-banner" *ngIf="errorMessage">
-      <span>⚠</span>
-      {{ errorMessage }}
-    </div>
-
-    <form [formGroup]="form" (ngSubmit)="onSubmit()" *ngIf="!successMessage">
-
-      <!-- ── Dados Básicos ─────────────────────────────── -->
-      <div class="section-title">Dados Básicos</div>
-
-      <div class="form-row">
-        <!-- Tipo Sanguíneo -->
-        <div class="form-group half">
-          <label for="bloodType">Tipo Sanguíneo *</label>
-          <select
-            id="bloodType"
-            formControlName="bloodType"
-            class="form-control"
-            [class.error]="getFieldError('bloodType')"
-          >
-            <option value="">Selecione...</option>
-            <option *ngFor="let bt of bloodTypes" [value]="bt">{{ bt }}</option>
-          </select>
-          <div class="field-error" *ngIf="getFieldError('bloodType')">{{ getFieldError('bloodType') }}</div>
-        </div>
-
-        <!-- Peso -->
-        <div class="form-group quarter">
-          <label for="weightKg">Peso (kg)</label>
-          <input
-            id="weightKg"
-            type="number"
-            formControlName="weightKg"
-            placeholder="Ex: 65"
-            class="form-control"
-            min="10"
-            max="300"
-          />
-        </div>
-
-        <!-- Altura -->
-        <div class="form-group quarter">
-          <label for="heightCm">Altura (cm)</label>
-          <input
-            id="heightCm"
-            type="number"
-            formControlName="heightCm"
-            placeholder="Ex: 170"
-            class="form-control"
-            min="100"
-            max="250"
-          />
-        </div>
+    <div class="grid three-columns">
+      <div class="form-group">
+        <label for="bloodType">Tipo Sanguineo *</label>
+        <select
+          id="bloodType"
+          formControlName="bloodType"
+          class="form-control"
+          [class.input-error]="getFieldError('bloodType')"
+        >
+          <option value="">Selecione...</option>
+          <option *ngFor="let bt of bloodTypes" [value]="bt">{{ bt }}</option>
+        </select>
+        <div class="error-message" *ngIf="getFieldError('bloodType')">{{ getFieldError('bloodType') }}</div>
       </div>
 
-      <!-- ── Condições Médicas ──────────────────────────── -->
-      <div class="section-title">Condições Médicas</div>
-      <p class="section-hint">Marque todas as condições que se aplicam ao aluno.</p>
-
-      <div class="conditions-grid">
-        <label class="checkbox-option">
-          <input type="checkbox" formControlName="hypertension" />
-          <span>🫀 Hipertensão</span>
-        </label>
-        <label class="checkbox-option">
-          <input type="checkbox" formControlName="diabetes" />
-          <span>🩸 Diabetes</span>
-        </label>
-        <label class="checkbox-option">
-          <input type="checkbox" formControlName="cardiac" />
-          <span>❤️ Problemas Cardíacos</span>
-        </label>
-        <label class="checkbox-option">
-          <input type="checkbox" formControlName="labyrinthitis" />
-          <span>🌀 Labirintite</span>
-        </label>
-        <label class="checkbox-option">
-          <input type="checkbox" formControlName="asthmaBronchitis" />
-          <span>🫁 Asma / Bronquite</span>
-        </label>
-        <label class="checkbox-option">
-          <input type="checkbox" formControlName="epilepsySeizures" />
-          <span>⚡ Epilepsia / Convulsões</span>
-        </label>
-        <label class="checkbox-option">
-          <input type="checkbox" formControlName="stressDepression" />
-          <span>🧠 Estresse / Depressão</span>
-        </label>
+      <div class="form-group">
+        <label for="weightKg">Peso (kg)</label>
+        <input
+          id="weightKg"
+          type="number"
+          formControlName="weightKg"
+          placeholder="Ex: 65"
+          class="form-control"
+          min="10"
+          max="300"
+        />
       </div>
 
-      <!-- ── Dados Sensíveis (Criptografados) ─────────────── -->
-      <div class="section-title">
-        Informações de Saúde
-        <span class="encrypted-badge">🔒 Criptografado</span>
+      <div class="form-group">
+        <label for="heightCm">Altura (cm)</label>
+        <input
+          id="heightCm"
+          type="number"
+          formControlName="heightCm"
+          placeholder="Ex: 170"
+          class="form-control"
+          min="100"
+          max="250"
+        />
       </div>
+    </div>
 
-      <!-- Alergias -->
+    <h3>Condicoes Medicas</h3>
+    <p class="section-hint">Marque todas as condicoes que se aplicam ao aluno.</p>
+
+    <div class="conditions-grid">
+      <label class="checkbox-option">
+        <input type="checkbox" formControlName="hypertension" />
+        <span>Hipertensao</span>
+      </label>
+      <label class="checkbox-option">
+        <input type="checkbox" formControlName="diabetes" />
+        <span>Diabetes</span>
+      </label>
+      <label class="checkbox-option">
+        <input type="checkbox" formControlName="cardiac" />
+        <span>Problemas Cardiacos</span>
+      </label>
+      <label class="checkbox-option">
+        <input type="checkbox" formControlName="labyrinthitis" />
+        <span>Labirintite</span>
+      </label>
+      <label class="checkbox-option">
+        <input type="checkbox" formControlName="asthmaBronchitis" />
+        <span>Asma / Bronquite</span>
+      </label>
+      <label class="checkbox-option">
+        <input type="checkbox" formControlName="epilepsySeizures" />
+        <span>Epilepsia / Convulsoes</span>
+      </label>
+      <label class="checkbox-option">
+        <input type="checkbox" formControlName="stressDepression" />
+        <span>Estresse / Depressao</span>
+      </label>
+    </div>
+
+    <h3>
+      Informacoes de Saude
+      <span class="encrypted-badge">Criptografado</span>
+    </h3>
+
+    <div class="grid two-columns">
       <div class="form-group">
         <label for="allergies">Alergias</label>
         <textarea
@@ -122,91 +100,86 @@
           formControlName="allergies"
           placeholder="Ex: Penicilina, Dipirona..."
           class="form-control"
-          rows="2"
+          rows="3"
         ></textarea>
       </div>
 
-      <!-- Medicamentos -->
       <div class="form-group">
         <label for="medications">Medicamentos em uso</label>
         <textarea
           id="medications"
           formControlName="medications"
-          placeholder="Ex: Ritalina 10mg — 1x ao dia"
+          placeholder="Ex: Ritalina 10mg - 1x ao dia"
           class="form-control"
-          rows="2"
+          rows="3"
         ></textarea>
       </div>
+    </div>
 
-      <!-- Condições existentes -->
+    <div class="grid two-columns">
       <div class="form-group">
-        <label for="existingConditions">Outras condições de saúde</label>
+        <label for="existingConditions">Outras condicoes de saude</label>
         <textarea
           id="existingConditions"
           formControlName="existingConditions"
-          placeholder="Descreva outras condições relevantes..."
-          class="form-control"
-          rows="2"
-        ></textarea>
-      </div>
-
-      <!-- Anotações do professor -->
-      <div class="form-group">
-        <label for="healthScreeningNotes">Anotações de triagem</label>
-        <textarea
-          id="healthScreeningNotes"
-          formControlName="healthScreeningNotes"
-          placeholder="Observações adicionais do professor ou responsável..."
+          placeholder="Descreva outras condicoes relevantes..."
           class="form-control"
           rows="3"
         ></textarea>
       </div>
 
-      <!-- ── Contato de Emergência ──────────────────────── -->
-      <div class="section-title">
-        Contato de Emergência
-        <span class="encrypted-badge">🔒 Criptografado</span>
+      <div class="form-group">
+        <label for="healthScreeningNotes">Anotacoes de triagem</label>
+        <textarea
+          id="healthScreeningNotes"
+          formControlName="healthScreeningNotes"
+          placeholder="Observacoes adicionais do professor ou responsavel..."
+          class="form-control"
+          rows="3"
+        ></textarea>
+      </div>
+    </div>
+
+    <h3>
+      Contato de Emergencia
+      <span class="encrypted-badge">Criptografado</span>
+    </h3>
+
+    <div class="grid two-columns">
+      <div class="form-group">
+        <label for="emergencyContactName">Nome do Responsavel *</label>
+        <input
+          id="emergencyContactName"
+          type="text"
+          formControlName="emergencyContactName"
+          placeholder="Ex: Maria Silva"
+          class="form-control"
+          [class.input-error]="getFieldError('emergencyContactName')"
+        />
+        <div class="error-message" *ngIf="getFieldError('emergencyContactName')">{{ getFieldError('emergencyContactName') }}</div>
       </div>
 
-      <div class="form-row">
-        <div class="form-group half">
-          <label for="emergencyContactName">Nome do Responsável *</label>
-          <input
-            id="emergencyContactName"
-            type="text"
-            formControlName="emergencyContactName"
-            placeholder="Ex: Maria Silva"
-            class="form-control"
-            [class.error]="getFieldError('emergencyContactName')"
-          />
-          <div class="field-error" *ngIf="getFieldError('emergencyContactName')">{{ getFieldError('emergencyContactName') }}</div>
-        </div>
-
-        <div class="form-group half">
-          <label for="emergencyContactPhone">Telefone de Emergência *</label>
-          <input
-            id="emergencyContactPhone"
-            type="tel"
-            formControlName="emergencyContactPhone"
-            placeholder="Ex: 11987654321"
-            class="form-control"
-            [class.error]="getFieldError('emergencyContactPhone')"
-          />
-          <div class="field-error" *ngIf="getFieldError('emergencyContactPhone')">{{ getFieldError('emergencyContactPhone') }}</div>
-        </div>
+      <div class="form-group">
+        <label for="emergencyContactPhone">Telefone de Emergencia *</label>
+        <input
+          id="emergencyContactPhone"
+          type="tel"
+          formControlName="emergencyContactPhone"
+          placeholder="Ex: 11987654321"
+          class="form-control"
+          [class.input-error]="getFieldError('emergencyContactPhone')"
+        />
+        <div class="error-message" *ngIf="getFieldError('emergencyContactPhone')">{{ getFieldError('emergencyContactPhone') }}</div>
       </div>
+    </div>
 
-      <!-- ── Ações ───────────────────────────────────────── -->
-      <div class="form-actions">
-        <button type="button" class="btn-secondary" (click)="goBack()" [disabled]="isLoading">
-          Voltar
-        </button>
-        <button type="submit" class="btn-primary" [disabled]="isLoading || isFetchingRecord">
-          <span *ngIf="isLoading">⏳ Salvando...</span>
-          <span *ngIf="!isLoading">{{ isEditMode ? '💾 Atualizar Anamnese' : '✓ Criar Anamnese' }}</span>
-        </button>
-      </div>
-
-    </form>
-  </div>
+    <div class="actions-row">
+      <button type="button" class="btn btn-secondary" (click)="goBack()" [disabled]="isLoading">
+        Voltar
+      </button>
+      <button type="submit" class="btn btn-primary" [disabled]="isLoading || isFetchingRecord">
+        {{ isLoading ? 'Salvando...' : (isEditMode ? 'Salvar Anamnese' : 'Criar Anamnese') }}
+      </button>
+    </div>
+  </form>
 </div>

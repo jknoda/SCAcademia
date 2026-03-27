@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ApiService } from '../../services/api.service';
+import { compressImage } from '../../utils/image.utils';
 import { AuthService } from '../../services/auth.service';
 import { CreateStudentPayload, UpdateStudentPayload } from '../../types';
 
@@ -22,6 +23,7 @@ export class StudentFormComponent implements OnInit {
   errorMessage = '';
   successMessage = '';
   warningMessage = '';
+  cepLookupMessage = '';
 
   generatedPasswordModalOpen = false;
   generatedPassword = '';
@@ -56,6 +58,7 @@ export class StudentFormComponent implements OnInit {
         ],
       ],
       fullName: ['', [Validators.required, Validators.minLength(2)]],
+      photoUrl: [''],
       birthDate: ['', [Validators.required]],
       documentId: ['', [Validators.pattern(/^$|^\d{3}\.\d{3}\.\d{3}-\d{2}$/)]],
       phone: [''],
@@ -157,6 +160,34 @@ export class StudentFormComponent implements OnInit {
     const digits = (input.value || '').replace(/\D/g, '').slice(0, 8);
     input.value = digits.length > 5 ? `${digits.slice(0, 5)}-${digits.slice(5)}` : digits;
     this.form.get('addressPostalCode')?.setValue(input.value, { emitEvent: false });
+    this.cepLookupMessage = '';
+  }
+
+  onPostalCodeBlur(): void {
+    this.cepLookupMessage = '';
+    const cepValue = String(this.form.get('addressPostalCode')?.value || '');
+    const sanitizedCep = cepValue.replace(/\D/g, '');
+    if (sanitizedCep.length !== 8) {
+      return;
+    }
+
+    this.api.lookupAddressByCep(sanitizedCep).subscribe({
+      next: (result) => {
+        const notFound = result?.erro === true || result?.erro === 'true';
+        if (!result || notFound) {
+          this.cepLookupMessage = 'CEP não encontrado';
+          return;
+        }
+
+        this.patchAddressField('addressStreet', result.logradouro || '');
+        this.patchAddressField('addressNeighborhood', result.bairro || '');
+        this.patchAddressField('addressCity', result.localidade || '');
+        this.patchAddressField('addressState', (result.uf || '').toUpperCase());
+      },
+      error: () => {
+        // If ViaCEP fails, keep the form unchanged.
+      },
+    });
   }
 
   onAddressStateInput(event: Event): void {
@@ -194,6 +225,39 @@ export class StudentFormComponent implements OnInit {
     }
   }
 
+  getPhotoPreview(): string {
+    return this.form.get('photoUrl')?.value || 'assets/default-user-photo.svg';
+  }
+
+  onPhotoSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) {
+      return;
+    }
+
+    if (!file.type.startsWith('image/')) {
+      this.errorMessage = 'Selecione um arquivo de imagem válido para a foto do aluno.';
+      input.value = '';
+      return;
+    }
+
+    compressImage(file).then(
+      (dataUrl) => {
+        this.form.get('photoUrl')?.setValue(dataUrl);
+        this.errorMessage = '';
+        this.successMessage = 'Foto carregada. Clique em salvar para confirmar.';
+      },
+      () => {
+        this.errorMessage = 'Não foi possível processar a imagem selecionada.';
+      }
+    );
+  }
+
+  clearPhoto(): void {
+    this.form.get('photoUrl')?.setValue('');
+  }
+
   getFieldError(fieldName: string): string | null {
     const field = this.form.get(fieldName);
     if (!field || !field.touched || !field.errors) {
@@ -224,6 +288,7 @@ export class StudentFormComponent implements OnInit {
         this.form.patchValue({
           email: student.email || '',
           fullName: student.fullName || '',
+          photoUrl: student.photoUrl || '',
           birthDate: this.toDateInput(student.birthDate),
           documentId: student.documentId || '',
           phone: student.phone || '',
@@ -277,6 +342,7 @@ export class StudentFormComponent implements OnInit {
       email: raw.email,
       password: raw.password,
       fullName: raw.fullName,
+      photoUrl: raw.photoUrl || '',
       birthDate: raw.birthDate,
       documentId: raw.documentId || '',
       phone: raw.phone || '',
@@ -297,6 +363,7 @@ export class StudentFormComponent implements OnInit {
     const raw = this.form.getRawValue();
     return {
       fullName: raw.fullName,
+      photoUrl: raw.photoUrl || '',
       birthDate: raw.birthDate,
       documentId: raw.documentId || '',
       phone: raw.phone || '',
@@ -331,5 +398,14 @@ export class StudentFormComponent implements OnInit {
     }
 
     return trimmed;
+  }
+
+  private patchAddressField(controlName: string, nextValue: string): void {
+    const control = this.form.get(controlName);
+    if (!control) {
+      return;
+    }
+
+    control.setValue(nextValue, { emitEvent: false });
   }
 }

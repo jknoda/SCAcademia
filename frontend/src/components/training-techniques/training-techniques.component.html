@@ -12,7 +12,7 @@
             <h2>Técnicas praticadas na aula</h2>
             <p>Selecione as técnicas do treino, revise a ordem e siga para lançar notas.</p>
           </div>
-          <button type="button" class="btn-secondary" (click)="goToProfessorTechniques()">
+          <button type="button" class="app-btn app-btn-secondary" (click)="goToProfessorTechniques()">
             Gerenciar catálogo de técnicas
           </button>
         </header>
@@ -22,8 +22,8 @@
           <p class="hint-text">Ao selecionar uma técnica, ela entra automaticamente na lista de técnicas do treino.</p>
         </section>
 
-        <div *ngIf="errorMessage" class="status error">{{ errorMessage }}</div>
-        <div *ngIf="infoMessage" class="status success">{{ infoMessage }}</div>
+        <div *ngIf="errorMessage" class="app-status-message error">{{ errorMessage }}</div>
+        <div *ngIf="infoMessage" class="app-status-message success">{{ infoMessage }}</div>
 
         <section class="ordered-selection">
           <div class="ordered-selection-header">
@@ -75,10 +75,10 @@
           <div class="preset-suggestion-inline" *ngIf="showPresetSuggestion && suggestedPreset">
             <span>Sugestão:</span>
             <strong>{{ suggestedPreset.name }}</strong>
-            <button type="button" class="btn-secondary" (click)="onAcceptPresetSuggestion()" [disabled]="applyingPreset">
+            <button type="button" class="app-btn app-btn-secondary" (click)="onAcceptPresetSuggestion()" [disabled]="applyingPreset">
               Usar sugestão
             </button>
-            <button type="button" class="btn-secondary" (click)="onRejectPresetSuggestion()" [disabled]="applyingPreset">
+            <button type="button" class="app-btn app-btn-secondary" (click)="onRejectPresetSuggestion()" [disabled]="applyingPreset">
               Ignorar
             </button>
           </div>
@@ -167,7 +167,7 @@
 
           <button
             type="button"
-            class="btn-primary add-custom-button"
+            class="app-btn app-btn-primary add-custom-button"
             (click)="addCustomTechnique()"
             [disabled]="!customTechniqueInput.trim() || addingCustom"
           >
@@ -177,13 +177,13 @@
         </div>
 
         <div class="navigation-buttons">
-          <button type="button" class="btn-secondary" (click)="onBackToAttendance()">
+          <button type="button" class="app-btn app-btn-secondary" (click)="onBackToAttendance()">
             Anterior: Frequência
           </button>
 
           <button
             type="button"
-            class="btn-primary"
+            class="app-btn app-btn-primary"
             (click)="onNextNotes()"
             [disabled]="isSaving || selectedSummary$.count === 0"
           >

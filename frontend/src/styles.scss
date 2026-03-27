@@ -16,6 +16,479 @@ body {
   background-color: #f5f5f5;
 }
 
+.app-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 0 16px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease,
+    transform 0.12s ease, box-shadow 0.18s ease;
+}
+
+.app-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.app-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.app-btn-primary {
+  background: #1565c0;
+  color: #ffffff;
+  box-shadow: 0 10px 18px rgba(21, 101, 192, 0.18);
+}
+
+.app-btn-primary:hover:not(:disabled) {
+  background: #0d47a1;
+}
+
+.app-btn-secondary {
+  background: #e8f0fb;
+  border-color: #c6daf4;
+  color: #19457c;
+}
+
+.app-btn-secondary:hover:not(:disabled) {
+  background: #d7e7fb;
+}
+
+.app-btn-danger {
+  background: #c62828;
+  color: #ffffff;
+  box-shadow: 0 10px 18px rgba(198, 40, 40, 0.18);
+}
+
+.app-btn-danger:hover:not(:disabled) {
+  background: #b71c1c;
+}
+
+.app-status-message {
+  border-radius: 14px;
+  padding: 12px 14px;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.app-status-message.success {
+  background: #e8f5e9;
+  border: 1px solid #c8e6c9;
+  color: #1b5e20;
+}
+
+.app-status-message.error {
+  background: #ffebee;
+  border: 1px solid #ffcdd2;
+  color: #b71c1c;
+}
+
+.training-techniques-container {
+  position: relative;
+  min-height: 100vh;
+  padding: 24px;
+  background:
+    radial-gradient(circle at top right, rgba(21, 101, 192, 0.18), transparent 28%),
+    linear-gradient(180deg, #eef4ff 0%, #dfeaf8 100%);
+}
+
+.training-techniques-container .loading-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.78);
+}
+
+.training-techniques-container .page-shell {
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+.training-techniques-container .page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.training-techniques-container .eyebrow {
+  margin: 0 0 6px;
+  color: #1b5fbf;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.training-techniques-container .page-header h2 {
+  margin: 0 0 6px;
+  color: #123a73;
+}
+
+.training-techniques-container .page-header p,
+.training-techniques-container .hint-text,
+.training-techniques-container .section-header p,
+.training-techniques-container .preset-panel-header p,
+.training-techniques-container .intro-card p {
+  margin: 0;
+  color: #455a64;
+  font-size: 0.93rem;
+}
+
+.training-techniques-container .intro-card,
+.training-techniques-container .preset-panel,
+.training-techniques-container .ordered-selection,
+.training-techniques-container .summary-card,
+.training-techniques-container .custom-technique-section,
+.training-techniques-container .group-card,
+.training-techniques-container .preset-modal {
+  border: 1px solid #d7e6fb;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 10px 20px rgba(9, 30, 66, 0.05);
+}
+
+.training-techniques-container .intro-card,
+.training-techniques-container .preset-panel,
+.training-techniques-container .ordered-selection {
+  padding: 16px 18px;
+  margin-bottom: 16px;
+}
+
+.training-techniques-container .intro-card h3,
+.training-techniques-container .preset-panel-header h3,
+.training-techniques-container .section-header h3,
+.training-techniques-container .ordered-selection-header h3,
+.training-techniques-container .group-header h4 {
+  margin: 0;
+  color: #123a73;
+}
+
+.training-techniques-container .app-status-message {
+  margin-bottom: 12px;
+}
+
+.training-techniques-container .preset-panel-header,
+.training-techniques-container .ordered-selection-header,
+.training-techniques-container .section-header,
+.training-techniques-container .group-header {
+  margin-bottom: 12px;
+}
+
+.training-techniques-container .preset-suggestion-inline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  padding: 12px;
+  border: 1px solid #ffd591;
+  border-radius: 12px;
+  background: #fff7e8;
+}
+
+.training-techniques-container .preset-list,
+.training-techniques-container .ordered-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.training-techniques-container .preset-chip,
+.training-techniques-container .order-btn {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.training-techniques-container .preset-chip {
+  padding: 10px 14px;
+  border: 1px solid #b8d1f5;
+  border-radius: 999px;
+  background: #f4f9ff;
+  color: #0d47a1;
+}
+
+.training-techniques-container .ordered-list,
+.training-techniques-container .techniques-groups,
+.training-techniques-container .linked-turmas-list {
+  display: grid;
+  gap: 8px;
+}
+
+.training-techniques-container .ordered-item {
+  display: grid;
+  grid-template-columns: 32px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid #d6e3f7;
+  border-radius: 12px;
+  background: #f7fbff;
+  cursor: grab;
+}
+
+.training-techniques-container .ordered-item.dragging {
+  opacity: 0.55;
+}
+
+.training-techniques-container .ordered-index {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: #1565c0;
+  color: #ffffff;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.training-techniques-container .ordered-name,
+.training-techniques-container .technique-name,
+.training-techniques-container .summary-title {
+  font-weight: 700;
+}
+
+.training-techniques-container .ordered-name {
+  color: #1e3a5f;
+}
+
+.training-techniques-container .order-btn {
+  width: 34px;
+  height: 34px;
+  border: 1px solid #bdd2ef;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #184f97;
+}
+
+.training-techniques-container .order-btn:disabled,
+.training-techniques-container .preset-chip:disabled,
+.training-techniques-container .technique-item:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.training-techniques-container .techniques-groups {
+  margin-bottom: 18px;
+  gap: 14px;
+}
+
+.training-techniques-container .group-card,
+.training-techniques-container .custom-technique-section,
+.training-techniques-container .summary-card {
+  padding: 16px;
+}
+
+.training-techniques-container .group-header p,
+.training-techniques-container .summary-list {
+  margin: 4px 0 0;
+  color: #607d8b;
+}
+
+.training-techniques-container .techniques-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+}
+
+.training-techniques-container .technique-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 62px;
+  padding: 14px;
+  border: 1px solid #cfdbef;
+  border-radius: 14px;
+  background: #f8fbff;
+  color: #17324d;
+  text-align: left;
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+
+.training-techniques-container .technique-item:hover:not(:disabled) {
+  transform: translateY(-1px);
+  border-color: #90caf9;
+  box-shadow: 0 8px 18px rgba(21, 101, 192, 0.12);
+}
+
+.training-techniques-container .technique-item.selected {
+  border-color: #1565c0;
+  background: linear-gradient(135deg, #1565c0 0%, #1e88e5 100%);
+  color: #ffffff;
+}
+
+.training-techniques-container .technique-state {
+  font-size: 0.8rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.training-techniques-container .item-spinner {
+  flex: 0 0 auto;
+}
+
+.training-techniques-container .summary-card {
+  margin-bottom: 18px;
+}
+
+.training-techniques-container .summary-title {
+  margin: 0 0 8px;
+  color: #0d47a1;
+  font-size: 1rem;
+}
+
+.training-techniques-container .summary-list {
+  margin: 0;
+  line-height: 1.5;
+  color: #35556b;
+}
+
+.training-techniques-container .custom-technique-section {
+  position: relative;
+  margin-bottom: 16px;
+}
+
+.training-techniques-container .custom-input-wrapper {
+  position: relative;
+  margin-bottom: 12px;
+}
+
+.training-techniques-container .custom-input-wrapper label {
+  display: block;
+  margin-bottom: 6px;
+  color: #37506e;
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.training-techniques-container .custom-input,
+.training-techniques-container .custom-input-field,
+.training-techniques-container .preset-name-field {
+  width: 100%;
+}
+
+.training-techniques-container .custom-input {
+  min-height: 42px;
+  padding: 8px 10px;
+  border: 1px solid #b7cde9;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #17324d;
+  font-size: 0.95rem;
+}
+
+.training-techniques-container .custom-input:disabled {
+  background: #eef3fa;
+  color: #6b7f93;
+}
+
+.training-techniques-container .autocomplete-dropdown {
+  position: absolute;
+  top: calc(100% - 4px);
+  left: 16px;
+  right: 16px;
+  z-index: 50;
+  max-height: 220px;
+  overflow-y: auto;
+  border: 1px solid #d7e6fb;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 14px 24px rgba(9, 30, 66, 0.12);
+}
+
+.training-techniques-container .autocomplete-item {
+  padding: 12px 14px;
+  cursor: pointer;
+}
+
+.training-techniques-container .autocomplete-item:hover {
+  background: #f3f8ff;
+}
+
+.training-techniques-container .add-custom-button,
+.training-techniques-container .save-preset-button {
+  width: 100%;
+  min-height: 42px;
+}
+
+.training-techniques-container .save-preset-button {
+  margin-bottom: 18px;
+}
+
+.training-techniques-container .modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(14, 30, 56, 0.46);
+}
+
+.training-techniques-container .preset-modal {
+  width: min(92vw, 420px);
+  padding: 20px;
+}
+
+.training-techniques-container .preset-modal h3 {
+  margin: 0 0 14px;
+}
+
+.training-techniques-container .modal-buttons,
+.training-techniques-container .navigation-buttons {
+  display: grid;
+  gap: 12px;
+}
+
+.training-techniques-container .modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.training-techniques-container .navigation-buttons {
+  grid-template-columns: 1fr 1fr;
+}
+
+.training-techniques-container .navigation-buttons button {
+  min-height: 46px;
+  border-radius: 12px;
+}
+
+@media (max-width: 768px) {
+  .training-techniques-container {
+    padding: 16px;
+  }
+
+  .training-techniques-container .page-header,
+  .training-techniques-container .preset-suggestion-inline,
+  .training-techniques-container .preset-list {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .training-techniques-container .techniques-list,
+  .training-techniques-container .navigation-buttons {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* Utility Styles */
 .container {
   max-width: 1200px;

@@ -77,6 +77,7 @@ const toUserProfileResponse = (user: any) => ({
   id: user.id,
   email: user.email,
   fullName: user.fullName,
+  photoUrl: user.photoUrl || '',
   role: user.role,
   academyId: user.academyId,
   documentId: user.documentId || '',
@@ -160,6 +161,7 @@ export const updateOwnUserProfile = async (req: AuthenticatedRequest, res: Respo
 
     const updated = await updateUserProfile(userId, academyId, {
       fullName: payload.fullName,
+      photoUrl: payload.photoUrl,
       documentId: payload.documentId,
       birthDate: payload.birthDate,
       phone: payload.phone,
@@ -266,6 +268,7 @@ export const createProfessorHandler = async (req: AuthenticatedRequest, res: Res
 
     const updatedProfessor = await updateProfessorProfile(professor.id, academyId, {
       fullName: payload.fullName,
+      photoUrl: payload.photoUrl,
       documentId: payload.documentId,
       birthDate: payload.birthDate,
       phone: payload.phone,
@@ -318,6 +321,7 @@ export const updateProfessorHandler = async (req: AuthenticatedRequest, res: Res
 
     const updated = await updateProfessorProfile(userId, academyId, {
       fullName: payload.fullName,
+      photoUrl: payload.photoUrl,
       documentId: payload.documentId,
       birthDate: payload.birthDate,
       phone: payload.phone,
@@ -523,6 +527,7 @@ export const createStudentHandler = async (req: AuthenticatedRequest, res: Respo
 
     const updatedStudent = await updateStudentProfile(student.id, academyId, {
       fullName: payload.fullName,
+      photoUrl: payload.photoUrl,
       documentId: payload.documentId,
       birthDate: payload.birthDate,
       phone: payload.phone,
@@ -600,6 +605,7 @@ export const updateStudentHandler = async (req: AuthenticatedRequest, res: Respo
 
     const updated = await updateStudentProfile(userId, academyId, {
       fullName: payload.fullName,
+      photoUrl: payload.photoUrl,
       documentId: payload.documentId,
       birthDate: payload.birthDate,
       phone: payload.phone,
@@ -981,7 +987,7 @@ export const getAcademyInfo = async (req: AuthenticatedRequest, res: Response) =
     if (!academy) {
       return res.status(404).json({ error: 'Academia não encontrada' });
     }
-    res.json({ id: academy.id, name: academy.name });
+    res.json({ id: academy.id, name: academy.name, fantasyName: academy.fantasyName || '', logoUrl: academy.logoUrl || '' });
   } catch (error) {
     res.status(500).json({ error: 'Erro ao buscar informações da academia' });
   }
@@ -999,6 +1005,8 @@ export const getAcademyProfile = async (req: AuthenticatedRequest, res: Response
     return res.json({
       academyId: academy.id,
       name: academy.name,
+      fantasyName: academy.fantasyName || '',
+      logoUrl: academy.logoUrl || '',
       description: academy.description || '',
       documentId: academy.documentId || '',
       contactEmail: academy.contactEmail || academy.email || '',
@@ -1028,6 +1036,8 @@ export const updateAcademyProfileHandler = async (req: AuthenticatedRequest, res
 
     const academy = await updateAcademyProfile(academyId, {
       name: payload.name,
+      fantasyName: payload.fantasyName,
+      logoUrl: payload.logoUrl,
       description: payload.description,
       documentId: payload.documentId,
       contactEmail: payload.contactEmail,
@@ -1050,6 +1060,8 @@ export const updateAcademyProfileHandler = async (req: AuthenticatedRequest, res
       academy: {
         academyId: academy.id,
         name: academy.name,
+        fantasyName: academy.fantasyName || '',
+        logoUrl: academy.logoUrl || '',
         description: academy.description || '',
         documentId: academy.documentId || '',
         contactEmail: academy.contactEmail || academy.email || '',
