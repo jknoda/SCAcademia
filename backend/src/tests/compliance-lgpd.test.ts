@@ -128,7 +128,7 @@ const setupComplianceContext = async (): Promise<ComplianceTestContext> => {
   };
 };
 
-describe('Compliance Report Generation (Story 2.6)', () => {
+describe('Compliance Report Generation (Story 5.3)', () => {
   let ctx: ComplianceTestContext;
   let latestReportId = '';
 
@@ -187,9 +187,121 @@ describe('Compliance Report Generation (Story 2.6)', () => {
       expect(report).toHaveProperty('generatedAt');
       expect(report).toHaveProperty('academyId', ctx.academyId);
       expect(report).toHaveProperty('version', '1.0.0');
+      expect(report).toHaveProperty('period');
+      expect(report).toHaveProperty('export');
+      expect(report).toHaveProperty('complianceStatus');
       expect(response.body).toHaveProperty('reportId');
+      expect(response.body).toHaveProperty('format', 'pdf');
+      expect(response.body).toHaveProperty('downloadUrl');
 
       latestReportId = response.body.reportId as string;
+    });
+
+    it('Should generate report in JSON without digital signature when requested', async () => {
+      const response = await request(app)
+        .post('/api/admin/compliance-report/generate')
+        .set('Authorization', `Bearer ${ctx.adminToken}`)
+        .send({
+          format: 'json',
+          periodPreset: 'current-month',
+          signDigital: false,
+        })
+        .expect(200);
+
+      expect(response.body.format).toBe('json');
+      expect(response.body.isSigned).toBe(false);
+      expect(response.body.fileName).toContain('.json');
+
+      const downloadResponse = await request(app)
+        .get(`/api/admin/compliance-report/download/${response.body.reportId}`)
+        .set('Authorization', `Bearer ${ctx.adminToken}`)
+        .expect(200);
+
+      expect(String(downloadResponse.header['content-type'] || '')).toContain('application/json');
+    });
+
+    it('Should generate report in Excel format', async () => {
+      const response = await request(app)
+        .post('/api/admin/compliance-report/generate')
+        .set('Authorization', `Bearer ${ctx.adminToken}`)
+        .send({
+          format: 'excel',
+          periodPreset: 'last-3-months',
+          signDigital: true,
+        })
+        .expect(200);
+
+      expect(response.body.format).toBe('excel');
+      expect(response.body.fileName).toContain('.xlsx');
+
+      const downloadResponse = await request(app)
+        .get(`/api/admin/compliance-report/download/${response.body.reportId}`)
+        .set('Authorization', `Bearer ${ctx.adminToken}`)
+        .expect(200);
+
+      expect(String(downloadResponse.header['content-type'] || '')).toContain(
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      );
+    });
+
+    it('Should reject custom period without valid date range', async () => {
+      await request(app)
+        .post('/api/admin/compliance-report/generate')
+        .set('Authorization', `Bearer ${ctx.adminToken}`)
+        .send({
+          format: 'pdf',
+          periodPreset: 'custom',
+          signDigital: true,
+        })
+        .expect(400);
+    });
+
+    it('Should apply custom period filter to audit totals', async () => {
+      await pool.query(
+        `INSERT INTO audit_logs (
+           academy_id,
+           resource_type,
+           resource_id,
+           action,
+           actor_user_id,
+           changes_json,
+           ip_address,
+           timestamp,
+           retention_until
+         )
+         VALUES ($1, 'User', $2, 'USER_LOGIN', $3, $4, '127.0.0.2', NOW() - INTERVAL '180 days', NOW() + INTERVAL '7 years')`,
+        [ctx.academyId, 'legacy-resource', ctx.adminId, JSON.stringify({ success: true, source: 'old-window' })]
+      );
+
+      const narrowWindowResponse = await request(app)
+        .post('/api/admin/compliance-report/generate')
+        .set('Authorization', `Bearer ${ctx.adminToken}`)
+        .send({
+          format: 'pdf',
+          periodPreset: 'custom',
+          dateFrom: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+          dateTo: new Date().toISOString(),
+          signDigital: true,
+        })
+        .expect(200);
+
+      const wideWindowResponse = await request(app)
+        .post('/api/admin/compliance-report/generate')
+        .set('Authorization', `Bearer ${ctx.adminToken}`)
+        .send({
+          format: 'pdf',
+          periodPreset: 'custom',
+          dateFrom: new Date(Date.now() - 220 * 24 * 60 * 60 * 1000).toISOString(),
+          dateTo: new Date().toISOString(),
+          signDigital: true,
+        })
+        .expect(200);
+
+      expect(narrowWindowResponse.body.report.period.preset).toBe('custom');
+      expect(narrowWindowResponse.body.report.audit.last90DaysAccess).toBeGreaterThanOrEqual(1);
+      expect(wideWindowResponse.body.report.audit.last90DaysAccess).toBeGreaterThan(
+        narrowWindowResponse.body.report.audit.last90DaysAccess
+      );
     });
 
     it('AC4: Should include alerts for expired consents', async () => {
@@ -297,6 +409,10 @@ describe('Compliance Report Generation (Story 2.6)', () => {
       expect(response.body.reports.length).toBeGreaterThan(0);
       expect(response.body.reports[0]).toHaveProperty('signatureHash');
       expect(response.body.reports[0]).toHaveProperty('filePath');
+      expect(response.body.reports[0]).toHaveProperty('format');
+      expect(response.body.reports[0]).toHaveProperty('periodLabel');
+      expect(response.body.reports[0]).toHaveProperty('complianceStatus');
+      expect(response.body.reports[0]).toHaveProperty('isSigned');
     });
 
     it('Should download generated PDF report', async () => {

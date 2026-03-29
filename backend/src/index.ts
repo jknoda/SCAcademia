@@ -1,6 +1,7 @@
 import dotenv from 'dotenv';
 import app from './app';
 import { testConnection } from './lib/db';
+import { initializeBackupScheduler } from './lib/backupSchedule';
 import { initializeComplianceScheduler } from './lib/complianceSchedule';
 import { runStartupSchemaChecks } from './lib/startupSchema';
 
@@ -11,6 +12,7 @@ const startServer = async (): Promise<void> => {
   try {
     await testConnection();
     await runStartupSchemaChecks();
+    initializeBackupScheduler();
     initializeComplianceScheduler();
 
     app.listen(PORT, () => {

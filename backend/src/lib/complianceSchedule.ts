@@ -97,6 +97,11 @@ const processDueSchedules = async (): Promise<void> => {
       academyId: schedule.academyId,
       generatedBy: schedule.generatedBy,
       trigger: 'scheduled',
+      options: {
+        format: 'pdf',
+        periodPreset: 'current-month',
+        signDigital: true,
+      },
     }).catch((error) => {
       console.error('Erro ao gerar relatório agendado de conformidade:', error);
     });

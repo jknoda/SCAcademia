@@ -1,0 +1,48 @@
+{
+  "generatedAt": "2026-03-29T12:02:07.023Z",
+  "academyId": "ab7bc150-5920-45fb-8059-2ce281bf37f1",
+  "version": "1.0.0",
+  "period": {
+    "preset": "current-month",
+    "label": "Este mês",
+    "dateFrom": "2026-03-01T03:00:00.000Z",
+    "dateTo": "2026-03-29T12:02:07.014Z"
+  },
+  "statistics": {
+    "totalStudents": 1,
+    "minorStudents": 0,
+    "adultStudents": 1,
+    "consentedStudents": 1,
+    "expiredConsentCount": 0
+  },
+  "consents": {
+    "versions": [
+      {
+        "consentType": "Saúde",
+        "totalApproved": 1,
+        "totalPending": 0
+      }
+    ],
+    "totalConsentApproved": 1,
+    "totalConsentPending": 0
+  },
+  "deletions": {
+    "processedRequests": 0,
+    "pendingRequests": 0,
+    "totalHardDeleted": 0
+  },
+  "audit": {
+    "last90DaysAccess": 5,
+    "unauthorizedAttempts": 0,
+    "anomalies": []
+  },
+  "alerts": [],
+  "complianceStatus": "COMPLIANT",
+  "export": {
+    "format": "json",
+    "fileName": "LGPD_Compliance_Academia_Conformidade_LGPD_2026-03-01_2026-03-29_1558633c-c3a1-41dd-b83b-0dcd07937ae4.json",
+    "contentType": "application/json",
+    "isSigned": false,
+    "complianceStatus": "COMPLIANT"
+  }
+}

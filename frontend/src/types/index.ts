@@ -271,6 +271,133 @@ export interface StudentMutationResponse {
   warning?: string | null;
 }
 
+export interface AdminManagedUserListItem {
+  id: string;
+  fullName: string;
+  email: string;
+  role: AdminManagedUserRole;
+  isActive: boolean;
+  status: AdminManagedUserStatus;
+  createdAt: string;
+  deletedAt: string | null;
+}
+
+export interface ListAdminUsersResponse {
+  users: AdminManagedUserListItem[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+  filters: {
+    role: AdminManagedUserRole | 'all';
+    status: 'active' | 'blocked' | 'pending' | 'all';
+    search: string;
+  };
+}
+
+export interface CreateAdminManagedUserPayload {
+  email: string;
+  fullName: string;
+  role: AdminManagedUserRole;
+  isActive?: boolean;
+  sendInvite?: boolean;
+}
+
+export interface UpdateAdminManagedUserPayload {
+  fullName?: string;
+  role?: AdminManagedUserRole;
+  isActive?: boolean;
+  reason?: string;
+}
+
+export interface DeleteAdminManagedUserPayload {
+  reason?: string;
+}
+
+export interface AdminManagedUserMutationResponse {
+  message: string;
+  user: AdminManagedUserListItem;
+  inviteSent?: boolean;
+  inviteLink?: string;
+}
+
+export type BackupJobType = 'auto' | 'manual';
+
+export type BackupJobStatus = 'pending' | 'running' | 'completed' | 'failed' | 'deleted';
+
+export interface BackupJob {
+  id: string;
+  academyId: string;
+  type: BackupJobType;
+  status: BackupJobStatus;
+  fileName: string | null;
+  filePath: string | null;
+  fileSizeBytes: number;
+  includeHistory: boolean;
+  isEncrypted: boolean;
+  initiatedBy: string | null;
+  startedAt: string | null;
+  completedAt: string | null;
+  errorMessage: string | null;
+  downloadExpiresAt: string | null;
+  retentionDays: number;
+  archivedAt: string | null;
+  createdAt: string;
+}
+
+export interface BackupScheduleConfig {
+  academyId: string;
+  generatedBy: string;
+  frequency: 'daily';
+  hour: number;
+  minute: number;
+  enabled: boolean;
+  retentionDays: number;
+  nextRunAt: string;
+  updatedAt: string;
+}
+
+export interface TriggerBackupPayload {
+  includeHistory?: boolean;
+  isEncrypted?: boolean;
+  encryptionPassword?: string;
+}
+
+export interface RestoreBackupPayload {
+  adminPassword: string;
+  encryptionPassword?: string;
+}
+
+export interface BackupScheduleUpdatePayload {
+  hour: number;
+  minute: number;
+  enabled: boolean;
+  retentionDays: number;
+}
+
+export interface BackupListResponse {
+  jobs: BackupJob[];
+  schedule: BackupScheduleConfig;
+  lastAutoBackup: BackupJob | null;
+}
+
+export interface BackupJobResponse {
+  job: BackupJob;
+}
+
+export interface BackupIntegrityResponse {
+  valid: boolean;
+  sizeBytes: number;
+  reason?: string;
+}
+
+export interface BackupTriggerResponse {
+  jobId: string;
+  message: string;
+}
+
 export interface StudentFichaResponse {
   student: StudentProfile;
   lgpd: {
@@ -374,6 +501,10 @@ export interface SetupState {
   userData?: User;
 }
 
+export type AdminManagedUserRole = 'Admin' | 'Professor' | 'Aluno' | 'Responsavel';
+
+export type AdminManagedUserStatus = 'active' | 'blocked' | 'pending';
+
 export interface PasswordStrengthResult {
   score: number; // 0-100
   requirements: {
@@ -396,6 +527,7 @@ export interface HealthRecord {
   labyrinthitis: boolean;
   asthmaBronchitis: boolean;
   epilepsySeizures: boolean;
+
   stressDepression: boolean;
   healthScreeningNotes: string | null;
   allergies: string | null;
@@ -403,15 +535,18 @@ export interface HealthRecord {
   existingConditions: string | null;
   emergencyContactName: string | null;
   emergencyContactPhone: string | null;
+
   createdAt: Date;
   updatedAt: Date;
 }
 
 export interface HealthScreeningPayload {
   bloodType: string;
+
   weightKg?: number;
   heightCm?: number;
   hypertension?: boolean;
+
   diabetes?: boolean;
   cardiac?: boolean;
   labyrinthitis?: boolean;
@@ -475,11 +610,15 @@ export interface AuditLogEntry {
   logId: string;
   actorId?: string;
   actorName?: string;
+  actorRole?: string;
   action: string;
   resourceType: string;
   resourceId: string;
+  outcome?: 'SUCCESS' | 'DENIED';
   timestamp: string;
   ipAddress?: string;
+  userAgent?: string;
+  anomalyFlag?: boolean;
   changesJson?: any;
 }
 
@@ -494,6 +633,7 @@ export interface AuditLogFilter {
   userId?: string;
   action?: string;
   resourceType?: string;
+  outcome?: 'SUCCESS' | 'DENIED';
   dateFrom?: string;
   dateTo?: string;
 }
@@ -530,6 +670,10 @@ export interface ComplianceReportAlert {
   recommendation: string;
 }
 
+export type ComplianceReportFormat = 'pdf' | 'excel' | 'json';
+
+export type ComplianceReportPeriodPreset = 'current-month' | 'last-3-months' | 'custom';
+
 export interface ComplianceReportStatistics {
   totalStudents: number;
   minorStudents: number;
@@ -548,6 +692,12 @@ export interface ComplianceReportPayload {
   generatedAt: string;
   academyId: string;
   version: string;
+  period: {
+    preset: ComplianceReportPeriodPreset;
+    label: string;
+    dateFrom: string;
+    dateTo: string;
+  };
   statistics: ComplianceReportStatistics;
   consents: {
     versions: ComplianceReportConsentItem[];
@@ -565,6 +715,14 @@ export interface ComplianceReportPayload {
     anomalies: string[];
   };
   alerts: ComplianceReportAlert[];
+  complianceStatus: 'COMPLIANT' | 'NAO_COMPLIANT';
+  export: {
+    format: ComplianceReportFormat;
+    fileName: string;
+    contentType: string;
+    isSigned: boolean;
+    complianceStatus: 'COMPLIANT' | 'NAO_COMPLIANT';
+  };
   signedBy?: string;
   signatureDate?: string;
 }
@@ -578,6 +736,24 @@ export interface ComplianceReportHistoryItem {
   signedAt: string | null;
   signatureHash: string | null;
   createdAt: string;
+  format: ComplianceReportFormat;
+  periodLabel: string;
+  complianceStatus: string;
+  isSigned: boolean;
+}
+
+export interface GenerateComplianceReportRequest {
+  format: ComplianceReportFormat;
+  periodPreset: ComplianceReportPeriodPreset;
+  dateFrom?: string;
+  dateTo?: string;
+  signDigital: boolean;
+}
+
+export interface ComplianceReportGenerationProgress {
+  status: 'idle' | 'processing' | 'completed' | 'error';
+  percentage: number;
+  message: string;
 }
 
 export interface ComplianceReportSchedule {
@@ -596,8 +772,209 @@ export interface GenerateComplianceReportResponse {
   message: string;
   reportId: string;
   report: ComplianceReportPayload;
+  format: ComplianceReportFormat;
+  periodLabel: string;
+  complianceStatus: string;
+  isSigned: boolean;
+  downloadUrl: string;
+  fileName: string;
   pdfUrl: string;
   alerts: ComplianceReportAlert[];
+}
+
+export type AdminDashboardStatus = 'operational' | 'attention' | 'critical';
+
+export interface AdminDashboardUsersMetric {
+  total: number;
+  students: number;
+  professors: number;
+  admins: number;
+  guardians: number;
+  weeklyNewUsers: number;
+}
+
+export interface AdminDashboardConsentsMetric {
+  valid: number;
+  total: number;
+  percentage: number;
+  expired: number;
+}
+
+export interface AdminDashboardTrainingsMetric {
+  total: number;
+  dailyAverage: number;
+}
+
+export interface AdminDashboardBackupMetric {
+  status: 'ok' | 'attention';
+  statusLabel: string;
+  lastKnownBackupAt: string | null;
+  nextScheduledAt: string | null;
+  isEstimated: boolean;
+  detail: string;
+}
+
+export interface AdminDashboardAlert {
+  severity: 'high' | 'medium' | 'low';
+  category: 'compliance' | 'audit' | 'users' | 'backup' | 'operations';
+  message: string;
+  recommendation: string;
+  actionLabel: string;
+  targetPath: string;
+  targetFilter?: string;
+}
+
+export interface AdminDashboardHistoryPoint {
+  date: string;
+  label: string;
+  status: AdminDashboardStatus;
+  uptimePercentage: number;
+}
+
+export interface AdminDashboardSystemStatus {
+  currentStatus: AdminDashboardStatus;
+  currentLabel: string;
+  uptimeLast7Days: number;
+  history7d: AdminDashboardHistoryPoint[];
+  logsLast24h: number;
+  failedLoginsLastHour: number;
+  unauthorizedAttemptsLast24h: number;
+}
+
+export interface AdminDashboardResponse {
+  status: AdminDashboardStatus;
+  statusLabel: string;
+  title: string;
+  complianceScore: number;
+  complianceExplanation: string;
+  lastRefreshAt: string;
+  lastAuditAt: string | null;
+  metrics: {
+    usersActive: AdminDashboardUsersMetric;
+    consents: AdminDashboardConsentsMetric;
+    trainingsMonth: AdminDashboardTrainingsMetric;
+    backup: AdminDashboardBackupMetric;
+  };
+  alerts: AdminDashboardAlert[];
+  systemStatus: AdminDashboardSystemStatus;
+}
+
+export type AdminAlertStatus = 'active' | 'acknowledged' | 'resolved';
+
+export type AdminAlertActionType = 'acknowledge' | 'resolve' | 'ignore' | 'block-ip';
+
+export interface AdminAlertItem {
+  id: string;
+  academyId: string;
+  severity: AdminDashboardAlert['severity'];
+  category: AdminDashboardAlert['category'];
+  title: string;
+  message: string;
+  status: AdminAlertStatus;
+  createdAt: string;
+  acknowledgedAt: string | null;
+  resolvedAt: string | null;
+  acknowledgedByUserId: string | null;
+  availableActions: AdminAlertActionType[];
+}
+
+export interface AdminAlertFeedResponse {
+  items: AdminAlertItem[];
+  total: number;
+  unreadCount: number;
+  criticalCount: number;
+  silencedUntil: string | null;
+}
+
+export interface AdminAlertCountResponse {
+  total: number;
+  unread: number;
+  critical: number;
+  silencedUntil: string | null;
+}
+
+export interface AdminAlertPreferences {
+  academyId: string;
+  channels: {
+    inApp: boolean;
+    push: boolean;
+    email: boolean;
+  };
+  severity: {
+    critical: boolean;
+    preventive: boolean;
+    informative: boolean;
+  };
+  digestWindowMinutes: number;
+  silencedUntil: string | null;
+  updatedAt: string;
+}
+
+export type HealthComponentStatus = 'ok' | 'degraded' | 'offline' | 'warning';
+
+export type HealthMonitorWindow = '24h' | '30d';
+
+export interface HealthTimeseriesPoint {
+  timestamp: string;
+  value: number;
+}
+
+export interface HealthComponentSnapshot {
+  id: 'api' | 'database' | 'cache' | 'email' | 'storage';
+  label: string;
+  status: HealthComponentStatus;
+  statusLabel: string;
+  details: string;
+  metrics: {
+    primaryLabel: string;
+    primaryValue: string;
+    secondaryLabel?: string;
+    secondaryValue?: string;
+    tertiaryLabel?: string;
+    tertiaryValue?: string;
+  };
+}
+
+export interface HealthAlertHint {
+  component: 'api' | 'database' | 'cache' | 'email' | 'storage';
+  severity: 'high' | 'medium' | 'low';
+  title: string;
+  message: string;
+  recommendation: string;
+  targetPath: string;
+}
+
+export interface HealthSnapshotResponse {
+  generatedAt: string;
+  uptimePercentage: number;
+  components: HealthComponentSnapshot[];
+  alerts: HealthAlertHint[];
+  timeseries24h: {
+    apiResponseMs: HealthTimeseriesPoint[];
+    cpuUsage: HealthTimeseriesPoint[];
+    memoryUsage: HealthTimeseriesPoint[];
+    databaseConnections: HealthTimeseriesPoint[];
+  };
+}
+
+export interface HealthHistoryResponse {
+  window: HealthMonitorWindow;
+  generatedAt: string;
+  patterns: string[];
+  series: {
+    apiResponseMs: HealthTimeseriesPoint[];
+    cpuUsage: HealthTimeseriesPoint[];
+    memoryUsage: HealthTimeseriesPoint[];
+    databaseConnections: HealthTimeseriesPoint[];
+  };
+}
+
+export interface AdminDashboardQuickAction {
+  key: 'audit' | 'export-report' | 'manage-users' | 'settings' | 'backup' | 'health-monitor' | 'professors' | 'profile' | 'consent-templates';
+  label: string;
+  description: string;
+  icon: string;
+  secondary?: boolean;
 }
 
 export interface TrainingEntryPointClass {
@@ -913,6 +1290,231 @@ export interface RecentTrainingSummary {
 
 export interface GetRecentTrainingsResponse {
   trainings: RecentTrainingSummary[];
+}
+
+export interface StudentProgressMonthlyItem {
+  monthStart: string;
+  presentCount: number;
+  totalCount: number;
+}
+
+export interface StudentProgressCommentItem {
+  content: string;
+  professorName: string;
+  sessionDate?: string;
+  createdAt: string;
+}
+
+export interface StudentProgressBeltHistoryItem {
+  belt: string;
+  receivedDate: string;
+  promotedBy?: string;
+  notes?: string;
+  durationDays: number;
+}
+
+// Story 4-2: Card 1 Expandido - Chart Data
+export interface StudentProgressWeekly {
+  weekNumber: number;
+  date: string;
+  proficiencyPercent: number;
+}
+
+export interface StudentProgressChartData {
+  weeklyEvolution: StudentProgressWeekly[];
+  minValue: number;
+  maxValue: number;
+  trend: 'up' | 'down' | 'flat';
+}
+
+export interface StudentAttendanceHistoryItem {
+  sessionDate: string;
+  turmaName: string;
+  status: 'present' | 'absent' | 'justified';
+  absenceReason?: string;
+}
+
+export interface StudentAttendanceHistoryResponse {
+  studentName: string;
+  items: StudentAttendanceHistoryItem[];
+  total: number;
+  limit: number;
+  offset: number;
+  attendancePercentage: number;
+  warningBelow70: boolean;
+  currentStreak: number;
+  currentStreakDays: number;
+  generatedAt: string;
+}
+
+// Story 4-4: Comment History types
+export interface StudentCommentHistoryItem {
+  content: string;
+  professorName: string;
+  sessionDate?: string;
+  createdAt: string;
+}
+
+export interface StudentCommentHistoryResponse {
+  items: StudentCommentHistoryItem[];
+  total: number;
+  limit: number;
+  offset: number;
+}
+
+// Story 4-5: Badges and milestones detailed history
+export interface StudentBadgeUnlockedItem {
+  badgeId: string;
+  name: string;
+  description: string;
+  iconUrl?: string;
+  earnedAt: string;
+  shareText: string;
+}
+
+export interface StudentBadgeUpcomingItem {
+  badgeId: string;
+  name: string;
+  description: string;
+  iconUrl?: string;
+  criteriaType: 'streak' | 'attendance_percentage' | 'sessions_total' | 'milestone';
+  criteriaValue: number;
+  currentValue: number;
+  progressPercent: number;
+  remaining: number;
+  etaHint?: string;
+}
+
+export interface StudentBadgesHistoryResponse {
+  unlocked: StudentBadgeUnlockedItem[];
+  upcoming: StudentBadgeUpcomingItem[];
+  totals: {
+    unlocked: number;
+    upcoming: number;
+  };
+}
+
+export interface StudentMonthlyStats {
+  monthStart: string;
+  monthLabel: string;
+  frequencia: {
+    presentCount: number;
+    totalCount: number;
+    pct: number;
+  };
+  tecnicas: number;
+  comentarios: number;
+}
+
+export interface StudentMonthlyComparisonResponse {
+  currentMonth: StudentMonthlyStats;
+  previousMonth: StudentMonthlyStats | null;
+  history: StudentMonthlyStats[];
+  hasEnoughData: boolean;
+}
+
+export interface StudentNotificationItem {
+  notificationId: string;
+  type: 'badge_earned' | 'attendance_reminder' | 'alert_system' | 'comment_received';
+  category: 'badges' | 'frequencia' | 'comentarios' | 'lembretes';
+  title: string;
+  message: string;
+  status: 'pending' | 'sent' | 'failed' | 'bounced';
+  createdAt: string;
+  sentAt?: string;
+  readAt?: string;
+  isRead: boolean;
+}
+
+export interface StudentNotificationFeedResponse {
+  items: StudentNotificationItem[];
+  total: number;
+  limit: number;
+  offset: number;
+  unreadCount: number;
+}
+
+export interface StudentNotificationPreferences {
+  badges: boolean;
+  frequencia: boolean;
+  comentarios: boolean;
+  lembretes: boolean;
+}
+
+// Story 4-8: Belt History types
+export interface StudentBeltHistoryEntry {
+  beltHistoryId: number;
+  belt: string;
+  receivedDate: string;
+  promotedBy?: string;
+  notes?: string;
+  durationDays: number;
+  isCurrentBelt: boolean;
+}
+
+export interface StudentBeltHistoryResponse {
+  entries: StudentBeltHistoryEntry[];
+  stats: {
+    totalBelts: number;
+    longestBeltName: string;
+    longestBeltDays: number;
+    lastBeltDate?: string;
+    dataEntrada?: string;
+  };
+  judoProfile: {
+    currentBelt?: string;
+    isFederated: boolean;
+    federationRegistration?: string;
+    federationDate?: string;
+  };
+}
+
+export interface StudentProgressDashboardResponse {
+  heading: string;
+  subheading: string;
+  cards: {
+    evolucaoMes: {
+      currentMonthPresentCount: number;
+      previousMonthPresentCount: number;
+      delta: number;
+      monthlySeries: StudentProgressMonthlyItem[];
+      weeklySeries: StudentProgressWeekly[];
+    };
+    frequencia: {
+      presentCount90d: number;
+      totalCount90d: number;
+      attendancePercentage90d: number;
+      nextClass?: {
+        turmaName: string;
+        sessionDate: string;
+        sessionTime: string;
+      };
+      recentSessions: Array<{
+        sessionDate: string;
+        status: 'present' | 'absent' | 'justified';
+      }>;
+    };
+    comentariosProfessor: {
+      latest?: StudentProgressCommentItem;
+      totalComments: number;
+      timeline: StudentProgressCommentItem[];
+    };
+    faixaConquistas: {
+      currentBelt?: string;
+      beltDate?: string;
+      isFederated: boolean;
+      federationDate?: string;
+      federationRegistration?: string;
+      totalBadges: number;
+      latestBadges: Array<{
+        name: string;
+        earnedAt: string;
+      }>;
+      currentStreak: number;
+      beltHistory: StudentProgressBeltHistoryItem[];
+    };
+  };
+  generatedAt: string;
 }
 
 // Story 3-7: Training History types

@@ -6,6 +6,15 @@
         <h1>{{ currentUser.academy.fantasyName || currentUser.academy.name }}</h1>
       </div>
       <div class="header-info">
+        <button
+          class="alert-bell"
+          type="button"
+          (click)="toggleAlertPanel()"
+          [attr.aria-label]="'Abrir alertas. Criticos: ' + criticalAlertCount"
+        >
+          🔔
+          <span class="alert-bell-badge" *ngIf="criticalAlertCount > 0">{{ criticalAlertCount }}</span>
+        </button>
         <img [src]="getUserPhoto()" alt="Foto do usuário" class="user-avatar" />
         <span class="welcome">Bem-vindo, {{ currentUser.fullName }}</span>
         <button (click)="logout()" class="btn-logout">
@@ -17,55 +26,327 @@
   </header>
 
   <main class="dashboard-main">
-    <section class="hero">
-      <h2>✅ Academia inicializada com sucesso!</h2>
-      <p>A sua academia está pronta para começar.</p>
-      <div class="academy-info">
-        <p><strong>Nome da Academia:</strong> {{ currentUser.academy.name }}</p>
-        <p><strong>Email de Contato:</strong> {{ currentUser.email }}</p>
-        <p><strong>Seu Perfil:</strong> {{ currentUser.role }}</p>
+    <section class="tour-overlay" *ngIf="onboardingVisible">
+      <div class="tour-card">
+        <p class="eyebrow">Seu dashboard do SCAcademia</p>
+        <h2>Visao executiva em um unico lugar</h2>
+        <p>
+          Aqui voce acompanha status geral, metricas criticas, alertas recentes e acessos rapidos para atuar
+          sem navegar por varias telas.
+        </p>
+        <div class="tour-steps">
+          <div><strong>1.</strong> Status geral e score LGPD no topo.</div>
+          <div><strong>2.</strong> Metricas de usuarios, consentimentos, treinos e backup.</div>
+          <div><strong>3.</strong> Alertas priorizados com acao recomendada.</div>
+          <div><strong>4.</strong> Atalhos para auditoria, relatorios e gestao.</div>
+        </div>
+        <div class="tour-actions">
+          <button class="action-btn primary" (click)="dismissOnboarding()">Entendi</button>
+          <button class="action-btn" (click)="dismissOnboarding()">Pular Tour</button>
+        </div>
       </div>
     </section>
 
-    <section class="status-badge-section">
-      <span class="badge success">🟢 Ready</span>
-    </section>
-
-    <section class="actions">
-      <h3>Próximas Ações</h3>
-      <div class="action-buttons">
-        <button class="action-btn" (click)="goToProfessors()">
-          👨‍🏫 Professores
-        </button>
-        <button class="action-btn" (click)="goToStudents()">
-          👨‍🎓 Adicionar Aluno
-        </button>
-        <button class="action-btn" (click)="goToAcademyProfile()">
-          🏢 Perfil da Academia
-        </button>
-        <button class="action-btn" (click)="goToMyProfile()">
-          👤 Meu Perfil
-        </button>
-        <button class="action-btn" (click)="goToConsentTemplates()">
-          ⚙️ Termos de Consentimento
-        </button>
-        <button class="action-btn" (click)="goToAuditLogs()">
-          🔍 Log de Auditoria LGPD
-        </button>
-        <button class="action-btn" (click)="goToComplianceReports()">
-          📄 Relatórios LGPD
+    <section class="hero executive-hero">
+      <div>
+        <p class="eyebrow">Painel administrativo</p>
+        <h2>{{ adminDashboard?.title || 'Saude da Academia' }}</h2>
+        <p class="hero-copy">
+          Visao rapida da operacao, conformidade LGPD e sinais de risco da academia.
+        </p>
+        <p class="hero-meta" *ngIf="adminDashboard?.lastRefreshAt">
+          Atualizado em {{ formatDateTime(adminDashboard!.lastRefreshAt) }}
+        </p>
+      </div>
+      <div class="hero-actions">
+        <button class="action-btn primary" (click)="refreshDashboard()" [disabled]="dashboardRefreshing || dashboardLoading">
+          {{ dashboardRefreshing ? 'Atualizando...' : 'Atualizar' }}
         </button>
       </div>
     </section>
+
+    <section class="alerts-realtime" *ngIf="showAlertPanel">
+      <div class="section-heading">
+        <div>
+          <h3>Alertas em Tempo Real</h3>
+          <p class="muted">Feed operacional com acoes rapidas para resposta imediata.</p>
+        </div>
+        <span class="badge status-critical" *ngIf="criticalAlertCount > 0">{{ criticalAlertCount }} critico(s)</span>
+      </div>
+
+      <div class="status-message" *ngIf="isSilencedActive()">
+        Alertas silenciados ate {{ silencedUntil ? formatDateTime(silencedUntil) : '-' }}.
+      </div>
+
+      <p class="muted" *ngIf="alertPanelLoading">Carregando alertas...</p>
+      <div class="status-message error" *ngIf="alertPanelError">{{ alertPanelError }}</div>
+
+      <div class="alert-empty" *ngIf="!alertPanelLoading && alertFeed.length === 0">
+        Nenhum alerta pendente para o painel administrativo.
+      </div>
+
+      <div class="alerts-grid" *ngIf="!alertPanelLoading && alertFeed.length > 0">
+        <article class="alert-card dashboard-alert" *ngFor="let alert of alertFeed" [ngClass]="getAlertClass(alert.severity)">
+          <div>
+            <strong>{{ alert.title }}</strong>
+            <p>{{ alert.message }}</p>
+            <small class="muted">{{ getAlertCategoryLabel(alert.category) }} - {{ formatDateTime(alert.createdAt) }}</small>
+          </div>
+          <div class="alert-actions">
+            <button
+              class="action-btn"
+              *ngFor="let action of alert.availableActions"
+              (click)="executeAlertAction(alert, action)"
+            >
+              {{ action }}
+            </button>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="status-message error" *ngIf="dashboardError">
+      {{ dashboardError }}
+    </section>
+
+    <section class="dashboard-skeleton" *ngIf="dashboardLoading && !adminDashboard">
+      <div class="skeleton-line heading"></div>
+      <div class="skeleton-line short"></div>
+      <div class="skeleton-grid">
+        <div class="skeleton-card" *ngFor="let card of [1, 2, 3, 4]"></div>
+      </div>
+    </section>
+
+    <ng-container *ngIf="adminDashboard as dashboard">
+      <section class="status-section">
+        <article
+          class="status-card"
+          [ngClass]="getStatusClass(dashboard.status)"
+          tabindex="0"
+          role="button"
+          (click)="toggleSystemStatusDetail()"
+          (keydown.enter)="toggleSystemStatusDetail()"
+          (keydown.space)="toggleSystemStatusDetail()"
+        >
+          <div class="status-card-top">
+            <span class="status-pill" [ngClass]="getStatusClass(dashboard.status)">
+              {{ getStatusEmoji(dashboard.status) }} {{ dashboard.statusLabel }}
+            </span>
+            <span class="status-card-hint">Clique para ver status do sistema</span>
+          </div>
+
+          <div class="status-card-main">
+            <div>
+              <p class="metric-label">Compliance Score</p>
+              <div class="score-row">
+                <strong class="score-value">{{ dashboard.complianceScore }}%</strong>
+                <button
+                  class="tooltip-trigger"
+                  type="button"
+                  (mouseenter)="showComplianceTooltip()"
+                  (mouseleave)="hideComplianceTooltip()"
+                  (focus)="showComplianceTooltip()"
+                  (blur)="hideComplianceTooltip()"
+                  [attr.aria-label]="dashboard.complianceExplanation"
+                  title="{{ dashboard.complianceExplanation }}"
+                >
+                  i
+                </button>
+              </div>
+              <div class="tooltip-panel" *ngIf="complianceTooltipVisible">
+                {{ dashboard.complianceExplanation }}
+              </div>
+            </div>
+
+            <div class="status-card-summary">
+              <p><strong>{{ currentUser.academy.name }}</strong></p>
+              <p>
+                Ultima auditoria:
+                {{ dashboard.lastAuditAt ? formatDateTime(dashboard.lastAuditAt) : 'Sem registro recente' }}
+              </p>
+              <button class="action-btn" type="button" (click)="$event.stopPropagation(); goToAuditLogs()">
+                Auditoria Completa
+              </button>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="metrics-section">
+        <div class="metrics-grid">
+          <article class="metric-card">
+            <p class="metric-label">Usuarios Ativos</p>
+            <strong class="metric-value">{{ dashboard.metrics.usersActive.total }} usuarios</strong>
+            <p class="metric-detail">
+              {{ dashboard.metrics.usersActive.students }} alunos, {{ dashboard.metrics.usersActive.professors }} prof,
+              {{ dashboard.metrics.usersActive.admins }} admin, {{ dashboard.metrics.usersActive.guardians }} responsavel
+            </p>
+            <p class="metric-trend">{{ getUsersTrendText() }}</p>
+          </article>
+
+          <article class="metric-card">
+            <p class="metric-label">Consentimentos</p>
+            <strong class="metric-value">
+              {{ dashboard.metrics.consents.valid }}/{{ dashboard.metrics.consents.total }} ({{ dashboard.metrics.consents.percentage }}%)
+            </strong>
+            <p class="metric-detail">Conformidade atual da base de alunos.</p>
+            <p class="metric-trend">{{ getConsentTrendText() }}</p>
+          </article>
+
+          <article class="metric-card">
+            <p class="metric-label">Treinos Registrados</p>
+            <strong class="metric-value">{{ dashboard.metrics.trainingsMonth.total }} treinos</strong>
+            <p class="metric-detail">Total confirmado no mes corrente.</p>
+            <p class="metric-trend">Media de {{ dashboard.metrics.trainingsMonth.dailyAverage | number:'1.1-1' }} por dia</p>
+          </article>
+
+          <article class="metric-card">
+            <p class="metric-label">Backup Status</p>
+            <strong class="metric-value">{{ getBackupCardLabel() }}</strong>
+            <p class="metric-detail">
+              {{ dashboard.metrics.backup.lastKnownBackupAt ? formatDateTime(dashboard.metrics.backup.lastKnownBackupAt) : 'Sem execucao registrada' }}
+            </p>
+            <p class="metric-trend">
+              Proximo: {{ dashboard.metrics.backup.nextScheduledAt ? formatDateTime(dashboard.metrics.backup.nextScheduledAt) : 'Sem agenda' }}
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section class="alerts-section" id="critical-alerts">
+        <div class="section-heading">
+          <div>
+            <h3>Alertas Recentes</h3>
+            <p class="muted">Os sinais abaixo priorizam conformidade, usuarios e auditoria.</p>
+          </div>
+          <span class="badge" [ngClass]="getStatusClass(dashboard.status)">
+            {{ dashboard.alerts.length }} alerta(s)
+          </span>
+        </div>
+
+        <div class="alert-empty" *ngIf="dashboard.alerts.length === 0">
+          ✓ Nenhum alerta ativo
+        </div>
+
+        <div class="alerts-grid" *ngIf="dashboard.alerts.length > 0">
+          <article class="alert-card dashboard-alert" *ngFor="let alert of dashboard.alerts" [ngClass]="getAlertClass(alert.severity)">
+            <div>
+              <strong>{{ alert.message }}</strong>
+              <p>{{ alert.recommendation }}</p>
+            </div>
+            <button class="action-btn" type="button" (click)="handleAlertAction(alert)">
+              {{ alert.actionLabel }}
+            </button>
+          </article>
+        </div>
+      </section>
+
+      <section class="actions primary-actions">
+        <h3>Acoes Rapidas</h3>
+        <div class="action-buttons">
+          <button class="action-btn quick-action" *ngFor="let action of quickActions | slice:0:4" (click)="handleQuickAction(action)">
+            <span class="quick-action-icon">{{ action.icon }}</span>
+            <span class="quick-action-copy">
+              <strong>{{ action.label }}</strong>
+              <small>{{ action.description }}</small>
+            </span>
+          </button>
+        </div>
+        <div class="secondary-actions">
+          <button class="action-btn secondary-action" *ngFor="let action of quickActions | slice:4" (click)="handleQuickAction(action)">
+            {{ action.icon }} {{ action.label }}
+          </button>
+        </div>
+      </section>
+
+      <section class="alert-preferences" *ngIf="alertPreferences as prefs">
+        <div class="section-heading">
+          <div>
+            <h3>Configuracoes de Alertas</h3>
+            <p class="muted">Escolha severidades e canais para notificacoes administrativas.</p>
+          </div>
+          <button class="action-btn" type="button" (click)="silenceAlertsForOneHour()">
+            Silenciar por 1 hora
+          </button>
+        </div>
+
+        <p class="muted" *ngIf="alertPreferencesLoading">Carregando preferencias...</p>
+        <div class="status-message error" *ngIf="alertPreferencesError">{{ alertPreferencesError }}</div>
+        <div class="status-message success" *ngIf="alertPreferencesMessage">{{ alertPreferencesMessage }}</div>
+
+        <div class="preferences-grid">
+          <article class="metric-card">
+            <p class="metric-label">Canais</p>
+            <label><input type="checkbox" [(ngModel)]="prefs.channels.inApp" /> In-app</label>
+            <label><input type="checkbox" [(ngModel)]="prefs.channels.push" /> Push/Mobile</label>
+            <label><input type="checkbox" [(ngModel)]="prefs.channels.email" /> Email</label>
+          </article>
+
+          <article class="metric-card">
+            <p class="metric-label">Severidade</p>
+            <label><input type="checkbox" [(ngModel)]="prefs.severity.critical" /> Critico</label>
+            <label><input type="checkbox" [(ngModel)]="prefs.severity.preventive" /> Preventivo</label>
+            <label><input type="checkbox" [(ngModel)]="prefs.severity.informative" /> Informativo</label>
+          </article>
+
+          <article class="metric-card">
+            <p class="metric-label">Janela de email (min)</p>
+            <input type="number" min="5" max="1440" [(ngModel)]="prefs.digestWindowMinutes" />
+          </article>
+        </div>
+
+        <div class="tour-actions">
+          <button class="action-btn primary" type="button" (click)="saveAlertPreferences()" [disabled]="alertPreferencesSaving">
+            {{ alertPreferencesSaving ? 'Salvando...' : 'Salvar preferencias' }}
+          </button>
+        </div>
+      </section>
+
+      <section class="system-status-detail" *ngIf="showSystemStatusDetail">
+        <div class="section-heading">
+          <div>
+            <h3>Status do Sistema</h3>
+            <p class="muted">Historico dos ultimos 7 dias com sinais derivados de auditoria e disponibilidade operacional.</p>
+          </div>
+          <span class="badge" [ngClass]="getStatusClass(dashboard.systemStatus.currentStatus)">
+            Uptime {{ dashboard.systemStatus.uptimeLast7Days | number:'1.1-1' }}%
+          </span>
+        </div>
+
+        <div class="status-summary-grid">
+          <div class="status-summary-card">
+            <span class="status-label">Autenticacao</span>
+            <strong>{{ dashboard.systemStatus.failedLoginsLastHour }} falha(s)/1h</strong>
+          </div>
+          <div class="status-summary-card">
+            <span class="status-label">Auditoria</span>
+            <strong>{{ dashboard.systemStatus.logsLast24h }} log(s)/24h</strong>
+          </div>
+          <div class="status-summary-card">
+            <span class="status-label">Acessos nao autorizados</span>
+            <strong>{{ dashboard.systemStatus.unauthorizedAttemptsLast24h }}/24h</strong>
+          </div>
+        </div>
+
+        <div class="status-history">
+          <div class="status-history-row" *ngFor="let item of dashboard.systemStatus.history7d">
+            <span>{{ item.label }}</span>
+            <span class="history-pill" [ngClass]="getStatusClass(item.status)">
+              {{ getStatusEmoji(item.status) }} {{ item.uptimePercentage | number:'1.1-1' }}%
+            </span>
+          </div>
+        </div>
+      </section>
+    </ng-container>
 
     <section class="compliance-lgpd">
       <div class="section-heading">
         <div>
           <h3>Conformidade LGPD</h3>
-          <p class="muted">Gere um relatório assinado, visualize alertas e acompanhe o histórico recente.</p>
+          <p class="muted">Gere um relatorio assinado, visualize alertas e acompanhe o historico recente.</p>
         </div>
         <button class="action-btn primary" (click)="generateComplianceReport()" [disabled]="complianceLoading">
-          {{ complianceLoading ? 'Gerando...' : 'Gerar Relatório' }}
+          {{ complianceLoading ? 'Gerando...' : 'Gerar Relatorio' }}
         </button>
       </div>
 
@@ -81,7 +362,7 @@
 
       <div class="report-summary" *ngIf="latestComplianceReport">
         <div>
-          <p><strong>Última geração:</strong> {{ formatDateTime(latestComplianceReport.createdAt) }}</p>
+          <p><strong>Ultima geracao:</strong> {{ formatDateTime(latestComplianceReport.createdAt) }}</p>
           <p><strong>Assinatura:</strong> {{ latestComplianceReport.signatureHash || 'N/D' }}</p>
           <p><strong>Consentimentos expirados:</strong> {{ latestComplianceReport.reportData.statistics.expiredConsentCount }}</p>
         </div>
@@ -91,8 +372,8 @@
       </div>
 
       <div class="history-list">
-        <h4>Histórico recente</h4>
-        <p *ngIf="complianceHistory.length === 0" class="muted">Nenhum relatório LGPD gerado até o momento.</p>
+        <h4>Historico recente</h4>
+        <p *ngIf="complianceHistory.length === 0" class="muted">Nenhum relatorio LGPD gerado ate o momento.</p>
         <div class="history-item" *ngFor="let report of complianceHistory | slice:0:3">
           <div>
             <p><strong>Gerado em:</strong> {{ formatDateTime(report.createdAt) }}</p>
@@ -140,7 +421,7 @@
     <section class="deletion-lgpd">
       <h3>Direito ao Esquecimento (LGPD)</h3>
       <p class="deletion-warning">
-        Esta ação agenda a deleção de dados do aluno após 30 dias de graça. Durante esse período, a solicitação pode ser cancelada.
+        Esta acao agenda a delecao de dados do aluno apos 30 dias de graca. Durante esse periodo, a solicitacao pode ser cancelada.
       </p>
 
       <div class="deletion-form">
@@ -154,14 +435,14 @@
         </div>
         <label class="confirm-row">
           <input type="checkbox" [(ngModel)]="deletionConfirm" />
-          <span>Entendo e concordo com o agendamento de deleção após 30 dias.</span>
+          <span>Entendo e concordo com o agendamento de delecao apos 30 dias.</span>
         </label>
         <div class="deletion-actions">
           <button class="action-btn" (click)="requestDeletion()" [disabled]="deletionLoading">
-            {{ deletionLoading ? 'Enviando...' : 'Solicitar Deleção' }}
+            {{ deletionLoading ? 'Enviando...' : 'Solicitar Delecao' }}
           </button>
           <button class="action-btn" (click)="processDueRequests()" [disabled]="processingDue">
-            {{ processingDue ? 'Processando...' : 'Processar Solicitações Vencidas' }}
+            {{ processingDue ? 'Processando...' : 'Processar Solicitacoes Vencidas' }}
           </button>
         </div>
       </div>
@@ -170,8 +451,8 @@
       <div class="status-message error" *ngIf="deletionError">{{ deletionError }}</div>
 
       <div class="pending-list">
-        <h4>Solicitações Pendentes</h4>
-        <p *ngIf="pendingDeletionRequests.length === 0" class="muted">Nenhuma solicitação pendente no momento.</p>
+        <h4>Solicitacoes Pendentes</h4>
+        <p *ngIf="pendingDeletionRequests.length === 0" class="muted">Nenhuma solicitacao pendente no momento.</p>
         <div class="pending-item" *ngFor="let item of pendingDeletionRequests">
           <div>
             <p><strong>Aluno:</strong> {{ item.studentName || item.studentId }}</p>
@@ -183,19 +464,16 @@
       </div>
     </section>
 
-    <section class="system-status">
-      <h3>Status do Sistema</h3>
-      <div class="status-item">
-        <span class="status-label">Sistema de Autenticação</span>
-        <span class="status-ok">✓ Operacional</span>
-      </div>
-      <div class="status-item">
-        <span class="status-label">Banco de Dados</span>
-        <span class="status-ok">✓ Operacional</span>
-      </div>
-      <div class="status-item">
-        <span class="status-label">API REST</span>
-        <span class="status-ok">✓ Operacional</span>
+    <section class="critical-modal-backdrop" *ngIf="showCriticalModal && criticalModalAlert as criticalAlert">
+      <div class="critical-modal" role="dialog" aria-modal="true" aria-label="ALERTA DE SEGURANCA">
+        <p class="eyebrow">ALERTA DE SEGURANCA</p>
+        <h3>{{ criticalAlert.title }}</h3>
+        <p>{{ criticalAlert.message }}</p>
+        <div class="tour-actions">
+          <button class="action-btn" type="button" (click)="executeAlertAction(criticalAlert, 'block-ip')">Bloquear</button>
+          <button class="action-btn" type="button" (click)="executeAlertAction(criticalAlert, 'acknowledge')">Investigar</button>
+          <button class="action-btn" type="button" (click)="executeAlertAction(criticalAlert, 'ignore'); closeCriticalModal()">Ignorar</button>
+        </div>
       </div>
     </section>
   </main>

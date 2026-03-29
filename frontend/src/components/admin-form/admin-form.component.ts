@@ -1,5 +1,6 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, NgZone, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { finalize } from 'rxjs/operators';
 import { ApiService } from '../../services/api.service';
 import { compressImage } from '../../utils/image.utils';
 import { PasswordValidatorService } from '../../services/password-validator.service';
@@ -23,7 +24,9 @@ export class AdminFormComponent {
   constructor(
     private fb: FormBuilder,
     private api: ApiService,
-    private passwordValidator: PasswordValidatorService
+    private passwordValidator: PasswordValidatorService,
+    private ngZone: NgZone,
+    private cdr: ChangeDetectorRef
   ) {
     this.adminForm = this.fb.group({
       fullName: ['', [Validators.required, Validators.minLength(2)]],
@@ -72,7 +75,7 @@ export class AdminFormComponent {
       return;
     }
 
-    this.isLoading = true;
+    this.setLoadingState(true);
     this.errorMessage = '';
     this.serverErrors = {};
 
@@ -83,24 +86,25 @@ export class AdminFormComponent {
       password: password,
     };
 
-    this.api.initAdmin(this.academyId, payload).subscribe(
-      (response: any) => {
-        this.isLoading = false;
-        this.adminCreated.emit({
-          fullName: this.adminForm.get('fullName')?.value,
-          email: this.adminForm.get('email')?.value,
-        });
-      },
-      (error: any) => {
-        this.isLoading = false;
-        if (error.error?.details) {
-          error.error.details.forEach((detail: any) => {
-            this.serverErrors[detail.field] = detail.message;
+    this.api
+      .initAdmin(this.academyId, payload)
+      .pipe(finalize(() => this.setLoadingState(false)))
+      .subscribe(
+        (_response: any) => {
+          this.adminCreated.emit({
+            fullName: this.adminForm.get('fullName')?.value,
+            email: this.adminForm.get('email')?.value,
           });
+        },
+        (error: any) => {
+          if (error.error?.details) {
+            error.error.details.forEach((detail: any) => {
+              this.serverErrors[detail.field] = detail.message;
+            });
+          }
+          this.errorMessage = error.error?.error || 'Erro ao registrar admin. Tente novamente.';
         }
-        this.errorMessage = error.error?.error || 'Erro ao registrar admin. Tente novamente.';
-      }
-    );
+      );
   }
 
   getPhotoPreview(): string {
@@ -132,6 +136,13 @@ export class AdminFormComponent {
 
   clearPhoto(): void {
     this.adminForm.get('photoUrl')?.setValue('');
+  }
+
+  private setLoadingState(value: boolean): void {
+    this.ngZone.run(() => {
+      this.isLoading = value;
+      this.cdr.detectChanges();
+    });
   }
 
   getFieldError(fieldName: string): string | null {

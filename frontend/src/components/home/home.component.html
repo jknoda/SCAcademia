@@ -20,7 +20,7 @@
     <section class="hero">
       <h2>{{ getHomeTitle() }}</h2>
       <p>{{ getHomeSubtitle() }}</p>
-      <div class="academy-info">
+      <div class="academy-info" *ngIf="!isAluno()">
         <p><strong>Nome da Academia:</strong> {{ currentUser.academy.name }}</p>
         <p><strong>Email de Contato:</strong> {{ currentUser.email }}</p>
         <p><strong>Seu Perfil:</strong> {{ getRoleLabel() }}</p>
@@ -29,6 +29,106 @@
 
     <section class="status-badge-section" *ngIf="isProfessor() || isAluno() || isResponsavel()">
       <span class="badge success">{{ getRoleLabel() }} ativo</span>
+    </section>
+
+    <section *ngIf="isAluno()" class="student-progress-section">
+      <div class="section-heading">
+        <div>
+          <h3>{{ getStudentProgressHeading() }}</h3>
+          <p class="muted">{{ getStudentProgressSubheading() }}</p>
+        </div>
+      </div>
+
+      <div *ngIf="isUsingCachedProgressData" class="status-message success">
+        Exibindo dados em cache (offline). Última sincronização: {{ getFormattedLastProgressSync() }}
+      </div>
+
+      <div class="student-notification-toast" *ngIf="activeStudentToastMessage">
+        {{ activeStudentToastMessage }}
+      </div>
+
+      <div *ngIf="isLoadingStudentProgress" class="student-progress-grid">
+        <article class="feature-card skeleton-card" *ngFor="let card of [1,2,3,4]">
+          <div class="skeleton-line skeleton-title"></div>
+          <div class="skeleton-line"></div>
+          <div class="skeleton-line skeleton-short"></div>
+        </article>
+      </div>
+
+      <div *ngIf="hasStudentProgressError" class="status-message error">
+        {{ studentProgressErrorMessage }}
+        <button class="action-btn" (click)="loadStudentProgressDashboard(true)">Tentar novamente</button>
+      </div>
+      <div
+        *ngIf="!isLoadingStudentProgress && !hasStudentProgressError && studentProgressDashboard && !studentProgressHasContent"
+        class="student-progress-empty-state"
+      >
+        <h4>Ainda não há dados para exibir</h4>
+        <p class="muted">
+          Seus cards serão preenchidos assim que a academia registrar presenças, comentários,
+          graduações ou conquistas no seu histórico.
+        </p>
+      </div>
+
+      <div
+        class="student-progress-grid"
+        *ngIf="!isLoadingStudentProgress && !hasStudentProgressError && studentProgressDashboard && studentProgressHasContent"
+      >
+        <article class="feature-card student-progress-card">
+          <h4>Evolução do Mês</h4>
+          <p class="summary-number">{{ studentProgressDashboard.cards.evolucaoMes.currentMonthPresentCount }}</p>
+          <p class="muted">
+            Mês anterior: {{ studentProgressDashboard.cards.evolucaoMes.previousMonthPresentCount }}
+            · Delta: {{ studentProgressDashboard.cards.evolucaoMes.delta >= 0 ? '+' : '' }}{{ studentProgressDashboard.cards.evolucaoMes.delta }}
+          </p>
+          <button class="action-btn" (click)="openStudentProgressDetails('comparacao')">Ver comparação</button>
+          <button class="action-btn" (click)="openStudentProgressDetails('evolucao')">Ver detalhes</button>
+        </article>
+
+        <article class="feature-card student-progress-card">
+          <h4>Frequência</h4>
+          <p class="summary-number">{{ studentProgressDashboard.cards.frequencia.attendancePercentage90d }}%</p>
+          <p class="muted">
+            {{ studentProgressDashboard.cards.frequencia.presentCount90d }} presenças em {{ studentProgressDashboard.cards.frequencia.totalCount90d }} sessões (90 dias)
+          </p>
+          <p class="muted" *ngIf="studentProgressDashboard.cards.frequencia.nextClass">
+            Próxima aula: {{ studentProgressDashboard.cards.frequencia.nextClass?.turmaName }} ·
+            {{ studentProgressDashboard.cards.frequencia.nextClass?.sessionDate | date: 'dd/MM/yyyy' }}
+            {{ studentProgressDashboard.cards.frequencia.nextClass?.sessionTime }}
+          </p>
+          <button class="action-btn" (click)="openStudentProgressDetails('frequencia')">Ver detalhes</button>
+        </article>
+
+        <article class="feature-card student-progress-card">
+          <h4>Comentários do Professor</h4>
+          <p class="muted" *ngIf="studentProgressDashboard.cards.comentariosProfessor.latest as latest">
+            "{{ latest.content }}"
+          </p>
+          <p class="muted" *ngIf="!studentProgressDashboard.cards.comentariosProfessor.latest">
+            Ainda não há comentários registrados.
+          </p>
+          <p class="muted">
+            Total de comentários: {{ studentProgressDashboard.cards.comentariosProfessor.totalComments }}
+          </p>
+          <p class="muted">Notificações não lidas: {{ notificationsUnreadCount }}</p>
+          <button class="action-btn" (click)="openStudentProgressDetails('notificacoes')">Ver notificações</button>
+          <button class="action-btn" (click)="openStudentProgressDetails('comentarios')">Ver detalhes</button>
+        </article>
+
+        <article class="feature-card student-progress-card">
+          <h4>Faixa e Conquistas</h4>
+          <p class="summary-number">{{ studentProgressDashboard.cards.faixaConquistas.currentBelt || '-' }}</p>
+          <p class="muted">
+            Conquistada em {{ studentProgressDashboard.cards.faixaConquistas.beltDate ? (studentProgressDashboard.cards.faixaConquistas.beltDate | date: 'dd/MM/yyyy') : '-' }}
+          </p>
+          <p class="muted">
+            Federação: {{ studentProgressDashboard.cards.faixaConquistas.isFederated ? 'Ativo' : 'Não federado' }}
+          </p>
+          <p class="muted">Badges: {{ studentProgressDashboard.cards.faixaConquistas.totalBadges }}</p>
+          <button class="action-btn" (click)="openStudentProgressDetails('faixa')">Ver histórico de faixas</button>
+          <button class="action-btn" (click)="openStudentProgressDetails('badges')">Ver todos badges</button>
+        </article>
+      </div>
     </section>
 
     <section class="actions" *ngIf="isProfessor()">
@@ -161,6 +261,555 @@
         </div>
       </div>
     </section>
+
+    <div class="student-progress-modal" *ngIf="selectedStudentProgressDetail && studentProgressDashboard">
+      <div class="student-progress-modal-backdrop" (click)="closeStudentProgressDetails()"></div>
+      <div class="student-progress-modal-content" role="dialog" aria-modal="true">
+        <div class="section-heading">
+          <h3>Detalhes</h3>
+          <button class="action-btn" (click)="closeStudentProgressDetails()">Fechar</button>
+        </div>
+
+        <div *ngIf="selectedStudentProgressDetail === 'evolucao'">
+          <h4>Sua Evolução</h4>
+          <p class="muted">Sua tendência de progresso nas últimas semanas</p>
+          
+          <!-- Story 4-2: Embed chart component -->
+          <div class="chart-wrapper">
+            <app-student-progress-chart 
+              [weeklyData]="studentProgressWeeklyData"
+              [period]="'current'">
+            </app-student-progress-chart>
+          </div>
+
+          <!-- Fallback to monthly series if chart not rendered -->
+          <div class="history-list" *ngIf="studentProgressWeeklyData.length < 2">
+            <div class="history-item" *ngFor="let item of studentProgressDashboard.cards.evolucaoMes.monthlySeries">
+              <div>
+                <p><strong>{{ item.monthStart | date: 'MMM/yyyy' }}</strong></p>
+                <p class="muted">{{ item.presentCount }} presença(s) em {{ item.totalCount }} sessões</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="selectedStudentProgressDetail === 'frequencia'">
+          <h4>Seu Histórico de Frequência</h4>
+
+          <div class="attendance-actions">
+            <div class="attendance-filters">
+              <label>
+                De
+                <input type="date" [(ngModel)]="attendanceFilterFrom" />
+              </label>
+              <label>
+                Até
+                <input type="date" [(ngModel)]="attendanceFilterTo" />
+              </label>
+              <button class="action-btn" (click)="applyAttendanceFilter()">Filtrar</button>
+              <button class="action-btn" (click)="clearAttendanceFilter()">Limpar</button>
+            </div>
+            <button class="action-btn" (click)="exportAttendanceCsv()" [disabled]="attendanceHistory.length === 0">
+              Exportar CSV
+            </button>
+          </div>
+
+          <div *ngIf="attendanceCurrentStreak >= 2" class="status-message success">
+            🔥 {{ attendanceCurrentStreak }} aulas sem faltar! {{ attendanceCurrentStreakDays }} dias consecutivos.
+          </div>
+
+          <div *ngIf="attendanceHistoryWarningBelow70" class="status-message warn">
+            ⚠️ Sua frequência está abaixo de 70%. Próximas 3 aulas são importantes para recuperação.
+          </div>
+
+          <p class="muted attendance-summary">Frequência atual: {{ attendanceHistoryPercentage }}%</p>
+
+          <p *ngIf="isLoadingAttendanceHistory" class="muted">Carregando histórico...</p>
+          <div *ngIf="attendanceHistoryErrorMessage" class="status-message error">{{ attendanceHistoryErrorMessage }}</div>
+
+          <div class="history-list" *ngIf="!isLoadingAttendanceHistory && !attendanceHistoryErrorMessage && attendanceHistory.length > 0">
+            <div class="history-item" *ngFor="let item of attendanceHistory">
+              <div class="attendance-row">
+                <p><strong>{{ item.sessionDate | date: 'dd MMM' }}</strong></p>
+                <p class="muted">{{ item.turmaName }}</p>
+              </div>
+              <p class="attendance-status" [ngClass]="getAttendanceStatusClass(item.status)">
+                {{ getAttendanceStatusLabel(item.status) }}
+              </p>
+            </div>
+          </div>
+
+          <div *ngIf="!isLoadingAttendanceHistory && !attendanceHistoryErrorMessage && attendanceHistory.length === 0" class="status-message success">
+            Nenhum registro de frequência encontrado para o período selecionado.
+          </div>
+
+          <div class="attendance-pagination" *ngIf="attendanceHistoryTotal > attendanceHistoryLimit">
+            <button class="action-btn" (click)="goToPreviousAttendancePage()" [disabled]="!canLoadPreviousAttendancePage">
+              Semana anterior
+            </button>
+            <p class="muted">{{ getAttendanceRangeLabel() }}</p>
+            <button class="action-btn" (click)="goToNextAttendancePage()" [disabled]="!canLoadNextAttendancePage">
+              Próxima semana
+            </button>
+          </div>
+        </div>
+
+        <div *ngIf="selectedStudentProgressDetail === 'comentarios'">
+          <h4>Comentários do Professor</h4>
+
+          <!-- Busca -->
+          <div class="attendance-actions">
+            <div class="attendance-filters">
+              <label>
+                Buscar
+                <input
+                  type="text"
+                  [(ngModel)]="commentSearchKeyword"
+                  placeholder="Ex: Osoto Gari"
+                  (keyup.enter)="applyCommentSearch()"
+                />
+              </label>
+              <button class="action-btn" (click)="applyCommentSearch()">Buscar</button>
+              <button class="action-btn" (click)="clearCommentSearch()" *ngIf="commentSearchKeyword">Limpar</button>
+            </div>
+          </div>
+
+          <!-- Confirmação de compartilhamento -->
+          <div *ngIf="commentShareConfirmation" class="status-message success">{{ commentShareConfirmation }}</div>
+
+          <!-- Loading -->
+          <p *ngIf="isLoadingCommentHistory" class="muted">Carregando comentários...</p>
+
+          <!-- Erro -->
+          <div *ngIf="commentHistoryErrorMessage" class="status-message error">{{ commentHistoryErrorMessage }}</div>
+
+          <!-- Estado vazio -->
+          <!-- Estado vazio: sem comentários -->
+          <div *ngIf="!isLoadingCommentHistory && !commentHistoryErrorMessage && commentHistoryTotal === 0 && !commentSearchKeyword.trim()" class="comment-empty-state">
+            <p class="comment-empty-icon">💬</p>
+            <p><strong>Nenhum comentário ainda!</strong></p>
+            <p class="muted">Continua treinando e em breve receberás feedback do professor.</p>
+            <button class="action-btn primary" (click)="closeStudentProgressDetails()">Agendar Conversa com Professor</button>
+          </div>
+
+          <!-- Estado vazio: busca sem resultado -->
+          <div *ngIf="!isLoadingCommentHistory && !commentHistoryErrorMessage && commentHistoryTotal === 0 && commentSearchKeyword.trim()" class="comment-empty-state">
+            <p class="comment-empty-icon">🔍</p>
+            <p><strong>Nenhum comentário encontrado.</strong></p>
+            <p class="muted">Nenhum comentário contém "<em>{{ commentSearchKeyword }}</em>". Tente outro termo.</p>
+          </div>
+
+          <!-- Timeline agrupada por data -->
+          <div *ngIf="!isLoadingCommentHistory && !commentHistoryErrorMessage && commentHistoryTotal > 0">
+            <div class="comment-date-group" *ngFor="let group of groupCommentsByDate(commentHistory)">
+              <p class="comment-date-label">{{ group.label }}</p>
+              <div
+                *ngFor="let item of group.comments"
+                class="comment-item"
+                [ngClass]="getCommentSentiment(item.content) === 'positive' ? 'comment-positive' : 'comment-neutral'"
+              >
+                <div class="comment-header">
+                  <span class="comment-sentiment-icon">{{ getCommentSentiment(item.content) === 'positive' ? '🟢' : '🔵' }}</span>
+                  <span class="comment-professor">{{ item.professorName }}</span>
+                  <span class="comment-time muted">{{ formatCommentDate(item.createdAt) }}</span>
+                </div>
+                <p class="comment-content" [innerHTML]="highlightSearchTerm(item.content)"></p>
+
+                <!-- Tags de técnicas extraídas do conteúdo -->
+                <div class="comment-tags" *ngIf="getCommentTechniqueTags(item.content).length > 0">
+                  <span class="technique-tag" *ngFor="let tag of getCommentTechniqueTags(item.content)">#{{ tag }}</span>
+                </div>
+
+                <div class="comment-actions">
+                  <button class="action-btn small" (click)="shareComment(item)">Compartilhar</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Paginação -->
+            <div class="attendance-pagination" *ngIf="commentHistoryTotal > commentHistoryLimit">
+              <button class="action-btn" (click)="goToPreviousCommentPage()" [disabled]="!canLoadPreviousCommentPage">
+                Anterior
+              </button>
+              <p class="muted">{{ getCommentRangeLabel() }}</p>
+              <button class="action-btn" (click)="goToNextCommentPage()" [disabled]="!canLoadNextCommentPage">
+                Próxima
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="selectedStudentProgressDetail === 'badges'">
+          <h4>Seus Badges e Milestones</h4>
+          <p class="muted">Conquistas desbloqueadas e próximos objetivos da sua jornada.</p>
+
+          <div *ngIf="badgeShareConfirmation" class="status-message success">{{ badgeShareConfirmation }}</div>
+
+          <p *ngIf="isLoadingBadgesHistory" class="muted">Carregando badges...</p>
+          <div *ngIf="badgesHistoryErrorMessage" class="status-message error">{{ badgesHistoryErrorMessage }}</div>
+
+          <div
+            *ngIf="!isLoadingBadgesHistory && !badgesHistoryErrorMessage && unlockedBadges.length === 0 && upcomingBadges.length === 0"
+            class="comment-empty-state"
+          >
+            <p class="comment-empty-icon">🎯</p>
+            <p><strong>Comece a treinar para desbloquear badges!</strong></p>
+            <p class="muted">Primeiro objetivo: manter consistência nas próximas aulas.</p>
+          </div>
+
+          <div *ngIf="!isLoadingBadgesHistory && !badgesHistoryErrorMessage && (unlockedBadges.length > 0 || upcomingBadges.length > 0)">
+            <h5>Badges desbloqueados ({{ totalUnlockedBadges }})</h5>
+            <div class="badges-grid" *ngIf="unlockedBadges.length > 0">
+              <article class="badge-card unlocked" *ngFor="let badge of unlockedBadges">
+                <p class="badge-icon">🏅</p>
+                <p><strong>{{ badge.name }}</strong></p>
+                <p class="muted">{{ badge.description }}</p>
+                <p class="muted">Desbloqueado em {{ badge.earnedAt | date: 'dd/MM/yyyy' }}</p>
+                <div class="comment-actions">
+                  <button class="action-btn small" (click)="openUnlockedBadgeDetails(badge)">Detalhes</button>
+                  <button class="action-btn small" (click)="shareBadge(badge)">Compartilhar Badge</button>
+                </div>
+              </article>
+            </div>
+            <p *ngIf="unlockedBadges.length === 0" class="muted">Nenhum badge desbloqueado ainda.</p>
+
+            <h5>Próximos badges ({{ totalUpcomingBadges }})</h5>
+            <div class="badges-grid" *ngIf="upcomingBadges.length > 0">
+              <article
+                class="badge-card upcoming"
+                *ngFor="let badge of upcomingBadges"
+                [attr.title]="getUpcomingBadgeTooltip(badge)"
+              >
+                <p class="badge-icon">🌟</p>
+                <p><strong>{{ badge.name }}</strong></p>
+                <p class="muted">{{ badge.description }}</p>
+                <p class="muted">{{ getUpcomingBadgeProgressLabel(badge) }}</p>
+                <p class="muted badge-progress-raw">({{ badge.currentValue }}/{{ badge.criteriaValue }})</p>
+                <div class="badge-progress-track">
+                  <div class="badge-progress-bar" [style.width.%]="badge.progressPercent"></div>
+                </div>
+                <p class="muted">{{ getUpcomingBadgeRemainingLabel(badge) }}</p>
+                <p class="muted">Continue treinando!</p>
+                <div class="comment-actions">
+                  <button class="action-btn small" (click)="toggleUpcomingBadgeTip(badge)">
+                    {{ isUpcomingBadgeTipExpanded(badge) ? 'Ocultar dica' : 'Ver dica' }}
+                  </button>
+                </div>
+                <p *ngIf="isUpcomingBadgeTipExpanded(badge)" class="status-message success badge-tooltip-inline">
+                  {{ getUpcomingBadgeTooltip(badge) }}
+                </p>
+              </article>
+            </div>
+            <p *ngIf="upcomingBadges.length === 0" class="muted">Todos os badges disponíveis já foram desbloqueados.</p>
+          </div>
+
+          <div class="badge-detail-modal" *ngIf="selectedUnlockedBadge">
+            <div class="badge-detail-card">
+              <div class="section-heading">
+                <h5>Detalhes do badge</h5>
+                <button class="action-btn small" (click)="closeUnlockedBadgeDetails()">Fechar</button>
+              </div>
+              <p class="badge-icon large">🏅</p>
+              <p><strong>{{ selectedUnlockedBadge.name }}</strong></p>
+              <p class="muted">{{ selectedUnlockedBadge.description }}</p>
+              <p class="muted">Data de desbloqueio: {{ selectedUnlockedBadge.earnedAt | date: 'dd/MM/yyyy' }}</p>
+              <div class="comment-actions">
+                <button class="action-btn small" (click)="shareBadge(selectedUnlockedBadge)">Compartilhar no WhatsApp</button>
+                <button class="action-btn small" (click)="copyBadgeToClipboard(selectedUnlockedBadge)">Copiar Mensagem</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="selectedStudentProgressDetail === 'comparacao'">
+          <h4>Comparação Mês-a-Mês</h4>
+          <p class="muted">Veja sua tendência de progresso entre o mês atual e o anterior.</p>
+
+          <p *ngIf="isLoadingComparacao" class="muted">Carregando comparação...</p>
+          <div *ngIf="comparacaoError" class="status-message error">{{ comparacaoError }}</div>
+
+          <div
+            *ngIf="!isLoadingComparacao && !comparacaoError && studentMonthlyComparison as cmp"
+            class="comparacao-wrapper"
+          >
+            <div *ngIf="!cmp.hasEnoughData" class="comment-empty-state">
+              <p class="comment-empty-icon">🚀</p>
+              <p><strong>Você está no início!</strong></p>
+              <p class="muted">Continue treinando para ver evolução mês-a-mês.</p>
+              <p class="muted">
+                Base atual: {{ getMonthLabel(cmp.currentMonth.monthStart) }} ·
+                {{ cmp.currentMonth.frequencia.presentCount }}/{{ cmp.currentMonth.frequencia.totalCount }} ({{ cmp.currentMonth.frequencia.pct }}%)
+              </p>
+            </div>
+
+            <div *ngIf="cmp.hasEnoughData && cmp.previousMonth as prev">
+              <div class="comparacao-grid">
+                <article class="comparacao-col">
+                  <h5>{{ getMonthLabel(cmp.currentMonth.monthStart) }}</h5>
+                  <p class="muted">Frequência: {{ cmp.currentMonth.frequencia.presentCount }}/{{ cmp.currentMonth.frequencia.totalCount }} ({{ cmp.currentMonth.frequencia.pct }}%)</p>
+                  <p class="muted">Técnicas praticadas: {{ cmp.currentMonth.tecnicas }}</p>
+                  <p class="muted">Comentários: {{ cmp.currentMonth.comentarios }}</p>
+                  <p class="muted">Evolução: {{ cmp.currentMonth.frequencia.pct }}%</p>
+                </article>
+
+                <article class="comparacao-col">
+                  <h5>{{ getMonthLabel(prev.monthStart) }}</h5>
+                  <p class="muted">Frequência: {{ prev.frequencia.presentCount }}/{{ prev.frequencia.totalCount }} ({{ prev.frequencia.pct }}%)</p>
+                  <p class="muted">Técnicas praticadas: {{ prev.tecnicas }}</p>
+                  <p class="muted">Comentários: {{ prev.comentarios }}</p>
+                  <p class="muted">Evolução: {{ prev.frequencia.pct }}%</p>
+                </article>
+              </div>
+
+              <div class="comparacao-summary">
+                <p class="comparacao-row">
+                  Frequência:
+                  <span [class]="getComparacaoTrendClass(cmp.currentMonth.frequencia.pct, prev.frequencia.pct)">
+                    {{ getComparacaoTrendIcon(cmp.currentMonth.frequencia.pct, prev.frequencia.pct) }}
+                    {{ getComparacaoDelta(cmp.currentMonth.frequencia.pct, prev.frequencia.pct) >= 0 ? '+' : '' }}{{ getComparacaoDelta(cmp.currentMonth.frequencia.pct, prev.frequencia.pct) }}%
+                  </span>
+                </p>
+                <p class="comparacao-row">
+                  Técnicas:
+                  <span [class]="getComparacaoTrendClass(cmp.currentMonth.tecnicas, prev.tecnicas)">
+                    {{ getComparacaoTrendIcon(cmp.currentMonth.tecnicas, prev.tecnicas) }}
+                    {{ getComparacaoDelta(cmp.currentMonth.tecnicas, prev.tecnicas) >= 0 ? '+' : '' }}{{ getComparacaoDelta(cmp.currentMonth.tecnicas, prev.tecnicas) }}
+                  </span>
+                </p>
+                <p class="comparacao-row">
+                  Comentários:
+                  <span [class]="getComparacaoTrendClass(cmp.currentMonth.comentarios, prev.comentarios)">
+                    {{ getComparacaoTrendIcon(cmp.currentMonth.comentarios, prev.comentarios) }}
+                    {{ getComparacaoDelta(cmp.currentMonth.comentarios, prev.comentarios) >= 0 ? '+' : '' }}{{ getComparacaoDelta(cmp.currentMonth.comentarios, prev.comentarios) }}
+                  </span>
+                </p>
+                <p class="comparacao-row">
+                  Evolução:
+                  <span [class]="getComparacaoTrendClass(cmp.currentMonth.frequencia.pct, prev.frequencia.pct)">
+                    {{ getComparacaoTrendIcon(cmp.currentMonth.frequencia.pct, prev.frequencia.pct) }}
+                    {{ getComparacaoDelta(cmp.currentMonth.frequencia.pct, prev.frequencia.pct) >= 0 ? '+' : '' }}{{ getComparacaoDelta(cmp.currentMonth.frequencia.pct, prev.frequencia.pct) }}%
+                  </span>
+                </p>
+              </div>
+
+              <div *ngIf="allMetricsImproved(cmp.currentMonth, prev)" class="status-message success">
+                🎉 Você MELHOROU em TODOS os aspectos!<br />
+                Excelente progresso! Continue assim!
+              </div>
+
+              <div *ngIf="!allMetricsImproved(cmp.currentMonth, prev)" class="status-message error">
+                <p *ngFor="let label of getComparacaoDropLabels(cmp.currentMonth, prev)">⚠️ {{ label }} caiu este mês.</p>
+                Agende mais aulas!
+                <span *ngIf="studentProgressDashboard?.cards?.frequencia?.nextClass as nc">
+                  Próxima: {{ nc.sessionDate | date: 'dd/MM/yyyy' }}
+                </span>
+              </div>
+            </div>
+
+            <div class="comparacao-history-actions">
+              <button class="action-btn" (click)="toggleComparacaoHistory()">
+                {{ showComparacaoHistory ? 'Ocultar últimos 6 meses' : 'Ver últimos 6 meses' }}
+              </button>
+            </div>
+
+            <div *ngIf="showComparacaoHistory" class="comparacao-history-list">
+              <div class="history-bar" *ngFor="let item of cmp.history">
+                <div>
+                  <p><strong>{{ getMonthLabel(item.monthStart) }}</strong></p>
+                  <p class="muted">{{ item.frequencia.presentCount }}/{{ item.frequencia.totalCount }} · {{ item.frequencia.pct }}%</p>
+                </div>
+                <div class="history-bar-track">
+                  <div class="history-bar-fill" [style.width.%]="item.frequencia.pct"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="selectedStudentProgressDetail === 'notificacoes'">
+          <h4>Notificações</h4>
+          <p class="muted">Acompanhe lembretes e mensagens motivacionais.</p>
+
+          <div class="notification-settings">
+            <h5>Configurações de Notificações</h5>
+            <div class="notification-preferences-grid">
+              <label>
+                <input
+                  type="checkbox"
+                  [ngModel]="notificationPreferences.badges"
+                  (ngModelChange)="setNotificationPreference('badges', $event)"
+                />
+                Badges
+              </label>
+              <label>
+                <input
+                  type="checkbox"
+                  [ngModel]="notificationPreferences.frequencia"
+                  (ngModelChange)="setNotificationPreference('frequencia', $event)"
+                />
+                Frequência
+              </label>
+              <label>
+                <input
+                  type="checkbox"
+                  [ngModel]="notificationPreferences.comentarios"
+                  (ngModelChange)="setNotificationPreference('comentarios', $event)"
+                />
+                Comentários
+              </label>
+              <label>
+                <input
+                  type="checkbox"
+                  [ngModel]="notificationPreferences.lembretes"
+                  (ngModelChange)="setNotificationPreference('lembretes', $event)"
+                />
+                Lembretes motivacionais
+              </label>
+            </div>
+          </div>
+
+          <div class="notification-actions">
+            <button class="action-btn" (click)="loadStudentNotifications(true)">Atualizar</button>
+            <button class="action-btn" (click)="markAllNotificationsAsRead()" [disabled]="notificationsUnreadCount === 0">
+              Marcar todas como lidas
+            </button>
+          </div>
+
+          <p *ngIf="isLoadingNotifications" class="muted">Carregando notificações...</p>
+          <div *ngIf="notificationsErrorMessage" class="status-message error">{{ notificationsErrorMessage }}</div>
+
+          <div *ngIf="!isLoadingNotifications && !notificationsErrorMessage && studentNotifications.length === 0" class="comment-empty-state">
+            <p class="comment-empty-icon">🔔</p>
+            <p><strong>Sem notificações por agora.</strong></p>
+            <p class="muted">Quando houver novidades no seu progresso, elas aparecerão aqui.</p>
+          </div>
+
+          <div *ngIf="!isLoadingNotifications && !notificationsErrorMessage && studentNotifications.length > 0" class="notifications-list">
+            <article
+              *ngFor="let item of studentNotifications"
+              class="notification-item"
+              [class.notification-item-unread]="!item.isRead"
+            >
+              <div class="notification-header">
+                <p><strong>{{ item.title }}</strong></p>
+                <span class="muted">{{ formatNotificationDate(item.createdAt) }}</span>
+              </div>
+              <p class="muted">{{ item.message }}</p>
+              <div class="notification-actions">
+                <button class="action-btn small" (click)="openNotificationTarget(item)">Abrir</button>
+                <button class="action-btn small" (click)="markNotificationAsRead(item.notificationId)" *ngIf="!item.isRead">
+                  Marcar como lida
+                </button>
+              </div>
+            </article>
+
+            <div class="attendance-pagination" *ngIf="notificationsTotal > notificationsLimit">
+              <button class="action-btn" (click)="goToPreviousNotificationsPage()" [disabled]="!canLoadPreviousNotificationsPage">
+                Anterior
+              </button>
+              <p class="muted">{{ getNotificationsRangeLabel() }}</p>
+              <button class="action-btn" (click)="goToNextNotificationsPage()" [disabled]="!canLoadNextNotificationsPage">
+                Próxima
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="selectedStudentProgressDetail === 'faixa'">
+          <h3 class="belt-timeline-heading">Suas Faixas no Judô 🥋</h3>
+          <p class="muted">Histórico completo de progressão</p>
+
+          <!-- Federation banner -->
+          <div class="federation-banner" *ngIf="beltHistoryData?.judoProfile?.isFederated">
+            🏅 Você está federado! Nº de registro: {{ beltHistoryData!.judoProfile.federationRegistration || '—' }}
+            <span *ngIf="beltHistoryData!.judoProfile.federationDate">
+              &nbsp;· Desde: {{ beltHistoryData!.judoProfile.federationDate | date: 'dd/MM/yyyy' }}
+            </span>
+          </div>
+
+          <!-- Stats section -->
+          <div class="belt-stats-grid" *ngIf="beltHistoryData && beltHistoryData.stats.totalBelts > 0">
+            <div class="belt-stat-card">
+              <p class="belt-stat-value">{{ beltHistoryData.stats.totalBelts }}</p>
+              <p class="belt-stat-label">faixas conquistadas</p>
+            </div>
+            <div class="belt-stat-card" *ngIf="beltHistoryData.stats.dataEntrada">
+              <p class="belt-stat-value">{{ formatPracticingTime(beltHistoryData.stats.dataEntrada) }}</p>
+              <p class="belt-stat-label">praticando</p>
+            </div>
+            <div class="belt-stat-card" *ngIf="beltHistoryData.stats.longestBeltName">
+              <p class="belt-stat-value">{{ beltHistoryData.stats.longestBeltName }}</p>
+              <p class="belt-stat-label">maior duração ({{ beltHistoryData.stats.longestBeltDays }} dias)</p>
+            </div>
+            <div class="belt-stat-card" *ngIf="beltHistoryData.stats.lastBeltDate">
+              <p class="belt-stat-value">{{ formatDaysAgo(beltHistoryData.stats.lastBeltDate) }}</p>
+              <p class="belt-stat-label">última conquista</p>
+            </div>
+          </div>
+
+          <!-- Skeleton loader -->
+          <div *ngIf="isLoadingBeltHistory" class="belt-skeleton-list">
+            <div class="belt-skeleton-item" *ngFor="let _ of [1, 2, 3]"></div>
+          </div>
+
+          <!-- Error state -->
+          <div *ngIf="beltHistoryErrorMessage && !isLoadingBeltHistory" class="status-message error">
+            {{ beltHistoryErrorMessage }}
+            <button class="action-btn" style="margin-left: 8px;" (click)="loadBeltHistory()">Tentar Novamente</button>
+          </div>
+
+          <!-- Cache indicator -->
+          <div *ngIf="beltHistoryCacheTimestamp && beltHistoryData && !isLoadingBeltHistory" class="muted" style="font-size: 12px; margin-bottom: 8px;">
+            ⏱ Histórico de {{ beltHistoryCacheTimestamp | date: 'dd/MM/yyyy HH:mm' }}
+          </div>
+
+          <!-- Empty state -->
+          <div *ngIf="beltHistoryData && beltHistoryData.entries.length === 0 && !isLoadingBeltHistory" class="status-message">
+            Comece seu histórico! Aproveite seu primeiro treino. 🥋
+          </div>
+
+          <!-- Belt timeline -->
+          <div class="belt-timeline" *ngIf="beltHistoryData && beltHistoryData.entries.length > 0 && !isLoadingBeltHistory">
+            <div
+              *ngFor="let item of beltHistoryData.entries"
+              class="belt-card"
+              [class.current-belt]="item.isCurrentBelt"
+              (click)="toggleBeltExpand(item.beltHistoryId)"
+              (keydown.enter)="toggleBeltExpand(item.beltHistoryId)"
+              (keydown.space)="toggleBeltExpand(item.beltHistoryId)"
+              role="button"
+              [attr.aria-expanded]="expandedBeltId === item.beltHistoryId"
+              tabindex="0"
+            >
+              <div class="belt-card-header">
+                <span class="belt-emoji">{{ getBeltEmoji(item.belt) }}</span>
+                <div class="belt-card-info">
+                  <p class="belt-name"><strong>{{ item.belt }}</strong></p>
+                  <p class="muted">Conquistada em {{ formatBeltDate(item.receivedDate) }}</p>
+                  <p class="muted">Ficou {{ formatBeltDurationFull(item.durationDays) }} nessa faixa</p>
+                  <p class="muted">por {{ item.promotedBy || 'Professor' }}</p>
+                  <p class="muted belt-notes" *ngIf="item.notes && expandedBeltId !== item.beltHistoryId">
+                    <em>{{ item.notes.length > 150 ? (item.notes | slice: 0 : 150) + '...' : item.notes }}</em>
+                  </p>
+                </div>
+                <span *ngIf="item.isCurrentBelt" class="belt-badge-current">Sua faixa atual</span>
+              </div>
+
+              <!-- Expanded details -->
+              <div *ngIf="expandedBeltId === item.beltHistoryId" class="belt-expand" (click)="$event.stopPropagation()">
+                <hr />
+                <p><strong>{{ getBeltEmoji(item.belt) }} {{ item.belt }}</strong></p>
+                <p class="muted">Data de conquista: {{ item.receivedDate | date: 'dd/MM/yyyy' }}</p>
+                <p class="muted">Duração: {{ formatBeltDurationFull(item.durationDays) }}</p>
+                <p class="muted">Promovido por: {{ item.promotedBy || 'Professor' }}</p>
+                <p class="muted" *ngIf="item.notes"><em>{{ item.notes }}</em></p>
+                <button class="action-btn" (click)="toggleBeltExpand(item.beltHistoryId); $event.stopPropagation()">Fechar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <section *ngIf="isResponsavel()" class="actions">
       <h3>Próximas Ações</h3>

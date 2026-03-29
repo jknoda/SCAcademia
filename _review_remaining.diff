@@ -1,0 +1,592 @@
+diff --git a/backend/src/routes/users.ts b/backend/src/routes/users.ts
+index 23cdc14..5368770 100644
+--- a/backend/src/routes/users.ts
++++ b/backend/src/routes/users.ts
+@@ -14,6 +14,7 @@ import {
+   updateStudentHandler,
+   updateStudentStatusHandler,
+   getStudentProfileViewHandler,
++  getMyStudentProgressDashboardHandler,
+   searchGuardianByEmailHandler,
+   linkGuardianToStudentHandler,
+   createAndLinkGuardianHandler,
+@@ -78,6 +79,9 @@ router.put('/alunos/:userId', authMiddleware, requireRole(['Admin', 'Professor']
+ // PUT /api/users/alunos/:userId/status — ativa/desativa aluno (Admin only)
+ router.put('/alunos/:userId/status', authMiddleware, requireRole(['Admin']), validate(studentStatusSchema), updateStudentStatusHandler);
+ 
++// GET /api/users/alunos/me/progresso — dashboard de progresso do aluno logado
++router.get('/alunos/me/progresso', authMiddleware, requireRole(['Aluno']), getMyStudentProgressDashboardHandler);
++
+ // GET /api/users/alunos/:userId/ficha — ficha completa do aluno (Admin/Professor)
+ router.get('/alunos/:userId/ficha', authMiddleware, requireRole(['Admin', 'Professor']), getStudentProfileViewHandler);
+ 
+diff --git a/frontend/src/app.module.ts b/frontend/src/app.module.ts
+index b0a0069..c48fce3 100644
+--- a/frontend/src/app.module.ts
++++ b/frontend/src/app.module.ts
+@@ -39,6 +39,7 @@ import { ProfessorTechniquesComponent } from './components/professor-techniques/
+ import { StudentsListComponent } from './components/students-list/students-list.component';
+ import { StudentFormComponent } from './components/student-form/student-form.component';
+ import { StudentProfileComponent } from './components/student-profile/student-profile.component';
++import { StudentProgressChartComponent } from './components/student-progress-chart/student-progress-chart.component';
+ import { AuthGuard } from './guards/auth.guard';
+ import { RoleGuard } from './guards/role.guard';
+ import { AuthInterceptor } from './services/auth.interceptor';
+@@ -87,6 +88,7 @@ import { AuthInterceptor } from './services/auth.interceptor';
+     FormsModule,
+     CommonModule,
+     AppRoutingModule,
++    StudentProgressChartComponent,
+   ],
+   providers: [
+     AuthGuard,
+diff --git a/frontend/src/components/admin-profile/admin-profile.component.spec.ts b/frontend/src/components/admin-profile/admin-profile.component.spec.ts
+index 8ccc69b..7c5f843 100644
+--- a/frontend/src/components/admin-profile/admin-profile.component.spec.ts
++++ b/frontend/src/components/admin-profile/admin-profile.component.spec.ts
+@@ -106,7 +106,10 @@ describe('AdminProfileComponent', () => {
+     component.saveProfile();
+ 
+     expect(apiSpy.updateUserProfile).toHaveBeenCalled();
+-    expect(authSpy.updateCurrentUserProfile).toHaveBeenCalledWith({ fullName: 'Admin Atualizado' });
++    expect(authSpy.updateCurrentUserProfile).toHaveBeenCalledWith({
++      fullName: 'Admin Atualizado',
++      photoUrl: undefined,
++    });
+     expect(component.successMessage).toBe('Perfil atualizado');
+   });
+ 
+diff --git a/frontend/src/components/home/home.component.html b/frontend/src/components/home/home.component.html
+index 1312976..9482a74 100644
+--- a/frontend/src/components/home/home.component.html
++++ b/frontend/src/components/home/home.component.html
+@@ -20,7 +20,7 @@
+     <section class="hero">
+       <h2>{{ getHomeTitle() }}</h2>
+       <p>{{ getHomeSubtitle() }}</p>
+-      <div class="academy-info">
++      <div class="academy-info" *ngIf="!isAluno()">
+         <p><strong>Nome da Academia:</strong> {{ currentUser.academy.name }}</p>
+         <p><strong>Email de Contato:</strong> {{ currentUser.email }}</p>
+         <p><strong>Seu Perfil:</strong> {{ getRoleLabel() }}</p>
+@@ -31,6 +31,88 @@
+       <span class="badge success">{{ getRoleLabel() }} ativo</span>
+     </section>
+ 
++    <section *ngIf="isAluno()" class="student-progress-section">
++      <div class="section-heading">
++        <div>
++          <h3>{{ getStudentProgressHeading() }}</h3>
++          <p class="muted">{{ getStudentProgressSubheading() }}</p>
++        </div>
++      </div>
++
++      <div *ngIf="isUsingCachedProgressData" class="status-message success">
++        Exibindo dados em cache (offline). Última sincronização: {{ getFormattedLastProgressSync() }}
++      </div>
++
++      <div *ngIf="isLoadingStudentProgress" class="student-progress-grid">
++        <article class="feature-card skeleton-card" *ngFor="let card of [1,2,3,4]">
++          <div class="skeleton-line skeleton-title"></div>
++          <div class="skeleton-line"></div>
++          <div class="skeleton-line skeleton-short"></div>
++        </article>
++      </div>
++
++      <div *ngIf="hasStudentProgressError" class="status-message error">
++        {{ studentProgressErrorMessage }}
++        <button class="action-btn" (click)="loadStudentProgressDashboard(true)">Tentar novamente</button>
++      </div>
++
++      <div
++        class="student-progress-grid"
++        *ngIf="!isLoadingStudentProgress && !hasStudentProgressError && studentProgressDashboard"
++      >
++        <article class="feature-card student-progress-card">
++          <h4>Evolução do Mês</h4>
++          <p class="summary-number">{{ studentProgressDashboard.cards.evolucaoMes.currentMonthPresentCount }}</p>
++          <p class="muted">
++            Mês anterior: {{ studentProgressDashboard.cards.evolucaoMes.previousMonthPresentCount }}
++            · Delta: {{ studentProgressDashboard.cards.evolucaoMes.delta >= 0 ? '+' : '' }}{{ studentProgressDashboard.cards.evolucaoMes.delta }}
++          </p>
++          <button class="action-btn" (click)="openStudentProgressDetails('evolucao')">Ver detalhes</button>
++        </article>
++
++        <article class="feature-card student-progress-card">
++          <h4>Frequência</h4>
++          <p class="summary-number">{{ studentProgressDashboard.cards.frequencia.attendancePercentage90d }}%</p>
++          <p class="muted">
++            {{ studentProgressDashboard.cards.frequencia.presentCount90d }} presenças em {{ studentProgressDashboard.cards.frequencia.totalCount90d }} sessões (90 dias)
++          </p>
++          <p class="muted" *ngIf="studentProgressDashboard.cards.frequencia.nextClass">
++            Próxima aula: {{ studentProgressDashboard.cards.frequencia.nextClass?.turmaName }} ·
++            {{ studentProgressDashboard.cards.frequencia.nextClass?.sessionDate | date: 'dd/MM/yyyy' }}
++            {{ studentProgressDashboard.cards.frequencia.nextClass?.sessionTime }}
++          </p>
++          <button class="action-btn" (click)="openStudentProgressDetails('frequencia')">Ver detalhes</button>
++        </article>
++
++        <article class="feature-card student-progress-card">
++          <h4>Comentários do Professor</h4>
++          <p class="muted" *ngIf="studentProgressDashboard.cards.comentariosProfessor.latest as latest">
++            "{{ latest.content }}"
++          </p>
++          <p class="muted" *ngIf="!studentProgressDashboard.cards.comentariosProfessor.latest">
++            Ainda não há comentários registrados.
++          </p>
++          <p class="muted">
++            Total de comentários: {{ studentProgressDashboard.cards.comentariosProfessor.totalComments }}
++          </p>
++          <button class="action-btn" (click)="openStudentProgressDetails('comentarios')">Ver detalhes</button>
++        </article>
++
++        <article class="feature-card student-progress-card">
++          <h4>Faixa e Conquistas</h4>
++          <p class="summary-number">{{ studentProgressDashboard.cards.faixaConquistas.currentBelt || '-' }}</p>
++          <p class="muted">
++            Conquistada em {{ studentProgressDashboard.cards.faixaConquistas.beltDate ? (studentProgressDashboard.cards.faixaConquistas.beltDate | date: 'dd/MM/yyyy') : '-' }}
++          </p>
++          <p class="muted">
++            Federação: {{ studentProgressDashboard.cards.faixaConquistas.isFederated ? 'Ativo' : 'Não federado' }}
++          </p>
++          <p class="muted">Badges: {{ studentProgressDashboard.cards.faixaConquistas.totalBadges }}</p>
++          <button class="action-btn" (click)="openStudentProgressDetails('faixa')">Ver histórico de faixas</button>
++        </article>
++      </div>
++    </section>
++
+     <section class="actions" *ngIf="isProfessor()">
+       <h3>Próximas Ações</h3>
+       <div class="action-buttons">
+@@ -162,6 +244,79 @@
+       </div>
+     </section>
+ 
++    <div class="student-progress-modal" *ngIf="selectedStudentProgressDetail && studentProgressDashboard">
++      <div class="student-progress-modal-backdrop" (click)="closeStudentProgressDetails()"></div>
++      <div class="student-progress-modal-content" role="dialog" aria-modal="true">
++        <div class="section-heading">
++          <h3>Detalhes</h3>
++          <button class="action-btn" (click)="closeStudentProgressDetails()">Fechar</button>
++        </div>
++
++        <div *ngIf="selectedStudentProgressDetail === 'evolucao'">
++          <h4>Sua Evolução</h4>
++          <p class="muted">Sua tendência de progresso nas últimas semanas</p>
++          
++          <!-- Story 4-2: Embed chart component -->
++          <div class="chart-wrapper">
++            <app-student-progress-chart 
++              [weeklyData]="studentProgressWeeklyData"
++              [period]="'current'">
++            </app-student-progress-chart>
++          </div>
++
++          <!-- Fallback to monthly series if chart not rendered -->
++          <div class="history-list" *ngIf="studentProgressWeeklyData.length < 2">
++            <div class="history-item" *ngFor="let item of studentProgressDashboard.cards.evolucaoMes.monthlySeries">
++              <div>
++                <p><strong>{{ item.monthStart | date: 'MMM/yyyy' }}</strong></p>
++                <p class="muted">{{ item.presentCount }} presença(s) em {{ item.totalCount }} sessões</p>
++              </div>
++            </div>
++          </div>
++        </div>
++
++        <div *ngIf="selectedStudentProgressDetail === 'frequencia'">
++          <h4>Histórico de frequência</h4>
++          <div class="history-list">
++            <div class="history-item" *ngFor="let item of studentProgressDashboard.cards.frequencia.recentSessions">
++              <div>
++                <p><strong>{{ item.sessionDate | date: 'dd/MM/yyyy' }}</strong></p>
++                <p class="muted">Status: {{ item.status }}</p>
++              </div>
++            </div>
++          </div>
++        </div>
++
++        <div *ngIf="selectedStudentProgressDetail === 'comentarios'">
++          <h4>Timeline de comentários</h4>
++          <div class="history-list">
++            <div class="history-item" *ngFor="let item of studentProgressDashboard.cards.comentariosProfessor.timeline">
++              <div>
++                <p><strong>{{ item.professorName }}</strong></p>
++                <p class="muted">{{ item.content }}</p>
++                <p class="muted">{{ item.createdAt | date: 'dd/MM/yyyy HH:mm' }}</p>
++              </div>
++            </div>
++          </div>
++        </div>
++
++        <div *ngIf="selectedStudentProgressDetail === 'faixa'">
++          <h4>Histórico de faixas</h4>
++          <div class="history-list">
++            <div class="history-item" *ngFor="let item of studentProgressDashboard.cards.faixaConquistas.beltHistory">
++              <div>
++                <p><strong>{{ item.belt }}</strong></p>
++                <p class="muted">Data: {{ item.receivedDate | date: 'dd/MM/yyyy' }}</p>
++                <p class="muted">Promovido por: {{ item.promotedBy || '-' }}</p>
++                <p class="muted">Duração: {{ formatBeltDuration(item.durationDays) }}</p>
++                <p class="muted" *ngIf="item.notes">Observações: {{ item.notes }}</p>
++              </div>
++            </div>
++          </div>
++        </div>
++      </div>
++    </div>
++
+     <section *ngIf="isResponsavel()" class="actions">
+       <h3>Próximas Ações</h3>
+       <div class="action-buttons">
+diff --git a/frontend/src/components/professors-list/professors-list.component.spec.ts b/frontend/src/components/professors-list/professors-list.component.spec.ts
+index 176dde4..dfc0dbc 100644
+--- a/frontend/src/components/professors-list/professors-list.component.spec.ts
++++ b/frontend/src/components/professors-list/professors-list.component.spec.ts
+@@ -93,6 +93,6 @@ describe('ProfessorsListComponent', () => {
+     component.loadProfessors();
+ 
+     expect(component.errorMessage).toBe('Falha na API');
+-    expect(component.loading).toBeFalse();
++    expect(component.isLoading).toBeFalse();
+   });
+ });
+diff --git a/frontend/src/components/student-form/student-form.component.spec.ts b/frontend/src/components/student-form/student-form.component.spec.ts
+index 93b542b..e2981b1 100644
+--- a/frontend/src/components/student-form/student-form.component.spec.ts
++++ b/frontend/src/components/student-form/student-form.component.spec.ts
+@@ -55,6 +55,7 @@ describe('StudentFormComponent', () => {
+           useValue: {
+             snapshot: {
+               paramMap: convertToParamMap({}),
++              queryParamMap: convertToParamMap({}),
+             },
+           },
+         },
+diff --git a/frontend/src/services/api.service.ts b/frontend/src/services/api.service.ts
+index 9f2abc6..96938b8 100644
+--- a/frontend/src/services/api.service.ts
++++ b/frontend/src/services/api.service.ts
+@@ -76,6 +76,8 @@ import {
+   ReorderSessionTechniquesResponse,
+   RecentTrainingSummary,
+   GetRecentTrainingsResponse,
++  StudentProgressDashboardResponse,
++  StudentProgressWeekly,
+   TrainingHistoryFilters,
+   TrainingHistoryResponse,
+   TrainingDetailsResponse,
+@@ -844,6 +846,25 @@ export class ApiService {
+     );
+   }
+ 
++  getStudentProgressDashboard(): Observable<StudentProgressDashboardResponse> {
++    return this.http.get<StudentProgressDashboardResponse>(
++      `${this.apiUrl}/users/alunos/me/progresso`,
++      { headers: this.getHeaders() }
++    );
++  }
++
++  getStudentProgressChart(): Observable<StudentProgressWeekly[]> {
++    return new Observable<StudentProgressWeekly[]>((subscriber) => {
++      this.getStudentProgressDashboard().subscribe({
++        next: (response) => {
++          subscriber.next(response.cards.evolucaoMes.weeklySeries || []);
++          subscriber.complete();
++        },
++        error: (error) => subscriber.error(error),
++      });
++    });
++  }
++
+   // Story 3-7: Training History
+   getTrainingHistory(filters?: TrainingHistoryFilters, limit = 20, offset = 0): Observable<{ success: boolean; data: TrainingHistoryResponse }> {
+     const params: Record<string, string> = { limit: String(limit), offset: String(offset) };
+diff --git a/frontend/src/services/offline-sync.service.spec.ts b/frontend/src/services/offline-sync.service.spec.ts
+index a4cfeeb..b8221c1 100644
+--- a/frontend/src/services/offline-sync.service.spec.ts
++++ b/frontend/src/services/offline-sync.service.spec.ts
+@@ -1,5 +1,7 @@
+-import { TestBed, fakeAsync, tick } from '@angular/core/testing';
++import { TestBed } from '@angular/core/testing';
+ import { HttpClientTestingModule } from '@angular/common/http/testing';
++import { firstValueFrom, of, throwError } from 'rxjs';
++import { take } from 'rxjs/operators';
+ import { OfflineStorageService, SyncQueueEntry } from './offline-storage.service';
+ import { OfflineMonitorService } from './offline-monitor.service';
+ import { SyncManagerService } from './sync-manager.service';
+@@ -11,7 +13,7 @@ describe('Offline Sync Services', () => {
+   let syncManager: SyncManagerService;
+   let apiService: ApiService;
+ 
+-  beforeEach(() => {
++  beforeEach(async () => {
+     TestBed.configureTestingModule({
+       imports: [HttpClientTestingModule],
+       providers: [
+@@ -26,6 +28,23 @@ describe('Offline Sync Services', () => {
+     offlineMonitor = TestBed.inject(OfflineMonitorService);
+     syncManager = TestBed.inject(SyncManagerService);
+     apiService = TestBed.inject(ApiService);
++
++    await offlineStorage.waitForReady();
++    await offlineStorage.clearQueue();
++
++    spyOn(apiService, 'syncBatch').and.returnValue(of({
++      success: true,
++      batchId: 'test-batch',
++      synced: 0,
++      failed: 0,
++      conflicts: 0,
++      data: [],
++      durationMs: 1,
++    }));
++  });
++
++  afterEach(async () => {
++    await offlineStorage.clearQueue();
+   });
+ 
+   describe('OfflineStorageService', () => {
+@@ -149,12 +168,9 @@ describe('Offline Sync Services', () => {
+       expect(typeof isOnline).toBe('boolean');
+     });
+ 
+-    it('should emit online status changes', (done) => {
+-      const subscription = offlineMonitor.getIsOnline$().subscribe(isOnline => {
+-        expect(typeof isOnline).toBe('boolean');
+-        subscription.unsubscribe();
+-        done();
+-      });
++    it('should emit online status changes', async () => {
++      const isOnline = await firstValueFrom(offlineMonitor.getIsOnline$().pipe(take(1)));
++      expect(typeof isOnline).toBe('boolean');
+     });
+ 
+     it('should provide connection state', () => {
+@@ -163,30 +179,19 @@ describe('Offline Sync Services', () => {
+     });
+ 
+     it('should have health check capability', async () => {
+-      // This will likely fail in test environment without a real server
+-      // but should not throw
+-      try {
+-        const isConnected = await offlineMonitor.checkConnection();
+-        expect(typeof isConnected).toBe('boolean');
+-      } catch {
+-        // Expected in test environment
+-      }
++      spyOn(window, 'fetch').and.resolveTo(new Response(null, { status: 200 }));
++
++      const isConnected = await offlineMonitor.checkConnection();
++      expect(isConnected).toBe(true);
+     });
+ 
+-    it('should emit status changes', (done) => {
+-      let callCount = 0;
+-      const subscription = offlineMonitor.getStatusChanged$().subscribe(() => {
+-        callCount++;
+-        if (callCount > 0) {
+-          subscription.unsubscribe();
+-          done();
+-        }
+-      });
++    it('should emit status changes', async () => {
++      const statusChangedPromise = firstValueFrom(offlineMonitor.getStatusChanged$().pipe(take(1)));
++
++      (offlineMonitor as any).handleOffline();
+ 
+-      // Simulate status change
+-      setTimeout(() => {
+-        window.dispatchEvent(new UIEvent('online'));
+-      }, 100);
++      const event = await statusChangedPromise;
++      expect(event.state).toBe('offline');
+     });
+   });
+ 
+@@ -232,19 +237,16 @@ describe('Offline Sync Services', () => {
+       subscription.unsubscribe();
+     });
+ 
+-    it('should not allow concurrent syncs', fakeAsync(async () => {
+-      // Simulate starting sync twice
+-      const result1 = syncManager.startSync();
+-      const result2 = syncManager.startSync();
++    it('should not allow concurrent syncs', async () => {
++      (syncManager as any).syncInProgress$.next(true);
+ 
+-      tick(100);
++      const secondSyncResult = await syncManager.startSync();
+ 
+-      const r1 = await result1;
+-      const r2 = await result2;
++      expect(secondSyncResult.success).toBe(false);
++      expect(secondSyncResult.errors).toContain('Sync already in progress');
+ 
+-      // One should fail due to concurrent protection
+-      expect(r1.success || r2.success).toBeDefined();
+-    }));
++      (syncManager as any).syncInProgress$.next(false);
++    });
+ 
+     it('should provide sync progress', () => {
+       let progress = { inProgress: false, current: 0, total: 0 };
+@@ -257,17 +259,25 @@ describe('Offline Sync Services', () => {
+       subscription.unsubscribe();
+     });
+ 
+-    it('should emit sync completed event', (done) => {
+-      const subscription = syncManager.getSyncCompleted$().subscribe(() => {
+-        subscription.unsubscribe();
+-        done();
+-      });
+-
+-      // Trigger a sync
+-      syncManager.startSync().catch(() => {
+-        // Expected if no server available
+-        done();
+-      });
++    it('should emit sync completed event', async () => {
++      const entryId = await syncManager.enqueueOperation('CREATE', 'training', { test: 1 });
++      (apiService.syncBatch as jasmine.Spy).and.returnValue(of({
++        success: true,
++        batchId: 'test-batch',
++        synced: 1,
++        failed: 0,
++        conflicts: 0,
++        data: [{ id: entryId, batchId: 'test-batch', result: 'synced' }],
++        durationMs: 1,
++      }));
++
++      const completedPromise = firstValueFrom(syncManager.getSyncCompleted$().pipe(take(1)));
++      const result = await syncManager.startSync();
++      const completed = await completedPromise;
++
++      expect(result.success).toBe(true);
++      expect(completed.success).toBe(true);
++      expect(completed.synced).toBe(1);
+     });
+   });
+ 
+@@ -281,20 +291,19 @@ describe('Offline Sync Services', () => {
+       expect(pending.length).toBeGreaterThanOrEqual(3);
+     });
+ 
+-    it('should maintain operations during sync attempt', fakeAsync(async () => {
++    it('should maintain operations during sync attempt', async () => {
+       await syncManager.enqueueOperation('CREATE', 'training', { test: 1 });
+       const countBefore = await offlineStorage.getPendingCount();
+ 
+-      // Try to sync (will fail without real server)
+-      syncManager.startSync().catch(() => {
+-        // Expected
+-      });
++      (apiService.syncBatch as jasmine.Spy).and.returnValue(
++        throwError(() => new Error('offline sync unavailable'))
++      );
+ 
+-      tick(100);
++      const result = await syncManager.startSync();
+ 
+-      // Operations should still be there (failed sync)
++      expect(result.success).toBe(false);
+       const countAfter = await offlineStorage.getPendingCount();
+       expect(countAfter).toBeGreaterThanOrEqual(countBefore);
+-    }));
++    });
+   });
+ });
+diff --git a/frontend/src/types/index.ts b/frontend/src/types/index.ts
+index cb558af..395dfdc 100644
+--- a/frontend/src/types/index.ts
++++ b/frontend/src/types/index.ts
+@@ -915,6 +915,89 @@ export interface GetRecentTrainingsResponse {
+   trainings: RecentTrainingSummary[];
+ }
+ 
++export interface StudentProgressMonthlyItem {
++  monthStart: string;
++  presentCount: number;
++  totalCount: number;
++}
++
++export interface StudentProgressCommentItem {
++  content: string;
++  professorName: string;
++  sessionDate?: string;
++  createdAt: string;
++}
++
++export interface StudentProgressBeltHistoryItem {
++  belt: string;
++  receivedDate: string;
++  promotedBy?: string;
++  notes?: string;
++  durationDays: number;
++}
++
++// Story 4-2: Card 1 Expandido - Chart Data
++export interface StudentProgressWeekly {
++  weekNumber: number;
++  date: string;
++  proficiencyPercent: number;
++}
++
++export interface StudentProgressChartData {
++  weeklyEvolution: StudentProgressWeekly[];
++  minValue: number;
++  maxValue: number;
++  trend: 'up' | 'down' | 'flat';
++}
++
++export interface StudentProgressDashboardResponse {
++  heading: string;
++  subheading: string;
++  cards: {
++    evolucaoMes: {
++      currentMonthPresentCount: number;
++      previousMonthPresentCount: number;
++      delta: number;
++      monthlySeries: StudentProgressMonthlyItem[];
++      weeklySeries: StudentProgressWeekly[];
++    };
++    frequencia: {
++      presentCount90d: number;
++      totalCount90d: number;
++      attendancePercentage90d: number;
++      nextClass?: {
++        turmaName: string;
++        sessionDate: string;
++        sessionTime: string;
++      };
++      recentSessions: Array<{
++        sessionDate: string;
++        status: 'present' | 'absent' | 'justified';
++      }>;
++    };
++    comentariosProfessor: {
++      latest?: StudentProgressCommentItem;
++      totalComments: number;
++      timeline: StudentProgressCommentItem[];
++    };
++    faixaConquistas: {
++      currentBelt?: string;
++      beltDate?: string;
++      isFederated: boolean;
++      federationDate?: string;
++      federationRegistration?: string;
++      totalBadges: number;
++      latestBadges: Array<{
++        name: string;
++        earnedAt: string;
++      }>;
++      currentStreak: number;
++      beltHistory: StudentProgressBeltHistoryItem[];
++    };
++  };
++  generatedAt: string;
++}
++
+ // Story 3-7: Training History types
+ export interface TrainingHistoryItem {
+   session_id: string;

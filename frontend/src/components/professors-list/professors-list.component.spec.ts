@@ -93,6 +93,6 @@ describe('ProfessorsListComponent', () => {
     component.loadProfessors();
 
     expect(component.errorMessage).toBe('Falha na API');
-    expect(component.loading).toBeFalse();
+    expect(component.isLoading).toBeFalse();
   });
 });

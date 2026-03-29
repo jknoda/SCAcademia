@@ -1,0 +1,456 @@
+diff --git a/frontend/src/components/home/home.component.scss b/frontend/src/components/home/home.component.scss
+index 13eaaee..d6e6834 100644
+--- a/frontend/src/components/home/home.component.scss
++++ b/frontend/src/components/home/home.component.scss
+@@ -182,6 +182,81 @@ section h3 {
+   margin: 0;
+ }
+ 
++.student-progress-section h3 {
++  margin-bottom: 6px;
++}
++
++.student-progress-grid {
++  display: grid;
++  grid-template-columns: 1fr;
++  gap: 16px;
++}
++
++.student-progress-card {
++  min-height: 220px;
++}
++
++.skeleton-card {
++  pointer-events: none;
++}
++
++.skeleton-line {
++  height: 12px;
++  border-radius: 6px;
++  background: linear-gradient(90deg, #e9ecef 25%, #f8f9fa 50%, #e9ecef 75%);
++  background-size: 300% 100%;
++  animation: skeleton-shimmer 1.2s ease-in-out infinite;
++}
++
++.skeleton-title {
++  height: 18px;
++  width: 60%;
++}
++
++.skeleton-short {
++  width: 40%;
++}
++
++@keyframes skeleton-shimmer {
++  0% {
++    background-position: 100% 0;
++  }
++  100% {
++    background-position: -100% 0;
++  }
++}
++
++.student-progress-modal {
++  position: fixed;
++  inset: 0;
++  z-index: 1200;
++  display: flex;
++  justify-content: center;
++  align-items: center;
++  padding: 16px;
++}
++
++.student-progress-modal-backdrop {
++  position: absolute;
++  inset: 0;
++  background: rgba(0, 0, 0, 0.45);
++}
++
++.student-progress-modal-content {
++  position: relative;
++  width: min(860px, 100%);
++  max-height: 85vh;
++  overflow: auto;
++  background: #fff;
++  border-radius: 12px;
++  padding: 20px;
++  box-shadow: 0 20px 42px rgba(0, 0, 0, 0.22);
++}
++
++.chart-wrapper {
++  margin-top: 16px;
++}
++
+ .feature-card-soft {
+   background: #f8fbff;
+   border-color: #dbeafe;
+@@ -374,6 +449,20 @@ section h3 {
+   }
+ }
+ 
++@media (min-width: 600px) and (max-width: 1199px) {
++  .student-progress-grid {
++    grid-template-columns: repeat(2, minmax(0, 1fr));
++    gap: 20px;
++  }
++}
++
++@media (min-width: 1200px) {
++  .student-progress-grid {
++    grid-template-columns: repeat(2, minmax(0, 1fr));
++    gap: 24px;
++  }
++}
++
+ @media (max-width: 600px) {
+   .dashboard-header {
+     padding: 12px;
+@@ -403,4 +492,13 @@ section h3 {
+   .user-avatar {
+     flex-shrink: 0;
+   }
++
++  .student-progress-grid {
++    gap: 16px;
++  }
++
++  .student-progress-modal-content {
++    padding: 16px;
++    max-height: 92vh;
++  }
+ }
+\ No newline at end of file
+diff --git a/frontend/src/components/home/home.component.spec.ts b/frontend/src/components/home/home.component.spec.ts
+index ac044c7..45208c3 100644
+--- a/frontend/src/components/home/home.component.spec.ts
++++ b/frontend/src/components/home/home.component.spec.ts
+@@ -5,6 +5,7 @@ import { BehaviorSubject, of } from 'rxjs';
+ 
+ import { ApiService } from '../../services/api.service';
+ import { AuthService } from '../../services/auth.service';
++import { StudentProgressChartComponent } from '../student-progress-chart/student-progress-chart.component';
+ import { HomeComponent } from './home.component';
+ 
+ describe('HomeComponent', () => {
+@@ -50,7 +51,7 @@ describe('HomeComponent', () => {
+ 
+     await TestBed.configureTestingModule({
+       declarations: [HomeComponent],
+-      imports: [FormsModule],
++      imports: [FormsModule, StudentProgressChartComponent],
+       providers: [
+         { provide: AuthService, useValue: authSpy },
+         { provide: ApiService, useValue: apiSpy },
+@@ -63,6 +64,10 @@ describe('HomeComponent', () => {
+     fixture.detectChanges();
+   });
+ 
++  afterEach(() => {
++    localStorage.clear();
++  });
++
+   it('lista filhos com anamnese pendente para o responsável', () => {
+     expect(component.studentsWithoutHealthScreening.length).toBe(1);
+     expect(component.studentsWithoutHealthScreening[0].studentName).toBe('Filho Um');
+@@ -75,4 +80,66 @@ describe('HomeComponent', () => {
+       queryParams: { returnTo: '/home' },
+     });
+   });
++
++  it('carrega dashboard de progresso do cache quando aluno está offline', () => {
++    const cachedDashboard = {
++      heading: 'Olá, Aluna!',
++      subheading: 'Seu progresso em judô',
++      cards: {
++        evolucaoMes: {
++          currentMonthPresentCount: 4,
++          previousMonthPresentCount: 3,
++          delta: 1,
++          monthlySeries: [],
++          weeklySeries: [
++            { weekNumber: 1, date: '2026-03-01', proficiencyPercent: 45 },
++            { weekNumber: 2, date: '2026-03-08', proficiencyPercent: 52 },
++          ],
++        },
++        frequencia: {
++          presentCount90d: 4,
++          totalCount90d: 5,
++          attendancePercentage90d: 80,
++          recentSessions: [],
++        },
++        comentariosProfessor: {
++          totalComments: 0,
++          timeline: [],
++        },
++        faixaConquistas: {
++          isFederated: false,
++          totalBadges: 0,
++          latestBadges: [],
++          currentStreak: 0,
++          beltHistory: [],
++        },
++      },
++      generatedAt: '2026-03-27T16:00:00.000Z',
++    } as any;
++
++    localStorage.setItem(
++      'student-progress-dashboard:student-1',
++      JSON.stringify({
++        data: cachedDashboard,
++        cachedAt: '2026-03-27T16:00:00.000Z',
++      })
++    );
++
++    spyOnProperty(window.navigator, 'onLine', 'get').and.returnValue(false);
++
++    component.currentUser = {
++      id: 'student-1',
++      email: 'aluno@test.com',
++      fullName: 'Aluna',
++      role: 'Aluno',
++      academy: { id: 'academy-1', name: 'Academia' },
++    } as any;
++
++    component.loadStudentProgressDashboard();
++
++    expect(component.studentProgressDashboard?.heading).toBe('Olá, Aluna!');
++    expect(component.studentProgressWeeklyData.length).toBe(2);
++    expect(component.isUsingCachedProgressData).toBeTrue();
++    expect(component.hasStudentProgressError).toBeFalse();
++  });
+ });
+\ No newline at end of file
+diff --git a/frontend/src/components/home/home.component.ts b/frontend/src/components/home/home.component.ts
+index fcc58e9..d4b414c 100644
+--- a/frontend/src/components/home/home.component.ts
++++ b/frontend/src/components/home/home.component.ts
+@@ -4,7 +4,15 @@ import { Subject } from 'rxjs';
+ import { finalize, takeUntil, timeout } from 'rxjs/operators';
+ import { AuthService } from '../../services/auth.service';
+ import { ApiService } from '../../services/api.service';
+-import { DeletionRequestItem, LinkedStudentItem, ProfessorTurmaItem, RecentTrainingSummary, User } from '../../types';
++import {
++  DeletionRequestItem,
++  LinkedStudentItem,
++  ProfessorTurmaItem,
++  RecentTrainingSummary,
++  StudentProgressDashboardResponse,
++  StudentProgressWeekly,
++  User,
++} from '../../types';
+ 
+ @Component({
+   selector: 'app-home',
+@@ -37,8 +45,19 @@ export class HomeComponent implements OnInit, OnDestroy {
+   isSubmittingDeletion = false;
+   isLoadingStatus = false;
+   isLoadingLinkedStudents = false;
++  studentProgressDashboard: StudentProgressDashboardResponse | null = null;
++  isLoadingStudentProgress = false;
++  hasStudentProgressError = false;
++  studentProgressErrorMessage = '';
++  isUsingCachedProgressData = false;
++  lastProgressSyncAt: string | null = null;
++  selectedStudentProgressDetail: 'evolucao' | 'frequencia' | 'comentarios' | 'faixa' | null = null;
++  studentProgressWeeklyData: StudentProgressWeekly[] = [];
+ 
+   private destroy$ = new Subject<void>();
++  private studentProgressRetryTimer: ReturnType<typeof setTimeout> | null = null;
++  private readonly STUDENT_PROGRESS_RETRY_MS = 2000;
++  private readonly STUDENT_PROGRESS_TIMEOUT_MS = 10000;
+ 
+   constructor(
+     private auth: AuthService,
+@@ -62,6 +81,10 @@ export class HomeComponent implements OnInit, OnDestroy {
+     if (this.isProfessor()) {
+       this.loadRecentTrainings();
+     }
++
++    if (this.isAluno()) {
++      this.loadStudentProgressDashboard();
++    }
+   }
+ 
+   isResponsavel(): boolean {
+@@ -188,6 +211,10 @@ export class HomeComponent implements OnInit, OnDestroy {
+   }
+ 
+   ngOnDestroy(): void {
++    if (this.studentProgressRetryTimer) {
++      clearTimeout(this.studentProgressRetryTimer);
++      this.studentProgressRetryTimer = null;
++    }
+     this.destroy$.next();
+     this.destroy$.complete();
+   }
+@@ -215,7 +242,7 @@ export class HomeComponent implements OnInit, OnDestroy {
+       return 'Painel do Professor';
+     }
+     if (this.isAluno()) {
+-      return 'Área do Aluno';
++      return `Olá, ${this.currentUser?.fullName || 'Aluno'}!`;
+     }
+     if (this.isResponsavel()) {
+       return 'Área do Responsável';
+@@ -228,7 +255,7 @@ export class HomeComponent implements OnInit, OnDestroy {
+       return 'Acompanhe seus treinos, organize turmas e acesse o histórico recente em um só lugar.';
+     }
+     if (this.isAluno()) {
+-      return 'Atualize seu cadastro, revise sua anamnese e acompanhe as próximas ações do seu perfil.';
++      return 'Seu progresso em judô';
+     }
+     if (this.isResponsavel()) {
+       return 'Gerencie pendências de saúde e acompanhe solicitações LGPD dos alunos vinculados.';
+@@ -359,6 +386,152 @@ export class HomeComponent implements OnInit, OnDestroy {
+       });
+   }
+ 
++  loadStudentProgressDashboard(forceRefresh: boolean = false): void {
++    if (!this.currentUser || !this.isAluno()) {
++      return;
++    }
++
++    if (this.studentProgressRetryTimer) {
++      clearTimeout(this.studentProgressRetryTimer);
++      this.studentProgressRetryTimer = null;
++    }
++
++    const cacheKey = this.getStudentProgressCacheKey();
++    const cached = this.readStudentProgressCache(cacheKey);
++
++    if (!navigator.onLine && cached) {
++      this.studentProgressDashboard = cached.data;
++      this.studentProgressWeeklyData = cached.data.cards.evolucaoMes.weeklySeries || [];
++      this.lastProgressSyncAt = cached.cachedAt;
++      this.isUsingCachedProgressData = true;
++      this.isLoadingStudentProgress = false;
++      this.hasStudentProgressError = false;
++      this.studentProgressErrorMessage = '';
++      return;
++    }
++
++    this.isLoadingStudentProgress = true;
++    this.hasStudentProgressError = false;
++    this.studentProgressErrorMessage = '';
++    this.isUsingCachedProgressData = false;
++
++    if (!forceRefresh && cached?.cachedAt) {
++      this.lastProgressSyncAt = cached.cachedAt;
++    }
++
++    const startedAt = Date.now();
++
++    const tryFetch = () => {
++      this.api.getStudentProgressDashboard().pipe(
++        timeout(3000),
++        takeUntil(this.destroy$)
++      ).subscribe({
++        next: (response) => {
++          this.studentProgressDashboard = response;
++          this.studentProgressWeeklyData = response.cards.evolucaoMes.weeklySeries || [];
++          this.isLoadingStudentProgress = false;
++          this.hasStudentProgressError = false;
++          this.studentProgressErrorMessage = '';
++          this.isUsingCachedProgressData = false;
++          this.lastProgressSyncAt = new Date().toISOString();
++          this.writeStudentProgressCache(cacheKey, response, this.lastProgressSyncAt);
++        },
++        error: () => {
++          const elapsed = Date.now() - startedAt;
++          if (elapsed < this.STUDENT_PROGRESS_TIMEOUT_MS && navigator.onLine) {
++            this.studentProgressRetryTimer = setTimeout(() => {
++              tryFetch();
++            }, this.STUDENT_PROGRESS_RETRY_MS);
++            return;
++          }
++
++          this.isLoadingStudentProgress = false;
++          this.hasStudentProgressError = true;
++          this.studentProgressErrorMessage = 'Erro ao carregar. Tentar novamente';
++        },
++      });
++    };
++
++    tryFetch();
++  }
++
++  openStudentProgressDetails(detail: 'evolucao' | 'frequencia' | 'comentarios' | 'faixa'): void {
++    this.selectedStudentProgressDetail = detail;
++  }
++
++  closeStudentProgressDetails(): void {
++    this.selectedStudentProgressDetail = null;
++  }
++
++  getStudentProgressHeading(): string {
++    if (this.studentProgressDashboard?.heading) {
++      return this.studentProgressDashboard.heading;
++    }
++    return `Olá, ${this.currentUser?.fullName || 'Aluno'}!`;
++  }
++
++  getStudentProgressSubheading(): string {
++    return this.studentProgressDashboard?.subheading || 'Seu progresso em judô';
++  }
++
++  getFormattedLastProgressSync(): string {
++    if (!this.lastProgressSyncAt) {
++      return '';
++    }
++
++    return new Date(this.lastProgressSyncAt).toLocaleString('pt-BR');
++  }
++
++  formatBeltDuration(days: number): string {
++    if (days <= 0) {
++      return 'Recente';
++    }
++
++    const months = Math.floor(days / 30);
++    if (months >= 1) {
++      return `${months} mes(es)`;
++    }
++
++    return `${days} dia(s)`;
++  }
++
++  private getStudentProgressCacheKey(): string {
++    return `student-progress-dashboard:${this.currentUser?.id || 'unknown'}`;
++  }
++
++  private readStudentProgressCache(cacheKey: string): {
++    data: StudentProgressDashboardResponse;
++    cachedAt: string;
++  } | null {
++    try {
++      const raw = localStorage.getItem(cacheKey);
++      if (!raw) {
++        return null;
++      }
++
++      const parsed = JSON.parse(raw) as { data: StudentProgressDashboardResponse; cachedAt: string };
++      if (!parsed?.data || !parsed?.cachedAt) {
++        return null;
++      }
++
++      return parsed;
++    } catch {
++      return null;
++    }
++  }
++
++  private writeStudentProgressCache(
++    cacheKey: string,
++    data: StudentProgressDashboardResponse,
++    cachedAt: string | null
++  ): void {
++    if (!cachedAt) {
++      return;
++    }
++
++    localStorage.setItem(cacheKey, JSON.stringify({ data, cachedAt }));
++  }
++
+   formatTrainingDate(dateStr: string): string {
+     const [year, month, day] = dateStr.split('-').map(Number);
+     return new Date(year, month - 1, day).toLocaleDateString('pt-BR');

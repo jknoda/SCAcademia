@@ -39,6 +39,10 @@ import { ProfessorTechniquesComponent } from './components/professor-techniques/
 import { StudentsListComponent } from './components/students-list/students-list.component';
 import { StudentFormComponent } from './components/student-form/student-form.component';
 import { StudentProfileComponent } from './components/student-profile/student-profile.component';
+import { AdminUsersListComponent } from './components/admin-users-list/admin-users-list.component';
+import { AdminBackupRecoveryComponent } from './components/admin-backup-recovery/admin-backup-recovery.component';
+import { AdminHealthMonitorComponent } from './components/admin-health-monitor/admin-health-monitor.component';
+import { StudentProgressChartComponent } from './components/student-progress-chart/student-progress-chart.component';
 import { AuthGuard } from './guards/auth.guard';
 import { RoleGuard } from './guards/role.guard';
 import { AuthInterceptor } from './services/auth.interceptor';
@@ -76,6 +80,9 @@ import { AuthInterceptor } from './services/auth.interceptor';
     ProfessorTurmasComponent,
     ProfessorTurmaCreateComponent,
     ProfessorTechniquesComponent,
+    AdminUsersListComponent,
+    AdminBackupRecoveryComponent,
+    AdminHealthMonitorComponent,
     StudentsListComponent,
     StudentFormComponent,
     StudentProfileComponent,
@@ -87,6 +94,7 @@ import { AuthInterceptor } from './services/auth.interceptor';
     FormsModule,
     CommonModule,
     AppRoutingModule,
+    StudentProgressChartComponent,
   ],
   providers: [
     AuthGuard,

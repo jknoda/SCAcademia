@@ -1,6 +1,15 @@
 import { Response } from 'express';
 import { AuthenticatedRequest } from '../types';
-import { getAuditLogsFiltered, getAuditLogsCsv, logAudit, AuditFilters } from '../lib/audit';
+import {
+  getAuditLogsFiltered,
+  getAuditLogsCsv,
+  logAudit,
+  AuditFilters,
+  inferAuditOutcome,
+  getAuditAnomalyLogIds,
+  getAuditLogsPdfBuffer,
+} from '../lib/audit';
+import { pool } from '../lib/db';
 
 const parsePagination = (query: any): { page: number; limit: number } => {
   const page = Math.max(1, parseInt(query.page as string, 10) || 1);
@@ -19,6 +28,13 @@ const parseFilters = (query: any): { filters: AuditFilters; error?: string } => 
   }
   if (query.resourceType && typeof query.resourceType === 'string') {
     filters.resourceType = query.resourceType;
+  }
+  if (query.outcome && typeof query.outcome === 'string') {
+    const normalized = query.outcome.toUpperCase();
+    if (normalized !== 'SUCCESS' && normalized !== 'DENIED') {
+      return { filters, error: 'outcome inválido. Use SUCCESS ou DENIED.' };
+    }
+    filters.outcome = normalized;
   }
   if (query.dateFrom && typeof query.dateFrom === 'string') {
     const d = new Date(query.dateFrom);
@@ -51,11 +67,24 @@ export const getAuditLogsHandler = async (req: AuthenticatedRequest, res: Respon
     const pagination = parsePagination(req.query);
 
     const { logs, total } = await getAuditLogsFiltered(academyId, filters, pagination);
+    const anomalyLogIds = await getAuditAnomalyLogIds(
+      academyId,
+      logs.map((log) => log.id)
+    );
 
-    logAudit(req.user!.userId, 'AUDIT_LOG_VIEWED', 'AuditLog', academyId, academyId, req.ip, {
-      filters,
-      page: pagination.page,
-    });
+    logAudit(
+      req.user!.userId,
+      'AUDIT_LOG_VIEWED',
+      'AuditLog',
+      academyId,
+      academyId,
+      req.ip,
+      {
+        filters,
+        page: pagination.page,
+      },
+      req.get('user-agent')
+    );
 
     const totalPages = Math.ceil(total / pagination.limit);
 
@@ -64,11 +93,15 @@ export const getAuditLogsHandler = async (req: AuthenticatedRequest, res: Respon
         logId: log.id,
         actorId: log.userId,
         actorName: log.actorName,
+        actorRole: log.actorRole,
         action: log.action,
         resourceType: log.entity,
         resourceId: log.entityId,
+        outcome: inferAuditOutcome(log.action),
         ipAddress: log.ipAddress,
+        userAgent: log.userAgent,
         timestamp: log.timestamp,
+        anomalyFlag: anomalyLogIds.has(log.id),
         changesJson: log.details,
       })),
       total,
@@ -91,10 +124,19 @@ export const exportAuditLogsCsvHandler = async (req: AuthenticatedRequest, res: 
 
     const rows = await getAuditLogsCsv(academyId, filters);
 
-    logAudit(req.user!.userId, 'AUDIT_LOG_EXPORTED', 'AuditLog', academyId, academyId, req.ip, {
-      filters,
-      rowCount: rows.length,
-    });
+    logAudit(
+      req.user!.userId,
+      'AUDIT_LOG_EXPORTED',
+      'AuditLog',
+      academyId,
+      academyId,
+      req.ip,
+      {
+        filters,
+        rowCount: rows.length,
+      },
+      req.get('user-agent')
+    );
 
     const headers = ['Data/Hora', 'Usuário', 'ID Usuário', 'Ação', 'Recurso', 'Tipo Recurso', 'IP', 'Detalhes'];
     const csvLines = [
@@ -125,5 +167,45 @@ export const exportAuditLogsCsvHandler = async (req: AuthenticatedRequest, res: 
   } catch (error) {
     console.error('Erro ao exportar audit logs CSV:', error);
     return res.status(500).json({ error: 'Erro ao exportar audit logs' });
+  }
+};
+
+export const exportAuditLogsPdfHandler = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const academyId = req.user!.academyId;
+    const { filters, error } = parseFilters(req.query);
+    if (error) {
+      return res.status(400).json({ error });
+    }
+
+    const academyRes = await pool.query(
+      'SELECT name FROM academies WHERE academy_id = $1 LIMIT 1',
+      [academyId]
+    );
+    const academyName: string = academyRes.rows[0]?.name || 'Academia';
+
+    const pdfBuffer = await getAuditLogsPdfBuffer(academyId, academyName, filters);
+
+    logAudit(
+      req.user!.userId,
+      'AUDIT_LOG_EXPORTED',
+      'AuditLog',
+      academyId,
+      academyId,
+      req.ip,
+      {
+        filters,
+        format: 'pdf',
+      },
+      req.get('user-agent')
+    );
+
+    const filename = `Auditoria_LGPD_${new Date().toISOString().slice(0, 10)}.pdf`;
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    return res.send(pdfBuffer);
+  } catch (error) {
+    console.error('Erro ao exportar audit logs PDF:', error);
+    return res.status(500).json({ error: 'Erro ao exportar audit logs PDF' });
   }
 };

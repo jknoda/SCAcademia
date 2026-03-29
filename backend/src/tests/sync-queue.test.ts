@@ -32,25 +32,32 @@ async function setupCtx(): Promise<void> {
     .post('/api/auth/academies')
     .send({
       name: 'Test Academy for Sync',
+      location: 'Sao Paulo',
       email: `academy-sync-${Date.now()}@test.com`,
-      password: 'TempPassword123!'
+      phone: '11999999999'
     });
 
-  ctx.academyId = academyRes.body.data.academyId;
+  ctx.academyId = academyRes.body?.academyId || academyRes.body?.data?.academyId;
 
-  // Create admin for academy
-  const adminRes = await request(app)
-    .post('/api/auth/register')
+  // Create admin via init-admin + login (current auth flow)
+  const adminEmail = `admin-sync-${Date.now()}@test.com`;
+  await request(app)
+    .post(`/api/auth/academies/${ctx.academyId}/init-admin`)
     .send({
-      email: `admin-sync-${Date.now()}@test.com`,
+      email: adminEmail,
       password: 'AdminPassword123!',
       fullName: 'Admin Sync Test',
-      role: 'Admin',
-      academyId: ctx.academyId
     });
 
-  ctx.adminId = adminRes.body.data.userId;
-  ctx.adminToken = adminRes.body.data.token;
+  const adminLoginRes = await request(app)
+    .post('/api/auth/login')
+    .send({
+      email: adminEmail,
+      password: 'AdminPassword123!',
+    });
+
+  ctx.adminId = adminLoginRes.body?.user?.id;
+  ctx.adminToken = adminLoginRes.body?.accessToken;
 
   // Create professor 1
   const profRes = await request(app)
@@ -63,8 +70,8 @@ async function setupCtx(): Promise<void> {
       academyId: ctx.academyId
     });
 
-  ctx.professorId = profRes.body.data.userId;
-  ctx.professorToken = profRes.body.data.token;
+  ctx.professorId = profRes.body?.user?.id || profRes.body?.data?.userId;
+  ctx.professorToken = profRes.body?.accessToken || profRes.body?.data?.token;
 
   // Create professor 2
   const prof2Res = await request(app)
@@ -77,8 +84,8 @@ async function setupCtx(): Promise<void> {
       academyId: ctx.academyId
     });
 
-  ctx.professor2Id = prof2Res.body.data.userId;
-  ctx.professor2Token = prof2Res.body.data.token;
+  ctx.professor2Id = prof2Res.body?.user?.id || prof2Res.body?.data?.userId;
+  ctx.professor2Token = prof2Res.body?.accessToken || prof2Res.body?.data?.token;
 
   // Create student
   const studentRes = await request(app)
@@ -91,7 +98,7 @@ async function setupCtx(): Promise<void> {
       academyId: ctx.academyId
     });
 
-  ctx.studentId = studentRes.body.data.userId;
+  ctx.studentId = studentRes.body?.user?.id || studentRes.body?.data?.userId;
 
   // Create turma
   const turmaRes = await request(app)
@@ -99,7 +106,7 @@ async function setupCtx(): Promise<void> {
     .set('Authorization', `Bearer ${ctx.professorToken}`)
     .send({ turmaName: 'Test Turma for Sync' });
 
-  ctx.turmaId = turmaRes.body.data.turmaId;
+  ctx.turmaId = turmaRes.body?.turmaId || turmaRes.body?.data?.turmaId;
 
   // Create training session
   const sessionRes = await request(app)
@@ -111,17 +118,13 @@ async function setupCtx(): Promise<void> {
       sessionTime: '15:00'
     });
 
-  ctx.sessionId = sessionRes.body.data.sessionId;
+  ctx.sessionId = sessionRes.body?.sessionId || sessionRes.body?.data?.sessionId;
 }
 
 describe('/api/trainings/sync-queue', () => {
   beforeAll(async () => {
     ctx = {} as TestContext;
     await setupCtx();
-  });
-
-  afterAll(async () => {
-    await pool.end();
   });
 
   describe('POST /api/trainings/sync-queue', () => {
@@ -191,7 +194,7 @@ describe('/api/trainings/sync-queue', () => {
         });
 
       expect(res.status).toBe(400);
-      expect(res.body.error).toMatch(/empty/i);
+      expect(res.body.error).toMatch(/vazio/i);
     });
 
     test('AC4: Rejects batch > 50 operations', async () => {
@@ -266,7 +269,7 @@ describe('/api/trainings/sync-queue', () => {
         });
 
       expect(res.status).toBe(403);
-      expect(res.body.error).toMatch(/professor/i);
+      expect(res.body.error).toMatch(/papel insuficiente|apenas professores/i);
     });
 
     test('AC7: Preserves client timestamp in queue', async () => {
@@ -294,12 +297,12 @@ describe('/api/trainings/sync-queue', () => {
       
       // Verify timestamp is stored
       const queueEntryId = res.body.data[0].id;
-      const checkRes = await request(app)
-        .get('/api/trainings/admin/sync-queue/pending')
-        .set('Authorization', `Bearer ${ctx.adminToken}`);
-
-      const queueEntry = checkRes.body.data.find((entry: any) => entry.id === queueEntryId);
-      expect(queueEntry).toBeDefined();
+      const dbRes = await pool.query(
+        'SELECT client_timestamp FROM sync_queue WHERE id = $1',
+        [queueEntryId]
+      );
+      expect(dbRes.rows).toHaveLength(1);
+      expect(Number(dbRes.rows[0].client_timestamp)).toBe(clientTimestamp);
     });
 
     test('AC8: Isolates professor data (RBAC)', async () => {
@@ -415,7 +418,7 @@ describe('/api/trainings/sync-queue', () => {
         .set('Authorization', `Bearer ${ctx.professorToken}`);
 
       expect(res.status).toBe(403);
-      expect(res.body.error).toMatch(/admin/i);
+      expect(res.body.error).toMatch(/papel insuficiente|apenas administradores/i);
     });
 
     test('AC3: Returns pending operation count', async () => {

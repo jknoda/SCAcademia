@@ -1,0 +1,193 @@
+<div class="backup-page">
+  <header class="backup-header">
+    <div>
+      <h2>Admin &gt; Backup &amp; Recovery</h2>
+      <p>Controle backups manuais, agenda automática, valide integridade e inicie restores com confirmação forte.</p>
+    </div>
+
+    <div class="header-actions">
+      <button class="action-btn primary" (click)="openTriggerForm()">Fazer Backup Agora</button>
+      <button class="action-btn" (click)="goBack()">Voltar ao dashboard</button>
+    </div>
+  </header>
+
+  <div *ngIf="errorMessage" class="status-message error">{{ errorMessage }}</div>
+  <div *ngIf="successMessage" class="status-message success">{{ successMessage }}</div>
+
+  <section class="backup-card status-card">
+    <h3>Status do Backup Automático</h3>
+    <div class="status-grid">
+      <div>
+        <span class="label">Frequência</span>
+        <strong>{{ schedule?.enabled ? 'Diariamente' : 'Desativado' }}</strong>
+      </div>
+      <div>
+        <span class="label">Horário</span>
+        <strong>{{ schedule?.hour ?? 2 | number:'2.0' }}:{{ schedule?.minute ?? 30 | number:'2.0' }}</strong>
+      </div>
+      <div>
+        <span class="label">Próxima execução</span>
+        <strong>{{ formatDateTime(schedule?.nextRunAt || null) }}</strong>
+      </div>
+      <div>
+        <span class="label">Último backup automático</span>
+        <strong>{{ lastAutoBackup ? formatDateTime(lastAutoBackup.completedAt) : 'Sem execução registrada' }}</strong>
+      </div>
+      <div>
+        <span class="label">Último tamanho</span>
+        <strong>{{ lastAutoBackup ? formatFileSize(lastAutoBackup.fileSizeBytes) : 'N/D' }}</strong>
+      </div>
+      <div>
+        <span class="label">Retenção</span>
+        <strong>{{ schedule?.retentionDays || 30 }} dias</strong>
+      </div>
+    </div>
+  </section>
+
+  <section class="backup-card schedule-card">
+    <h3>Agendamento Automático</h3>
+    <div class="form-grid">
+      <label>
+        <span>Hora</span>
+        <input type="number" min="0" max="23" [(ngModel)]="schedulePayload.hour" />
+      </label>
+
+      <label>
+        <span>Minuto</span>
+        <input type="number" min="0" max="59" [(ngModel)]="schedulePayload.minute" />
+      </label>
+
+      <label>
+        <span>Retenção (dias)</span>
+        <input type="number" min="7" max="90" [(ngModel)]="schedulePayload.retentionDays" />
+      </label>
+    </div>
+
+    <label class="checkbox-row">
+      <input type="checkbox" [(ngModel)]="schedulePayload.enabled" />
+      <span>Ativar backups automáticos diários</span>
+    </label>
+
+    <button class="action-btn primary" (click)="saveSchedule()" [disabled]="isSavingSchedule">
+      {{ isSavingSchedule ? 'Salvando...' : 'Salvar Agendamento' }}
+    </button>
+  </section>
+
+  <section class="backup-card history-card">
+    <h3>Histórico de Backups</h3>
+    <div *ngIf="isLoading" class="muted">Carregando histórico...</div>
+
+    <div *ngIf="!isLoading && jobs.length === 0" class="muted">Nenhum backup registrado até agora.</div>
+
+    <table *ngIf="!isLoading && jobs.length > 0" class="jobs-table">
+      <thead>
+        <tr>
+          <th>Data</th>
+          <th>Tipo</th>
+          <th>Tamanho</th>
+          <th>Status</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let job of jobs">
+          <td>
+            <div>{{ formatDateTime(job.createdAt) }}</div>
+            <small>{{ job.fileName || 'Arquivo pendente' }}</small>
+          </td>
+          <td>{{ getJobTypeLabel(job.type) }}</td>
+          <td>{{ formatFileSize(job.fileSizeBytes) }}</td>
+          <td>
+            <span class="badge" [class.ok]="job.status === 'completed'" [class.running]="job.status === 'running'" [class.failed]="job.status === 'failed'" [class.expired]="job.status === 'deleted'">
+              {{ getStatusLabel(job.status) }}
+            </span>
+          </td>
+          <td class="actions-cell">
+            <button class="action-btn small" (click)="downloadBackup(job.id)" [disabled]="job.status !== 'completed'">Download</button>
+            <button class="action-btn small" (click)="openVerifyModal(job)" [disabled]="job.status !== 'completed'">Testar Restore</button>
+            <button class="action-btn small danger" (click)="openRestoreModal(job)" [disabled]="job.status !== 'completed'">Restaurar</button>
+            <button class="action-btn small" (click)="deleteBackup(job)" [disabled]="job.status === 'running'">Excluir</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+</div>
+
+<div *ngIf="showTriggerForm" class="modal-backdrop" (click)="closeModals()">
+  <section class="modal-card" (click)="$event.stopPropagation()">
+    <h3>Backup Manual On-Demand</h3>
+
+    <label class="checkbox-row compact">
+      <input type="checkbox" [(ngModel)]="triggerPayload.includeHistory" />
+      <span>Incluir dados históricos completos</span>
+    </label>
+
+    <label class="checkbox-row compact">
+      <input type="checkbox" [(ngModel)]="triggerPayload.isEncrypted" />
+      <span>Encriptar backup com senha</span>
+    </label>
+
+    <label *ngIf="triggerPayload.isEncrypted">
+      <span>Senha de criptografia</span>
+      <input type="password" [(ngModel)]="triggerPayload.encryptionPassword" placeholder="Mínimo 8 caracteres" />
+    </label>
+
+    <div class="progress-panel" *ngIf="isTriggeringBackup">
+      <p>Processando backup... (pode levar 5-10 min)</p>
+      <div class="progress-track">
+        <div class="progress-fill indeterminate"></div>
+      </div>
+      <small>Não feche essa página.</small>
+    </div>
+
+    <div class="modal-actions">
+      <button class="action-btn" (click)="closeModals()">Cancelar</button>
+      <button class="action-btn primary" (click)="triggerBackup()" [disabled]="isTriggeringBackup">
+        {{ isTriggeringBackup ? 'Iniciando...' : 'Fazer Backup Agora' }}
+      </button>
+    </div>
+  </section>
+</div>
+
+<div *ngIf="showVerifyModal" class="modal-backdrop" (click)="closeModals()">
+  <section class="modal-card" (click)="$event.stopPropagation()">
+    <h3>Verificação de Integridade</h3>
+    <p *ngIf="verifyTargetJob">Backup: <strong>{{ verifyTargetJob.fileName || verifyTargetJob.id }}</strong></p>
+
+    <div class="verification-result" *ngIf="verifyResult">
+      <p [class.success-text]="verifyResult.valid" [class.error-text]="!verifyResult.valid">
+        {{ verifyResult.valid ? '✓ Backup íntegro' : '✗ Arquivo corrompido' }}
+      </p>
+      <p>Tamanho: {{ formatFileSize(verifyResult.sizeBytes) }}</p>
+      <p *ngIf="verifyResult.reason">Detalhe: {{ verifyResult.reason }}</p>
+    </div>
+
+    <div class="modal-actions">
+      <button class="action-btn" (click)="closeModals()">Fechar</button>
+    </div>
+  </section>
+</div>
+
+<div *ngIf="showRestoreModal" class="modal-backdrop" (click)="closeModals()">
+  <section class="modal-card danger-card" (click)="$event.stopPropagation()">
+    <h3>⚠️ AÇÃO IRREVERSÍVEL</h3>
+    <p>Isso sobrescreverá os dados atuais com o conteúdo do backup selecionado.</p>
+    <p *ngIf="restoreTargetJob"><strong>Backup:</strong> {{ restoreTargetJob.fileName || restoreTargetJob.id }}</p>
+
+    <label>
+      <span>Digite sua senha atual para confirmar</span>
+      <input type="password" [(ngModel)]="restorePayload.adminPassword" />
+    </label>
+
+    <label *ngIf="restoreTargetJob?.isEncrypted">
+      <span>Senha de criptografia do backup</span>
+      <input type="password" [(ngModel)]="restorePayload.encryptionPassword" />
+    </label>
+
+    <div class="modal-actions">
+      <button class="action-btn" (click)="closeModals()">Cancelar</button>
+      <button class="action-btn danger" (click)="confirmRestore()" [disabled]="!canConfirmRestore()">RESTAURAR AGORA</button>
+    </div>
+  </section>
+</div>

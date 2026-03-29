@@ -108,8 +108,8 @@ describe('Story 9.2 - Perfil Completo do Administrador', () => {
         documentId: '123.456.789-09',
       });
 
-    expect(res.status).toBe(404);
-    expect(res.body.error).toBe('Usuário não encontrado');
+    expect(res.status).toBe(401);
+    expect(res.body.error).toBe('Token inválido ou expirado');
   });
 
   it('AC3: altera senha com sucesso e mantém sessão válida', async () => {

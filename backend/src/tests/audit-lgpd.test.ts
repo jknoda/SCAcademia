@@ -1,5 +1,6 @@
 import request from 'supertest';
 import app from '../app';
+import { pool } from '../lib/db';
 
 const strongPassword = 'SenhaForte1!';
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -26,6 +27,8 @@ const waitForAuditAction = async (token: string, action: string): Promise<boolea
 describe('Auditoria LGPD — GET /api/admin/audit-logs', () => {
   let academyId = '';
   let adminToken = '';
+  let adminUserId = '';
+  let adminEmail = '';
 
   beforeEach(async () => {
     await request(app).post('/api/auth/test/reset').send({});
@@ -38,19 +41,31 @@ describe('Auditoria LGPD — GET /api/admin/audit-logs', () => {
     });
     academyId = academyRes.body.academyId;
 
+    adminEmail = 'admin.audit@academia.com';
+
     await request(app)
       .post(`/api/auth/academies/${academyId}/init-admin`)
       .send({
-        email: 'admin.audit@academia.com',
+        email: adminEmail,
         password: strongPassword,
         fullName: 'Admin Auditoria',
       });
 
     const loginRes = await request(app).post('/api/auth/login').send({
-      email: 'admin.audit@academia.com',
+      email: adminEmail,
       password: strongPassword,
     });
     adminToken = loginRes.body.accessToken;
+
+    const adminRes = await pool.query(
+      `SELECT user_id
+       FROM users
+       WHERE academy_id = $1
+         AND email = $2
+       LIMIT 1`,
+      [academyId, adminEmail]
+    );
+    adminUserId = String(adminRes.rows[0]?.user_id || '');
   });
 
   afterAll(async () => {
@@ -135,6 +150,87 @@ describe('Auditoria LGPD — GET /api/admin/audit-logs', () => {
     expect(bodyStr.startsWith('\uFEFF')).toBe(true);
     // Verifica que tem cabeçalho CSV
     expect(bodyStr).toMatch(/timestamp|acao|recurso/i);
+  });
+
+  it('retorna outcome por log e permite filtro por outcome', async () => {
+    const allLogsRes = await request(app)
+      .get('/api/admin/audit-logs')
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(allLogsRes.status).toBe(200);
+    expect(Array.isArray(allLogsRes.body.logs)).toBe(true);
+    expect(allLogsRes.body.logs.length).toBeGreaterThan(0);
+    expect(['SUCCESS', 'DENIED']).toContain(allLogsRes.body.logs[0].outcome);
+
+    const successOnlyRes = await request(app)
+      .get('/api/admin/audit-logs?outcome=SUCCESS')
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(successOnlyRes.status).toBe(200);
+    successOnlyRes.body.logs.forEach((log: any) => {
+      expect(log.outcome).toBe('SUCCESS');
+    });
+  });
+
+  it('filtra outcome=DENIED para ações com sufixo _DENIED', async () => {
+    await pool.query(
+      `INSERT INTO audit_logs
+        (academy_id, resource_type, resource_id, action, actor_user_id, ip_address, user_agent, timestamp, retention_until)
+       VALUES
+        ($1, 'AuditLog', 'denied-log-1', 'LOGIN_DENIED', $2, '127.0.0.1', 'Jest/Denied', NOW(), NOW() + INTERVAL '7 years')`,
+      [academyId, adminUserId]
+    );
+
+    const deniedRes = await request(app)
+      .get('/api/admin/audit-logs?outcome=DENIED&limit=200')
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(deniedRes.status).toBe(200);
+    expect(Array.isArray(deniedRes.body.logs)).toBe(true);
+    expect(deniedRes.body.logs.length).toBeGreaterThan(0);
+    deniedRes.body.logs.forEach((log: any) => {
+      expect(log.outcome).toBe('DENIED');
+      expect(String(log.action)).toMatch(/_(DENIED|FAILED|BLOCKED|REJECTED|UNAUTHORIZED)$/i);
+    });
+  });
+
+  it('marca anomalyFlag quando há 10+ ações DELETE no mesmo minuto', async () => {
+    const insertValues: string[] = [];
+    const params: Array<string> = [academyId, adminUserId];
+    for (let i = 0; i < 10; i++) {
+      const resourceIdParam = params.length + 1;
+      insertValues.push(`($1, 'AuditLog', $${resourceIdParam}, 'DATA_DELETE', $2, '10.10.10.10', 'Jest/Anomaly', NOW(), NOW() + INTERVAL '7 years')`);
+      params.push(`anomaly-log-${i}`);
+    }
+
+    await pool.query(
+      `INSERT INTO audit_logs
+        (academy_id, resource_type, resource_id, action, actor_user_id, ip_address, user_agent, timestamp, retention_until)
+       VALUES ${insertValues.join(', ')}`,
+      params
+    );
+
+    const anomalyRes = await request(app)
+      .get('/api/admin/audit-logs?action=DATA_DELETE&limit=200')
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(anomalyRes.status).toBe(200);
+    expect(Array.isArray(anomalyRes.body.logs)).toBe(true);
+    const anomalyLogs = anomalyRes.body.logs.filter((log: any) => String(log.action) === 'DATA_DELETE');
+    expect(anomalyLogs.length).toBeGreaterThanOrEqual(10);
+    anomalyLogs.slice(0, 10).forEach((log: any) => {
+      expect(log.anomalyFlag).toBe(true);
+    });
+  });
+
+  it('exporta PDF com Content-Type application/pdf', async () => {
+    const res = await request(app)
+      .get('/api/admin/audit-logs/export-pdf')
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(res.status).toBe(200);
+    expect(res.headers['content-type']).toMatch(/application\/pdf/);
+    expect(res.headers['content-disposition']).toMatch(/attachment/);
   });
 
   it('registra AUDIT_LOG_VIEWED ao consultar logs', async () => {

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import {
   Academy,
   AcademyProfile,
@@ -20,6 +21,19 @@ import {
   UpdateStudentPayload,
   UpdateStudentStatusPayload,
   StudentMutationResponse,
+  ListAdminUsersResponse,
+  CreateAdminManagedUserPayload,
+  UpdateAdminManagedUserPayload,
+  DeleteAdminManagedUserPayload,
+  AdminManagedUserMutationResponse,
+  BackupIntegrityResponse,
+  BackupJobResponse,
+  BackupListResponse,
+  BackupScheduleConfig,
+  BackupScheduleUpdatePayload,
+  BackupTriggerResponse,
+  RestoreBackupPayload,
+  TriggerBackupPayload,
   StudentFichaResponse,
   StudentProfile,
   GuardianSearchResult,
@@ -37,10 +51,19 @@ import {
   ReconsentAffectedStudent,
   AuditLogsResponse,
   AuditLogFilter,
+  AdminAlertActionType,
+  AdminAlertCountResponse,
+  AdminAlertFeedResponse,
+  AdminAlertPreferences,
+  AdminDashboardResponse,
+  HealthHistoryResponse,
+  HealthMonitorWindow,
+  HealthSnapshotResponse,
   DeletionRequestItem,
   DeletionRequestResponse,
   LinkedStudentItem,
   ComplianceReportHistoryItem,
+  GenerateComplianceReportRequest,
   ComplianceReportSchedule,
   GenerateComplianceReportResponse,
   TrainingEntryPointResponse,
@@ -76,6 +99,14 @@ import {
   ReorderSessionTechniquesResponse,
   RecentTrainingSummary,
   GetRecentTrainingsResponse,
+  StudentProgressDashboardResponse,
+  StudentAttendanceHistoryResponse,
+  StudentBadgesHistoryResponse,
+  StudentMonthlyComparisonResponse,
+  StudentNotificationFeedResponse,
+  StudentCommentHistoryResponse,
+  StudentBeltHistoryResponse,
+  StudentProgressWeekly,
   TrainingHistoryFilters,
   TrainingHistoryResponse,
   TrainingDetailsResponse,
@@ -141,6 +172,77 @@ export class ApiService {
     });
   }
 
+  getAdminDashboard(): Observable<AdminDashboardResponse> {
+    return this.http.get<AdminDashboardResponse>(`${this.apiUrl}/admin/dashboard`, {
+      headers: this.getHeaders(),
+    });
+  }
+
+  getAdminHealthMonitor(): Observable<HealthSnapshotResponse> {
+    return this.http.get<HealthSnapshotResponse>(`${this.apiUrl}/admin/health-monitor`, {
+      headers: this.getHeaders(),
+    });
+  }
+
+  getAdminHealthMonitorHistory(window: HealthMonitorWindow = '24h'): Observable<HealthHistoryResponse> {
+    return this.http.get<HealthHistoryResponse>(`${this.apiUrl}/admin/health-monitor/history`, {
+      headers: this.getHeaders(),
+      params: { window },
+    });
+  }
+
+  getAdminAlerts(params?: { limit?: number; offset?: number }): Observable<AdminAlertFeedResponse> {
+    const queryParams: Record<string, string> = {};
+    if (typeof params?.limit === 'number') queryParams['limit'] = String(params.limit);
+    if (typeof params?.offset === 'number') queryParams['offset'] = String(params.offset);
+
+    return this.http.get<AdminAlertFeedResponse>(`${this.apiUrl}/admin/alerts`, {
+      headers: this.getHeaders(),
+      params: queryParams,
+    });
+  }
+
+  getAdminAlertCounts(): Observable<AdminAlertCountResponse> {
+    return this.http.get<AdminAlertCountResponse>(`${this.apiUrl}/admin/alerts/count`, {
+      headers: this.getHeaders(),
+    });
+  }
+
+  executeAdminAlertAction(
+    alertId: string,
+    action: AdminAlertActionType
+  ): Observable<{ message: string; alert: any }> {
+    return this.http.patch<{ message: string; alert: any }>(
+      `${this.apiUrl}/admin/alerts/${alertId}/action`,
+      { action },
+      { headers: this.getHeaders() }
+    );
+  }
+
+  getAdminAlertPreferences(): Observable<AdminAlertPreferences> {
+    return this.http.get<AdminAlertPreferences>(`${this.apiUrl}/admin/alerts/preferences`, {
+      headers: this.getHeaders(),
+    });
+  }
+
+  updateAdminAlertPreferences(payload: {
+    channels: AdminAlertPreferences['channels'];
+    severity: AdminAlertPreferences['severity'];
+    digestWindowMinutes: number;
+  }): Observable<AdminAlertPreferences> {
+    return this.http.post<AdminAlertPreferences>(`${this.apiUrl}/admin/alerts/preferences`, payload, {
+      headers: this.getHeaders(),
+    });
+  }
+
+  silenceAdminAlerts(durationMinutes: number = 60): Observable<AdminAlertPreferences> {
+    return this.http.post<AdminAlertPreferences>(
+      `${this.apiUrl}/admin/alerts/silence`,
+      { durationMinutes },
+      { headers: this.getHeaders() }
+    );
+  }
+
   updateAdminAcademyProfile(
     payload: UpdateAcademyProfilePayload
   ): Observable<{ message: string; academy: AcademyProfile }> {
@@ -166,6 +268,125 @@ export class ApiService {
       payload,
       { headers: this.getHeaders() }
     );
+  }
+
+  listAdminUsers(filters?: {
+    page?: number;
+    limit?: number;
+    role?: 'Admin' | 'Professor' | 'Aluno' | 'Responsavel' | 'all';
+    status?: 'active' | 'blocked' | 'pending' | 'all';
+    search?: string;
+  }): Observable<ListAdminUsersResponse> {
+    const params: Record<string, string> = {};
+    if (typeof filters?.page === 'number') params['page'] = String(filters.page);
+    if (typeof filters?.limit === 'number') params['limit'] = String(filters.limit);
+    if (filters?.role && filters.role !== 'all') params['role'] = filters.role;
+    if (filters?.status && filters.status !== 'all') params['status'] = filters.status;
+    if (filters?.search) params['search'] = filters.search;
+
+    return this.http.get<ListAdminUsersResponse>(`${this.apiUrl}/admin/users`, {
+      headers: this.getHeaders(),
+      params,
+    });
+  }
+
+  createAdminManagedUser(payload: CreateAdminManagedUserPayload): Observable<AdminManagedUserMutationResponse> {
+    return this.http.post<AdminManagedUserMutationResponse>(`${this.apiUrl}/admin/users`, payload, {
+      headers: this.getHeaders(),
+    });
+  }
+
+  updateAdminManagedUser(
+    userId: string,
+    payload: UpdateAdminManagedUserPayload
+  ): Observable<AdminManagedUserMutationResponse> {
+    return this.http.put<AdminManagedUserMutationResponse>(`${this.apiUrl}/admin/users/${userId}`, payload, {
+      headers: this.getHeaders(),
+    });
+  }
+
+  deleteAdminManagedUser(
+    userId: string,
+    payload?: DeleteAdminManagedUserPayload
+  ): Observable<AdminManagedUserMutationResponse> {
+    return this.http.delete<AdminManagedUserMutationResponse>(`${this.apiUrl}/admin/users/${userId}`, {
+      headers: this.getHeaders(),
+      body: payload || {},
+    });
+  }
+
+  exportAdminUsersCsv(filters?: {
+    role?: 'Admin' | 'Professor' | 'Aluno' | 'Responsavel' | 'all';
+    status?: 'active' | 'blocked' | 'pending' | 'all';
+    search?: string;
+  }): Observable<HttpResponse<Blob>> {
+    const params: Record<string, string> = {};
+    if (filters?.role && filters.role !== 'all') params['role'] = filters.role;
+    if (filters?.status && filters.status !== 'all') params['status'] = filters.status;
+    if (filters?.search) params['search'] = filters.search;
+
+    return this.http.get(`${this.apiUrl}/admin/users/export`, {
+      headers: this.getHeaders(),
+      params,
+      observe: 'response',
+      responseType: 'blob',
+    });
+  }
+
+  listAdminBackups(): Observable<BackupListResponse> {
+    return this.http.get<BackupListResponse>(`${this.apiUrl}/admin/backup/jobs`, {
+      headers: this.getHeaders(),
+    });
+  }
+
+  getAdminBackupJobStatus(jobId: string): Observable<BackupJobResponse> {
+    return this.http.get<BackupJobResponse>(`${this.apiUrl}/admin/backup/jobs/${jobId}`, {
+      headers: this.getHeaders(),
+    });
+  }
+
+  triggerAdminBackup(payload: TriggerBackupPayload): Observable<BackupTriggerResponse> {
+    return this.http.post<BackupTriggerResponse>(`${this.apiUrl}/admin/backup/trigger`, payload, {
+      headers: this.getHeaders(),
+    });
+  }
+
+  downloadAdminBackup(jobId: string): Observable<HttpResponse<Blob>> {
+    return this.http.get(`${this.apiUrl}/admin/backup/download/${jobId}`, {
+      headers: this.getHeaders(),
+      observe: 'response',
+      responseType: 'blob',
+    });
+  }
+
+  verifyAdminBackup(jobId: string): Observable<BackupIntegrityResponse> {
+    return this.http.post<BackupIntegrityResponse>(`${this.apiUrl}/admin/backup/verify/${jobId}`, {}, {
+      headers: this.getHeaders(),
+    });
+  }
+
+  restoreAdminBackup(jobId: string, payload: RestoreBackupPayload): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.apiUrl}/admin/backup/restore/${jobId}`, payload, {
+      headers: this.getHeaders(),
+    });
+  }
+
+  deleteAdminBackupJob(jobId: string): Observable<{ message: string }> {
+    return this.http.delete<{ message: string }>(`${this.apiUrl}/admin/backup/jobs/${jobId}`, {
+      headers: this.getHeaders(),
+    });
+  }
+
+  getAdminBackupSchedule(): Observable<BackupScheduleConfig> {
+    return this.http.get<BackupScheduleConfig>(`${this.apiUrl}/admin/backup/schedule`, {
+      headers: this.getHeaders(),
+    });
+  }
+
+  upsertAdminBackupSchedule(payload: BackupScheduleUpdatePayload): Observable<BackupScheduleConfig> {
+    return this.http.put<BackupScheduleConfig>(`${this.apiUrl}/admin/backup/schedule`, payload, {
+      headers: this.getHeaders(),
+    });
   }
 
   listProfessors(filters?: { name?: string; status?: 'active' | 'inactive' | 'all' }): Observable<ListProfessorsResponse> {
@@ -487,6 +708,7 @@ export class ApiService {
     if (filter.userId) params['userId'] = filter.userId;
     if (filter.action) params['action'] = filter.action;
     if (filter.resourceType) params['resourceType'] = filter.resourceType;
+    if (filter.outcome) params['outcome'] = filter.outcome;
     if (filter.dateFrom) params['dateFrom'] = filter.dateFrom;
     if (filter.dateTo) params['dateTo'] = filter.dateTo;
     return { ...params, ...extra };
@@ -510,6 +732,15 @@ export class ApiService {
   exportAuditLogsCsv(filter: AuditLogFilter): Observable<Blob> {
     const params = this.buildAuditQueryParams(filter);
     return this.http.get(`${this.apiUrl}/admin/audit-logs/export`, {
+      headers: this.getHeaders(),
+      responseType: 'blob',
+      params,
+    });
+  }
+
+  exportAuditLogsPdf(filter: AuditLogFilter): Observable<Blob> {
+    const params = this.buildAuditQueryParams(filter);
+    return this.http.get(`${this.apiUrl}/admin/audit-logs/export-pdf`, {
       headers: this.getHeaders(),
       responseType: 'blob',
       params,
@@ -788,10 +1019,10 @@ export class ApiService {
     );
   }
 
-  generateComplianceReport(): Observable<GenerateComplianceReportResponse> {
+  generateComplianceReport(payload?: GenerateComplianceReportRequest): Observable<GenerateComplianceReportResponse> {
     return this.http.post<GenerateComplianceReportResponse>(
       `${this.apiUrl}/admin/compliance-report/generate`,
-      {},
+      payload || {},
       { headers: this.getHeaders() }
     );
   }
@@ -841,6 +1072,119 @@ export class ApiService {
     return this.http.get<GetRecentTrainingsResponse>(
       `${this.apiUrl}/trainings/recent`,
       { headers: this.getHeaders(), params: { limit: String(limit) } }
+    );
+  }
+
+  getStudentProgressDashboard(): Observable<StudentProgressDashboardResponse> {
+    return this.http.get<StudentProgressDashboardResponse>(
+      `${this.apiUrl}/users/alunos/me/progresso`,
+      { headers: this.getHeaders() }
+    );
+  }
+
+  getStudentProgressChart(): Observable<StudentProgressWeekly[]> {
+    return this.getStudentProgressDashboard().pipe(
+      map((response) => response.cards.evolucaoMes.weeklySeries || [])
+    );
+  }
+
+  getStudentAttendanceHistory(filters?: {
+    dateFrom?: string;
+    dateTo?: string;
+    limit?: number;
+    offset?: number;
+  }): Observable<StudentAttendanceHistoryResponse> {
+    const params: Record<string, string> = {};
+    if (filters?.dateFrom) params['dateFrom'] = filters.dateFrom;
+    if (filters?.dateTo) params['dateTo'] = filters.dateTo;
+    if (filters?.limit !== undefined) params['limit'] = String(filters.limit);
+    if (filters?.offset !== undefined) params['offset'] = String(filters.offset);
+
+    return this.http.get<StudentAttendanceHistoryResponse>(
+      `${this.apiUrl}/users/alunos/me/frequencia`,
+      { headers: this.getHeaders(), params }
+    );
+  }
+
+  // Story 4-4: Comment history with pagination + keyword search
+  getStudentCommentHistory(filters?: {
+    keyword?: string;
+    limit?: number;
+    offset?: number;
+  }): Observable<StudentCommentHistoryResponse> {
+    const params: Record<string, string> = {};
+    if (filters?.keyword) params['keyword'] = filters.keyword;
+    if (filters?.limit !== undefined) params['limit'] = String(filters.limit);
+    if (filters?.offset !== undefined) params['offset'] = String(filters.offset);
+
+    return this.http.get<StudentCommentHistoryResponse>(
+      `${this.apiUrl}/users/alunos/me/comentarios`,
+      { headers: this.getHeaders(), params }
+    );
+  }
+
+  getStudentBadgesHistory(filters?: {
+    limitUnlocked?: number;
+    limitUpcoming?: number;
+  }): Observable<StudentBadgesHistoryResponse> {
+    const params: Record<string, string> = {};
+    if (filters?.limitUnlocked !== undefined) params['limitUnlocked'] = String(filters.limitUnlocked);
+    if (filters?.limitUpcoming !== undefined) params['limitUpcoming'] = String(filters.limitUpcoming);
+
+    return this.http.get<StudentBadgesHistoryResponse>(
+      `${this.apiUrl}/users/alunos/me/badges`,
+      { headers: this.getHeaders(), params }
+    );
+  }
+
+  getStudentMonthlyComparison(filters?: {
+    months?: number;
+  }): Observable<StudentMonthlyComparisonResponse> {
+    const params: Record<string, string> = {};
+    if (filters?.months !== undefined) params['months'] = String(filters.months);
+
+    return this.http.get<StudentMonthlyComparisonResponse>(
+      `${this.apiUrl}/users/alunos/me/comparacao-mensal`,
+      { headers: this.getHeaders(), params }
+    );
+  }
+
+  getStudentNotifications(filters?: {
+    status?: 'pending' | 'sent' | 'failed' | 'bounced';
+    limit?: number;
+    offset?: number;
+  }): Observable<StudentNotificationFeedResponse> {
+    const params: Record<string, string> = {};
+    if (filters?.status) params['status'] = filters.status;
+    if (filters?.limit !== undefined) params['limit'] = String(filters.limit);
+    if (filters?.offset !== undefined) params['offset'] = String(filters.offset);
+
+    return this.http.get<StudentNotificationFeedResponse>(
+      `${this.apiUrl}/users/alunos/me/notificacoes`,
+      { headers: this.getHeaders(), params }
+    );
+  }
+
+  markStudentNotificationRead(notificationId: string): Observable<{ success: boolean }> {
+    return this.http.patch<{ success: boolean }>(
+      `${this.apiUrl}/users/alunos/me/notificacoes/${notificationId}/read`,
+      {},
+      { headers: this.getHeaders() }
+    );
+  }
+
+  markAllStudentNotificationsRead(): Observable<{ success: boolean; affected: number }> {
+    return this.http.patch<{ success: boolean; affected: number }>(
+      `${this.apiUrl}/users/alunos/me/notificacoes/read-all`,
+      {},
+      { headers: this.getHeaders() }
+    );
+  }
+
+  getStudentBeltHistory(): Observable<StudentBeltHistoryResponse> {
+    return this.http.get<StudentBeltHistoryResponse>(
+      `${this.apiUrl}/users/alunos/me/historico-faixas`,
+      { headers: this.getHeaders() }
     );
   }
 

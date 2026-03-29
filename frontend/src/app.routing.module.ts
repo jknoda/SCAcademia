@@ -30,6 +30,9 @@ import { ProfessorTechniquesComponent } from './components/professor-techniques/
 import { StudentsListComponent } from './components/students-list/students-list.component';
 import { StudentFormComponent } from './components/student-form/student-form.component';
 import { StudentProfileComponent } from './components/student-profile/student-profile.component';
+import { AdminUsersListComponent } from './components/admin-users-list/admin-users-list.component';
+import { AdminBackupRecoveryComponent } from './components/admin-backup-recovery/admin-backup-recovery.component';
+import { AdminHealthMonitorComponent } from './components/admin-health-monitor/admin-health-monitor.component';
 import { AuthGuard } from './guards/auth.guard';
 import { RoleGuard } from './guards/role.guard';
 
@@ -46,6 +49,9 @@ const routes: Routes = [
   { path: 'admin/professores', component: ProfessorsListComponent, canActivate: [AuthGuard, RoleGuard] },
   { path: 'admin/professores/novo', component: ProfessorFormComponent, canActivate: [AuthGuard, RoleGuard] },
   { path: 'admin/professores/:id/editar', component: ProfessorFormComponent, canActivate: [AuthGuard, RoleGuard] },
+  { path: 'admin/users', component: AdminUsersListComponent, canActivate: [AuthGuard, RoleGuard] },
+  { path: 'admin/backup', component: AdminBackupRecoveryComponent, canActivate: [AuthGuard, RoleGuard] },
+  { path: 'admin/health-monitor', component: AdminHealthMonitorComponent, canActivate: [AuthGuard, RoleGuard] },
   { path: 'admin/alunos', component: StudentsListComponent, canActivate: [AuthGuard, RoleGuard] },
   { path: 'admin/alunos/novo', component: StudentFormComponent, canActivate: [AuthGuard, RoleGuard] },
   { path: 'admin/alunos/:id/editar', component: StudentFormComponent, canActivate: [AuthGuard, RoleGuard] },

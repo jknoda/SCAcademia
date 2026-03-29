@@ -20,6 +20,7 @@ import { hashPassword, verifyPassword, validatePasswordStrength } from '../lib/p
 import { sign, verify } from '../lib/jwt';
 import { seedDefaultTemplates, createConsentRequest } from '../lib/consents';
 import { sendConsentEmail, sendPasswordResetEmail, sendWelcomeEmail } from '../lib/email';
+import { isIpBlockedForAcademy } from '../lib/securityBlocklist';
 
 const toExpiresAt = (seconds: number): Date => new Date(Date.now() + seconds * 1000);
 
@@ -108,6 +109,7 @@ export const initAdminHandler = async (req: any, res: Response) => {
 export const loginHandler = async (req: any, res: Response) => {
   try {
     const { email, password } = req.body as LoginRequest;
+    const requestIp = String(req.ip || '');
 
     const user = await getUserByEmailAcrossAcademies(email);
 
@@ -125,6 +127,15 @@ export const loginHandler = async (req: any, res: Response) => {
         reason: 'Inactive user',
       });
       return res.status(403).json({ error: 'Usuário inativo. Procure a administração da academia.' });
+    }
+
+    if (isIpBlockedForAcademy(user.academyId, requestIp)) {
+      logAudit(user.id, 'LOGIN_FAILURE', 'Auth', 'login', user.academyId, undefined, {
+        email,
+        ip: requestIp,
+        reason: 'Blocked IP by admin alert action',
+      });
+      return res.status(403).json({ error: 'Acesso temporariamente bloqueado para este IP. Procure a administração.' });
     }
 
     const passwordMatch = await verifyPassword(password, user.passwordHash);
@@ -382,14 +393,31 @@ export const registerUserHandler = async (req: any, res: Response) => {
       consentLink = `http://localhost:4200/consent/${consentToken}`;
 
       if (user.responsavelEmail) {
-        await sendConsentEmail(user.responsavelEmail, user.fullName, consentLink);
+        // Do not block API response on SMTP latency/failures.
+        void sendConsentEmail(user.responsavelEmail, user.fullName, consentLink)
+          .then((sent) => {
+            logAudit(user.id, sent ? 'CONSENT_EMAIL_SENT' : 'CONSENT_EMAIL_SIMULATED', 'User', user.id, academyId, undefined, {
+              responsavelEmail: user.responsavelEmail,
+              consentLink,
+              reason: 'Aluno menor de idade',
+            });
+          })
+          .catch((emailError) => {
+            console.error('[REGISTER] Falha ao enviar email de consentimento:', emailError);
+            logAudit(user.id, 'CONSENT_EMAIL_FAILED', 'User', user.id, academyId, undefined, {
+              responsavelEmail: user.responsavelEmail,
+              consentLink,
+              reason: 'Aluno menor de idade',
+              error: String(emailError),
+            });
+          });
+      } else {
+        logAudit(user.id, 'CONSENT_EMAIL_SKIPPED', 'User', user.id, academyId, undefined, {
+          responsavelEmail: user.responsavelEmail,
+          consentLink,
+          reason: 'Aluno menor sem email de responsavel',
+        });
       }
-
-      logAudit(user.id, 'CONSENT_EMAIL_SENT', 'User', user.id, academyId, undefined, {
-        responsavelEmail: user.responsavelEmail,
-        consentLink,
-        reason: 'Aluno menor de idade',
-      });
     }
 
     if (role === 'Professor') {

@@ -14,6 +14,15 @@ import {
   updateStudentHandler,
   updateStudentStatusHandler,
   getStudentProfileViewHandler,
+  getMyStudentProgressDashboardHandler,
+  getMyStudentAttendanceHistoryHandler,
+  getMyStudentCommentHistoryHandler,
+  getMyStudentBadgesHistoryHandler,
+  getMyStudentMonthlyComparisonHandler,
+  getMyStudentNotificationsHandler,
+  markMyStudentNotificationReadHandler,
+  markAllMyStudentNotificationsReadHandler,
+  getMyStudentBeltHistoryHandler,
   searchGuardianByEmailHandler,
   linkGuardianToStudentHandler,
   createAndLinkGuardianHandler,
@@ -77,6 +86,33 @@ router.put('/alunos/:userId', authMiddleware, requireRole(['Admin', 'Professor']
 
 // PUT /api/users/alunos/:userId/status — ativa/desativa aluno (Admin only)
 router.put('/alunos/:userId/status', authMiddleware, requireRole(['Admin']), validate(studentStatusSchema), updateStudentStatusHandler);
+
+// GET /api/users/alunos/me/progresso — dashboard de progresso do aluno logado
+router.get('/alunos/me/progresso', authMiddleware, requireRole(['Aluno']), getMyStudentProgressDashboardHandler);
+
+// GET /api/users/alunos/me/frequencia — histórico detalhado de frequência do aluno logado
+router.get('/alunos/me/frequencia', authMiddleware, requireRole(['Aluno']), getMyStudentAttendanceHistoryHandler);
+
+// GET /api/users/alunos/me/comentarios — histórico completo de comentários do professor com busca e paginação
+router.get('/alunos/me/comentarios', authMiddleware, requireRole(['Aluno']), getMyStudentCommentHistoryHandler);
+
+// GET /api/users/alunos/me/badges — histórico completo de badges e milestones
+router.get('/alunos/me/badges', authMiddleware, requireRole(['Aluno']), getMyStudentBadgesHistoryHandler);
+
+// GET /api/users/alunos/me/comparacao-mensal — comparação mês-a-mês do aluno logado
+router.get('/alunos/me/comparacao-mensal', authMiddleware, requireRole(['Aluno']), getMyStudentMonthlyComparisonHandler);
+
+// GET /api/users/alunos/me/notificacoes — feed de notificações do aluno logado
+router.get('/alunos/me/notificacoes', authMiddleware, requireRole(['Aluno']), getMyStudentNotificationsHandler);
+
+// PATCH /api/users/alunos/me/notificacoes/:notificationId/read — marca notificação como lida
+router.patch('/alunos/me/notificacoes/:notificationId/read', authMiddleware, requireRole(['Aluno']), markMyStudentNotificationReadHandler);
+
+// PATCH /api/users/alunos/me/notificacoes/read-all — marca todas notificações como lidas
+router.patch('/alunos/me/notificacoes/read-all', authMiddleware, requireRole(['Aluno']), markAllMyStudentNotificationsReadHandler);
+
+// GET /api/users/alunos/me/historico-faixas — histórico completo de faixas do aluno logado
+router.get('/alunos/me/historico-faixas', authMiddleware, requireRole(['Aluno']), getMyStudentBeltHistoryHandler);
 
 // GET /api/users/alunos/:userId/ficha — ficha completa do aluno (Admin/Professor)
 router.get('/alunos/:userId/ficha', authMiddleware, requireRole(['Admin', 'Professor']), getStudentProfileViewHandler);

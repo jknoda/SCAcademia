@@ -1,6 +1,7 @@
 import { pool } from './db';
 import {
   ComplianceReportData,
+  ComplianceReportPeriod,
   ComplianceReportStatistics,
   ComplianceReportConsentSection,
   ComplianceReportDeletionSection,
@@ -8,12 +9,41 @@ import {
   ComplianceReportAlert,
 } from '../types';
 
+export interface ComplianceReportPeriodRange {
+  dateFrom: string;
+  dateTo: string;
+  label: string;
+  preset: ComplianceReportPeriod['preset'];
+}
+
+const withPeriodBounds = (
+  baseQuery: string,
+  baseValues: any[],
+  period: ComplianceReportPeriodRange | undefined,
+  dateColumn: string
+): { query: string; values: any[] } => {
+  if (!period) {
+    return { query: baseQuery, values: baseValues };
+  }
+
+  const values = [...baseValues, period.dateFrom, period.dateTo];
+  const fromParam = `$${baseValues.length + 1}`;
+  const toParam = `$${baseValues.length + 2}`;
+  return {
+    query: `${baseQuery}\n        AND ${dateColumn} >= ${fromParam}::timestamptz\n        AND ${dateColumn} <= ${toParam}::timestamptz`,
+    values,
+  };
+};
+
 /**
  * Collect statistics for compliance report (AC2 - Statistics Section)
  */
-export async function collectStatistics(academyId: string): Promise<ComplianceReportStatistics> {
+export async function collectStatistics(
+  academyId: string,
+  period?: ComplianceReportPeriodRange
+): Promise<ComplianceReportStatistics> {
   try {
-    const result = await pool.query(
+    const studentsQuery = withPeriodBounds(
       `
       SELECT
         COUNT(*) AS total_students,
@@ -22,13 +52,16 @@ export async function collectStatistics(academyId: string): Promise<ComplianceRe
       FROM users
       WHERE academy_id = $1 AND role = $2 AND deleted_at IS NULL
       `,
-      [academyId, 'Aluno']
+      [academyId, 'Aluno'],
+      period,
+      'created_at'
     );
+    const result = await pool.query(studentsQuery.query, studentsQuery.values);
 
     const row = result.rows[0] || {};
 
     // Count expired consents
-    const consentResult = await pool.query(
+    const expiredQuery = withPeriodBounds(
       `
       SELECT COUNT(DISTINCT user_id) AS expired_count,
              COUNT(DISTINCT CASE WHEN status = 'accepted' THEN user_id END) AS consented_students
@@ -37,18 +70,24 @@ export async function collectStatistics(academyId: string): Promise<ComplianceRe
         AND expires_at < NOW()
         AND status IN ('accepted', 'expired')
       `,
-      [academyId]
+      [academyId],
+      period,
+      'created_at'
     );
+    const consentResult = await pool.query(expiredQuery.query, expiredQuery.values);
 
-    const activeConsentResult = await pool.query(
+    const activeQuery = withPeriodBounds(
       `
       SELECT COUNT(DISTINCT user_id) AS consented_students
       FROM consents
       WHERE academy_id = $1
         AND status = 'accepted'
       `,
-      [academyId]
+      [academyId],
+      period,
+      'created_at'
     );
+    const activeConsentResult = await pool.query(activeQuery.query, activeQuery.values);
 
     return {
       totalStudents: parseInt(row.total_students || '0'),
@@ -66,10 +105,12 @@ export async function collectStatistics(academyId: string): Promise<ComplianceRe
 /**
  * Collect consents data for compliance report (AC2 - Consents Section)
  */
-export async function collectConsentData(academyId: string): Promise<ComplianceReportConsentSection> {
+export async function collectConsentData(
+  academyId: string,
+  period?: ComplianceReportPeriodRange
+): Promise<ComplianceReportConsentSection> {
   try {
-    const result = await pool.query(
-      `
+    let query = `
       SELECT
         consent_type,
         COUNT(*) AS total,
@@ -77,10 +118,20 @@ export async function collectConsentData(academyId: string): Promise<ComplianceR
         SUM(CASE WHEN status IN ('pending', 'expired') THEN 1 ELSE 0 END) AS pending
       FROM consents
       WHERE academy_id = $1
-      GROUP BY consent_type
-      `,
-      [academyId]
-    );
+    `;
+    const values: any[] = [academyId];
+
+    if (period) {
+      values.push(period.dateFrom, period.dateTo);
+      query += `
+        AND created_at >= $2::timestamptz
+        AND created_at <= $3::timestamptz
+      `;
+    }
+
+    query += ` GROUP BY consent_type`;
+
+    const result = await pool.query(query, values);
 
     const versions = result.rows.map((row: any) => ({
       consentType: (
@@ -111,9 +162,12 @@ export async function collectConsentData(academyId: string): Promise<ComplianceR
 /**
  * Collect deletion data for compliance report (AC2 - Deletions Section)
  */
-export async function collectDeletionData(academyId: string): Promise<ComplianceReportDeletionSection> {
+export async function collectDeletionData(
+  academyId: string,
+  period?: ComplianceReportPeriodRange
+): Promise<ComplianceReportDeletionSection> {
   try {
-    const result = await pool.query(
+    const deletionQuery = withPeriodBounds(
       `
       SELECT
         COUNT(*) AS total_requests,
@@ -122,8 +176,11 @@ export async function collectDeletionData(academyId: string): Promise<Compliance
       FROM deletion_requests
       WHERE academy_id = $1
       `,
-      [academyId]
-    ).catch((error: any) => {
+      [academyId],
+      period,
+      'requested_at'
+    );
+    const result = await pool.query(deletionQuery.query, deletionQuery.values).catch((error: any) => {
       if (error?.code === '42P01') {
         return { rows: [{ total_requests: '0', processed: '0', pending: '0' }] };
       }
@@ -133,14 +190,17 @@ export async function collectDeletionData(academyId: string): Promise<Compliance
     const row = result.rows[0] || {};
 
     // Count hard-deleted users
-    const deletedResult = await pool.query(
+    const deletedQuery = withPeriodBounds(
       `
       SELECT COUNT(*) AS hard_deleted_count
       FROM users
       WHERE academy_id = $1 AND deleted_at IS NOT NULL
       `,
-      [academyId]
+      [academyId],
+      period,
+      'deleted_at'
     );
+    const deletedResult = await pool.query(deletedQuery.query, deletedQuery.values);
 
     return {
       processedRequests: parseInt(row.processed || '0'),
@@ -156,41 +216,51 @@ export async function collectDeletionData(academyId: string): Promise<Compliance
 /**
  * Collect audit data for compliance report (AC2 - Audit Section)
  */
-export async function collectAuditData(academyId: string): Promise<ComplianceReportAuditSection> {
+export async function collectAuditData(
+  academyId: string,
+  period?: ComplianceReportPeriodRange
+): Promise<ComplianceReportAuditSection> {
   try {
-    const accessResult = await pool.query(
+    const accessQuery = withPeriodBounds(
       `
       SELECT COUNT(*) AS total_access
       FROM audit_logs
       WHERE academy_id = $1
-        AND timestamp >= NOW() - INTERVAL '90 days'
       `,
-      [academyId]
+      [academyId],
+      period,
+      'timestamp'
     );
+    const accessResult = await pool.query(accessQuery.query, accessQuery.values);
 
-    const unauthorizedResult = await pool.query(
+    const unauthorizedQuery = withPeriodBounds(
       `
       SELECT COUNT(*) AS unauthorized_attempts
       FROM audit_logs
       WHERE academy_id = $1
         AND (action = 'UNAUTHORIZED_ACCESS' OR action LIKE '%forbidden%')
       `,
-      [academyId]
+      [academyId],
+      period,
+      'timestamp'
     );
+    const unauthorizedResult = await pool.query(unauthorizedQuery.query, unauthorizedQuery.values);
 
     const anomalies: string[] = [];
 
     // Detect potential anomalies (example: multiple failed logins)
-    const failedLoginsResult = await pool.query(
+    const failedLoginsQuery = withPeriodBounds(
       `
       SELECT COUNT(*) AS failed_logins
       FROM audit_logs
       WHERE academy_id = $1
         AND action = 'LOGIN_FAILED'
-        AND timestamp >= NOW() - INTERVAL '7 days'
       `,
-      [academyId]
+      [academyId],
+      period,
+      'timestamp'
     );
+    const failedLoginsResult = await pool.query(failedLoginsQuery.query, failedLoginsQuery.values);
 
     if (parseInt(failedLoginsResult.rows[0]?.failed_logins || '0') > 50) {
       anomalies.push('Alta taxa de falhas de login detectada nos últimos 7 dias');
@@ -251,22 +321,49 @@ export async function generateComplianceAlerts(
  * Generate complete compliance report data (AC1, AC2)
  */
 export async function generateComplianceReportData(academyId: string): Promise<ComplianceReportData> {
+  return generateComplianceReportDataForPeriod(academyId, {
+    preset: 'current-month',
+    label: 'Este mês',
+    dateFrom: new Date(new Date().getFullYear(), new Date().getMonth(), 1, 0, 0, 0, 0).toISOString(),
+    dateTo: new Date().toISOString(),
+  });
+}
+
+export async function generateComplianceReportDataForPeriod(
+  academyId: string,
+  period: ComplianceReportPeriodRange
+): Promise<ComplianceReportData> {
   try {
-    const statistics = await collectStatistics(academyId);
-    const consents = await collectConsentData(academyId);
-    const deletions = await collectDeletionData(academyId);
-    const audit = await collectAuditData(academyId);
+    const statistics = await collectStatistics(academyId, period);
+    const consents = await collectConsentData(academyId, period);
+    const deletions = await collectDeletionData(academyId, period);
+    const audit = await collectAuditData(academyId, period);
     const alerts = await generateComplianceAlerts(statistics, consents, deletions);
+    const complianceStatus = alerts.length > 0 ? 'NAO_COMPLIANT' : 'COMPLIANT';
 
     return {
       generatedAt: new Date().toISOString(),
       academyId,
       version: '1.0.0',
+      period: {
+        preset: period.preset,
+        label: period.label,
+        dateFrom: period.dateFrom,
+        dateTo: period.dateTo,
+      },
       statistics,
       consents,
       deletions,
       audit,
       alerts,
+      complianceStatus,
+      export: {
+        format: 'pdf',
+        fileName: '',
+        contentType: 'application/pdf',
+        isSigned: true,
+        complianceStatus,
+      },
     };
   } catch (error) {
     console.error('Error generating compliance report data:', error);

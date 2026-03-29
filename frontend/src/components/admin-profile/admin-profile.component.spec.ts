@@ -106,7 +106,10 @@ describe('AdminProfileComponent', () => {
     component.saveProfile();
 
     expect(apiSpy.updateUserProfile).toHaveBeenCalled();
-    expect(authSpy.updateCurrentUserProfile).toHaveBeenCalledWith({ fullName: 'Admin Atualizado' });
+    expect(authSpy.updateCurrentUserProfile).toHaveBeenCalledWith({
+      fullName: 'Admin Atualizado',
+      photoUrl: undefined,
+    });
     expect(component.successMessage).toBe('Perfil atualizado');
   });
 

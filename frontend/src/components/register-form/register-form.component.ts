@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, NgZone, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Router } from '@angular/router';
-import { finalize } from 'rxjs/operators';
+import { EMPTY } from 'rxjs';
+import { catchError, finalize, switchMap, timeout } from 'rxjs/operators';
 import { ApiService } from '../../services/api.service';
 import { PasswordValidatorService } from '../../services/password-validator.service';
 
@@ -24,6 +25,7 @@ export class RegisterFormComponent implements OnInit {
   showPassword = false;
   today = new Date().toISOString().split('T')[0];
   academyId = '';
+  private loadingWatchdog: ReturnType<typeof setTimeout> | null = null;
 
   passwordStrength = {
     score: 0,
@@ -40,7 +42,9 @@ export class RegisterFormComponent implements OnInit {
     private route: ActivatedRoute,
     private api: ApiService,
     private router: Router,
-    private passwordValidator: PasswordValidatorService
+    private passwordValidator: PasswordValidatorService,
+    private ngZone: NgZone,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -215,44 +219,89 @@ export class RegisterFormComponent implements OnInit {
       return;
     }
 
-    this.isLoading = true;
+    this.setLoadingState(true);
+    this.startLoadingWatchdog();
     this.errorMessage = '';
     this.suggestions = [];
 
-    this.api.checkSetupNeeded().subscribe(
-      (setupResponse: any) => {
-        if (setupResponse?.needsSetup || !setupResponse?.academyId) {
-          this.isLoading = false;
-          this.errorMessage = 'Academia não encontrada. Execute o setup inicial da academia.';
-          return;
+    this.api
+      .checkSetupNeeded()
+      .pipe(
+        timeout(10000),
+        switchMap((setupResponse: any) => {
+          if (setupResponse?.needsSetup || !setupResponse?.academyId) {
+            this.errorMessage = 'Academia não encontrada. Execute o setup inicial da academia.';
+            return EMPTY;
+          }
+
+          this.academyId = setupResponse.academyId;
+          localStorage.setItem('academyId', setupResponse.academyId);
+
+          const { fullName, email, password, role, birthDate, responsavelEmail } = this.registerForm.value;
+          const payload = {
+            email,
+            password,
+            fullName,
+            role,
+            academyId: this.academyId,
+            birthDate: birthDate || undefined,
+            responsavelEmail: responsavelEmail || undefined,
+          };
+
+          return this.api.registerUser(payload).pipe(timeout(15000));
+        }),
+        catchError((error: any) => {
+          if (error?.name === 'TimeoutError') {
+            this.errorMessage = 'A requisição demorou demais. Verifique a conexão e tente novamente.';
+            return EMPTY;
+          }
+
+          const requestUrl = String(error?.url || '');
+          if (requestUrl.includes('/auth/setup/init')) {
+            this.errorMessage = 'Não foi possível validar a academia. Tente novamente.';
+            return EMPTY;
+          }
+
+          this.handleRegisterError(error);
+          return EMPTY;
+        }),
+        finalize(() => {
+          this.clearLoadingWatchdog();
+          this.setLoadingState(false);
+        })
+      )
+      .subscribe((response: any) => {
+        if (response) {
+          this.handleRegisterSuccess(response);
         }
+      });
+  }
 
-        this.academyId = setupResponse.academyId;
-        localStorage.setItem('academyId', setupResponse.academyId);
-
-        const { fullName, email, password, role, birthDate, responsavelEmail } = this.registerForm.value;
-        const payload = {
-          email,
-          password,
-          fullName,
-          role,
-          academyId: this.academyId,
-          birthDate: birthDate || undefined,
-          responsavelEmail: responsavelEmail || undefined,
-        };
-
-        this.api
-          .registerUser(payload)
-          .pipe(finalize(() => (this.isLoading = false)))
-          .subscribe(
-            (response: any) => this.handleRegisterSuccess(response),
-            (error: any) => this.handleRegisterError(error)
-          );
-      },
-      () => {
-        this.isLoading = false;
-        this.errorMessage = 'Não foi possível validar a academia. Tente novamente.';
+  private startLoadingWatchdog(): void {
+    this.clearLoadingWatchdog();
+    this.loadingWatchdog = setTimeout(() => {
+      if (!this.isLoading) {
+        return;
       }
-    );
+
+      this.setLoadingState(false);
+      if (!this.errorMessage) {
+        this.errorMessage = 'A operação demorou mais do que o esperado. Tente novamente.';
+      }
+    }, 25000);
+  }
+
+  private clearLoadingWatchdog(): void {
+    if (this.loadingWatchdog) {
+      clearTimeout(this.loadingWatchdog);
+      this.loadingWatchdog = null;
+    }
+  }
+
+  private setLoadingState(value: boolean): void {
+    this.ngZone.run(() => {
+      this.isLoading = value;
+      this.cdr.detectChanges();
+    });
   }
 }

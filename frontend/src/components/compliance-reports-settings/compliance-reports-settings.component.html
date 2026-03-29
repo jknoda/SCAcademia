@@ -4,11 +4,15 @@
       <h2>Configurações > Relatórios Automáticos</h2>
       <p>Configure a geração mensal do relatório LGPD e acompanhe o histórico auditável.</p>
     </div>
-    <button class="action-btn" (click)="goBack()">Voltar ao dashboard</button>
+    <div class="header-actions">
+      <button class="action-btn primary" (click)="openGenerateModal()">Gerar Relatório de Conformidade</button>
+      <button class="action-btn" (click)="goBack()">Voltar ao dashboard</button>
+    </div>
   </header>
 
   <section class="settings-card">
     <h3>Agendamento Mensal</h3>
+    <p class="muted" *ngIf="latestStatusMessage">{{ latestStatusMessage }}</p>
     <div class="form-grid">
       <label>
         <span>Dia do mês</span>
@@ -48,10 +52,83 @@
     <div class="history-row" *ngFor="let report of history">
       <div>
         <p><strong>Gerado em:</strong> {{ formatDateTime(report.createdAt) }}</p>
+        <p><strong>Período:</strong> {{ report.periodLabel }}</p>
+        <p><strong>Formato:</strong> {{ getFormatLabel(report.format) }}</p>
+        <p><strong>Status:</strong> {{ getComplianceStatusLabel(report.complianceStatus) }}</p>
+        <p><strong>Assinado digitalmente:</strong> {{ report.isSigned ? 'Sim' : 'Não' }}</p>
         <p><strong>Hash:</strong> {{ report.signatureHash || 'N/D' }}</p>
         <p><strong>Alertas:</strong> {{ report.reportData.alerts.length }}</p>
       </div>
-      <button class="action-btn" (click)="downloadReport(report.id)">Download PDF</button>
+      <button class="action-btn" (click)="downloadReport(report.id, report.reportData.export.fileName)">
+        Download {{ getFormatLabel(report.format) }}
+      </button>
     </div>
   </section>
+
+  <section class="settings-card" *ngIf="lastGeneratedReport">
+    <h3>Último Relatório Gerado</h3>
+    <p><strong>Arquivo:</strong> {{ lastGeneratedReport.fileName }}</p>
+    <p><strong>Status:</strong> {{ lastGeneratedReport.complianceStatus }}</p>
+    <p><strong>Período:</strong> {{ lastGeneratedReport.periodLabel }}</p>
+    <button class="action-btn" (click)="downloadReport(lastGeneratedReport.reportId, lastGeneratedReport.fileName)">
+      Download Imediato
+    </button>
+  </section>
+
+  <div class="modal-backdrop" *ngIf="showGenerateModal">
+    <div class="modal-card">
+      <h3>Gerar Relatório de Conformidade LGPD</h3>
+
+      <div class="form-grid">
+        <label>
+          <span>Formato</span>
+          <select [(ngModel)]="generationFormat">
+            <option value="pdf">PDF</option>
+            <option value="excel">Excel</option>
+            <option value="json">JSON</option>
+          </select>
+        </label>
+
+        <label>
+          <span>Período</span>
+          <select [(ngModel)]="generationPeriodPreset">
+            <option value="current-month">Este mês</option>
+            <option value="last-3-months">Últimos 3 meses</option>
+            <option value="custom">Custom</option>
+          </select>
+        </label>
+
+        <label class="checkbox-row compact">
+          <input type="checkbox" [(ngModel)]="generationSignDigital" />
+          <span>Assinar digitalmente</span>
+        </label>
+      </div>
+
+      <div class="form-grid" *ngIf="generationPeriodPreset === 'custom'">
+        <label>
+          <span>Data inicial</span>
+          <input type="date" [(ngModel)]="generationDateFrom" />
+        </label>
+        <label>
+          <span>Data final</span>
+          <input type="date" [(ngModel)]="generationDateTo" />
+        </label>
+      </div>
+
+      <div class="progress-panel" *ngIf="generationState.status === 'processing' || generationState.status === 'completed'">
+        <p>{{ generationState.message }}</p>
+        <div class="progress-track">
+          <div class="progress-fill" [style.width.%]="generationState.percentage"></div>
+        </div>
+        <small>{{ generationState.percentage }}%</small>
+      </div>
+
+      <div class="modal-actions">
+        <button class="action-btn" (click)="closeGenerateModal()" [disabled]="generationState.status === 'processing'">Fechar</button>
+        <button class="action-btn primary" (click)="generateReport()" [disabled]="generationState.status === 'processing'">
+          {{ generationState.status === 'processing' ? 'Processando...' : 'Gerar' }}
+        </button>
+      </div>
+    </div>
+  </div>
 </div>

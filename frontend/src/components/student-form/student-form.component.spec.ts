@@ -55,6 +55,7 @@ describe('StudentFormComponent', () => {
           useValue: {
             snapshot: {
               paramMap: convertToParamMap({}),
+              queryParamMap: convertToParamMap({}),
             },
           },
         },

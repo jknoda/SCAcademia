@@ -19,6 +19,8 @@ export class AuditLogComponent implements OnInit {
   limit = 50;
   loading = false;
   exporting = false;
+  exportFormat: 'csv' | 'pdf' = 'csv';
+  expandedLogId: string | null = null;
   errorMessage = '';
 
   readonly actionOptions = [
@@ -34,6 +36,15 @@ export class AuditLogComponent implements OnInit {
     { value: 'PASSWORD_RESET_COMPLETED', label: 'Reset de Senha Concluído' },
     { value: 'AUDIT_LOG_VIEWED', label: 'Log de Auditoria Visualizado' },
     { value: 'AUDIT_LOG_EXPORTED', label: 'Log de Auditoria Exportado' },
+    { value: 'TRAINING_CREATED', label: 'Treino Criado' },
+    { value: 'TRAINING_UPDATED', label: 'Treino Atualizado' },
+    { value: 'TRAINING_ATTENDANCE_MARKED', label: 'Presença Registrada' },
+    { value: 'DATA_DELETION_REQUESTED', label: 'Solicitação de Deleção' },
+    { value: 'DATA_DELETED', label: 'Dados Deletados' },
+    { value: 'HEALTH_RECORD_VIEWED', label: 'Anamnese Visualizada' },
+    { value: 'HEALTH_RECORD_UPDATED', label: 'Anamnese Atualizada' },
+    { value: 'ADMIN_DASHBOARD_VIEWED', label: 'Dashboard Admin Visualizado' },
+    { value: 'COMPLIANCE_REPORT_GENERATED', label: 'Relatório de Compliance Gerado' },
   ];
 
   readonly resourceOptions = [
@@ -43,6 +54,16 @@ export class AuditLogComponent implements OnInit {
     { value: 'user', label: 'Usuário' },
     { value: 'academy', label: 'Academia' },
     { value: 'audit_log', label: 'Log de Auditoria' },
+    { value: 'training', label: 'Treino' },
+    { value: 'student_health', label: 'Anamnese' },
+    { value: 'training_attendance', label: 'Frequência de Treino' },
+    { value: 'performance_notes', label: 'Notas de Performance' },
+  ];
+
+  readonly outcomeOptions = [
+    { value: '', label: 'Todos os resultados' },
+    { value: 'SUCCESS', label: 'Success' },
+    { value: 'DENIED', label: 'Denied' },
   ];
 
   constructor(
@@ -54,6 +75,7 @@ export class AuditLogComponent implements OnInit {
       userId: [''],
       action: [''],
       resourceType: [''],
+      outcome: [''],
       dateFrom: [''],
       dateTo: [''],
     });
@@ -87,7 +109,7 @@ export class AuditLogComponent implements OnInit {
   }
 
   clearFilters(): void {
-    this.filterForm.reset({ userId: '', action: '', resourceType: '', dateFrom: '', dateTo: '' });
+    this.filterForm.reset({ userId: '', action: '', resourceType: '', outcome: '', dateFrom: '', dateTo: '' });
     this.page = 1;
     this.loadLogs();
   }
@@ -115,6 +137,70 @@ export class AuditLogComponent implements OnInit {
       error: () => {
         this.errorMessage = 'Erro ao exportar CSV.';
         this.exporting = false;
+      },
+    });
+  }
+
+  exportPdf(): void {
+    this.exporting = true;
+    const filter = this.filterForm.value;
+    this.api.exportAuditLogsPdf(filter).subscribe({
+      next: (blob: Blob) => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        const today = new Date().toISOString().slice(0, 10);
+        a.href = url;
+        a.download = `Auditoria_LGPD_${today}.pdf`;
+        a.click();
+        URL.revokeObjectURL(url);
+        this.exporting = false;
+      },
+      error: () => {
+        this.errorMessage = 'Erro ao exportar PDF.';
+        this.exporting = false;
+      },
+    });
+  }
+
+  exportSelected(): void {
+    if (this.exportFormat === 'pdf') {
+      this.exportPdf();
+      return;
+    }
+    this.exportCsv();
+  }
+
+  toggleLogDetail(logId: string): void {
+    this.expandedLogId = this.expandedLogId === logId ? null : logId;
+  }
+
+  getOutcomeLabel(outcome?: 'SUCCESS' | 'DENIED'): string {
+    return outcome === 'DENIED' ? 'Denied' : 'Success';
+  }
+
+  getOutcomeClass(outcome?: 'SUCCESS' | 'DENIED'): string {
+    return outcome === 'DENIED' ? 'outcome-denied' : 'outcome-success';
+  }
+
+  getDeniedReason(log: AuditLogEntry): string {
+    if (!log.changesJson || typeof log.changesJson !== 'object') {
+      return 'Sem detalhe adicional.';
+    }
+
+    const maybeReason = (log.changesJson.reason || log.changesJson.error || log.changesJson.message) as
+      | string
+      | undefined;
+    return maybeReason || 'Sem motivo informado.';
+  }
+
+  investigateLog(log: AuditLogEntry): void {
+    this.toggleLogDetail(log.logId);
+  }
+
+  blockUser(log: AuditLogEntry): void {
+    this.router.navigate(['/admin/users'], {
+      queryParams: {
+        q: log.actorName || log.actorId || '',
       },
     });
   }

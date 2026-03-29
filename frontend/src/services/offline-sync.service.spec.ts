@@ -1,5 +1,7 @@
-import { TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { firstValueFrom, of, throwError } from 'rxjs';
+import { take } from 'rxjs/operators';
 import { OfflineStorageService, SyncQueueEntry } from './offline-storage.service';
 import { OfflineMonitorService } from './offline-monitor.service';
 import { SyncManagerService } from './sync-manager.service';
@@ -11,7 +13,7 @@ describe('Offline Sync Services', () => {
   let syncManager: SyncManagerService;
   let apiService: ApiService;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       providers: [
@@ -26,6 +28,23 @@ describe('Offline Sync Services', () => {
     offlineMonitor = TestBed.inject(OfflineMonitorService);
     syncManager = TestBed.inject(SyncManagerService);
     apiService = TestBed.inject(ApiService);
+
+    await offlineStorage.waitForReady();
+    await offlineStorage.clearQueue();
+
+    spyOn(apiService, 'syncBatch').and.returnValue(of({
+      success: true,
+      batchId: 'test-batch',
+      synced: 0,
+      failed: 0,
+      conflicts: 0,
+      data: [],
+      durationMs: 1,
+    }));
+  });
+
+  afterEach(async () => {
+    await offlineStorage.clearQueue();
   });
 
   describe('OfflineStorageService', () => {
@@ -149,12 +168,9 @@ describe('Offline Sync Services', () => {
       expect(typeof isOnline).toBe('boolean');
     });
 
-    it('should emit online status changes', (done) => {
-      const subscription = offlineMonitor.getIsOnline$().subscribe(isOnline => {
-        expect(typeof isOnline).toBe('boolean');
-        subscription.unsubscribe();
-        done();
-      });
+    it('should emit online status changes', async () => {
+      const isOnline = await firstValueFrom(offlineMonitor.getIsOnline$().pipe(take(1)));
+      expect(typeof isOnline).toBe('boolean');
     });
 
     it('should provide connection state', () => {
@@ -163,30 +179,19 @@ describe('Offline Sync Services', () => {
     });
 
     it('should have health check capability', async () => {
-      // This will likely fail in test environment without a real server
-      // but should not throw
-      try {
-        const isConnected = await offlineMonitor.checkConnection();
-        expect(typeof isConnected).toBe('boolean');
-      } catch {
-        // Expected in test environment
-      }
+      spyOn(window, 'fetch').and.resolveTo(new Response(null, { status: 200 }));
+
+      const isConnected = await offlineMonitor.checkConnection();
+      expect(isConnected).toBe(true);
     });
 
-    it('should emit status changes', (done) => {
-      let callCount = 0;
-      const subscription = offlineMonitor.getStatusChanged$().subscribe(() => {
-        callCount++;
-        if (callCount > 0) {
-          subscription.unsubscribe();
-          done();
-        }
-      });
+    it('should emit status changes', async () => {
+      const statusChangedPromise = firstValueFrom(offlineMonitor.getStatusChanged$().pipe(take(1)));
 
-      // Simulate status change
-      setTimeout(() => {
-        window.dispatchEvent(new UIEvent('online'));
-      }, 100);
+      (offlineMonitor as any).handleOffline();
+
+      const event = await statusChangedPromise;
+      expect(event.state).toBe('offline');
     });
   });
 
@@ -232,19 +237,16 @@ describe('Offline Sync Services', () => {
       subscription.unsubscribe();
     });
 
-    it('should not allow concurrent syncs', fakeAsync(async () => {
-      // Simulate starting sync twice
-      const result1 = syncManager.startSync();
-      const result2 = syncManager.startSync();
+    it('should not allow concurrent syncs', async () => {
+      (syncManager as any).syncInProgress$.next(true);
 
-      tick(100);
+      const secondSyncResult = await syncManager.startSync();
 
-      const r1 = await result1;
-      const r2 = await result2;
+      expect(secondSyncResult.success).toBe(false);
+      expect(secondSyncResult.errors).toContain('Sync already in progress');
 
-      // One should fail due to concurrent protection
-      expect(r1.success || r2.success).toBeDefined();
-    }));
+      (syncManager as any).syncInProgress$.next(false);
+    });
 
     it('should provide sync progress', () => {
       let progress = { inProgress: false, current: 0, total: 0 };
@@ -257,17 +259,25 @@ describe('Offline Sync Services', () => {
       subscription.unsubscribe();
     });
 
-    it('should emit sync completed event', (done) => {
-      const subscription = syncManager.getSyncCompleted$().subscribe(() => {
-        subscription.unsubscribe();
-        done();
-      });
+    it('should emit sync completed event', async () => {
+      const entryId = await syncManager.enqueueOperation('CREATE', 'training', { test: 1 });
+      (apiService.syncBatch as jasmine.Spy).and.returnValue(of({
+        success: true,
+        batchId: 'test-batch',
+        synced: 1,
+        failed: 0,
+        conflicts: 0,
+        data: [{ id: entryId, batchId: 'test-batch', result: 'synced' }],
+        durationMs: 1,
+      }));
 
-      // Trigger a sync
-      syncManager.startSync().catch(() => {
-        // Expected if no server available
-        done();
-      });
+      const completedPromise = firstValueFrom(syncManager.getSyncCompleted$().pipe(take(1)));
+      const result = await syncManager.startSync();
+      const completed = await completedPromise;
+
+      expect(result.success).toBe(true);
+      expect(completed.success).toBe(true);
+      expect(completed.synced).toBe(1);
     });
   });
 
@@ -281,20 +291,19 @@ describe('Offline Sync Services', () => {
       expect(pending.length).toBeGreaterThanOrEqual(3);
     });
 
-    it('should maintain operations during sync attempt', fakeAsync(async () => {
+    it('should maintain operations during sync attempt', async () => {
       await syncManager.enqueueOperation('CREATE', 'training', { test: 1 });
       const countBefore = await offlineStorage.getPendingCount();
 
-      // Try to sync (will fail without real server)
-      syncManager.startSync().catch(() => {
-        // Expected
-      });
+      (apiService.syncBatch as jasmine.Spy).and.returnValue(
+        throwError(() => new Error('offline sync unavailable'))
+      );
 
-      tick(100);
+      const result = await syncManager.startSync();
 
-      // Operations should still be there (failed sync)
+      expect(result.success).toBe(false);
       const countAfter = await offlineStorage.getPendingCount();
       expect(countAfter).toBeGreaterThanOrEqual(countBefore);
-    }));
+    });
   });
 });

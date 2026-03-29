@@ -495,3 +495,81 @@ export const createAndLinkGuardianSchema = Joi.object({
   }),
   phone: Joi.string().min(10).max(20).allow('').optional(),
 });
+
+const adminManagedRoleSchema = Joi.string()
+  .valid('Admin', 'Professor', 'Aluno', 'Responsavel')
+  .messages({
+    'any.only': 'Role inválido. Use Admin, Professor, Aluno ou Responsavel',
+  });
+
+export const adminManagedUserCreateSchema = Joi.object({
+  email: Joi.string().email().required().messages({
+    'string.email': 'Email deve ser válido',
+    'any.required': 'Email é obrigatório',
+  }),
+  fullName: Joi.string().min(2).max(255).required().messages({
+    'string.min': 'Nome completo deve ter ao menos 2 caracteres',
+    'any.required': 'Nome completo é obrigatório',
+  }),
+  role: adminManagedRoleSchema.required().messages({
+    'any.required': 'Role é obrigatório',
+  }),
+  isActive: Joi.boolean().optional(),
+  sendInvite: Joi.boolean().optional(),
+});
+
+export const adminManagedUserUpdateSchema = Joi.object({
+  fullName: Joi.string().min(2).max(255).optional(),
+  role: adminManagedRoleSchema.optional(),
+  isActive: Joi.boolean().optional(),
+  reason: Joi.string().max(255).allow('').optional(),
+}).or('fullName', 'role', 'isActive', 'reason');
+
+export const adminManagedUserDeleteSchema = Joi.object({
+  reason: Joi.string().max(255).allow('').optional(),
+});
+
+export const backupTriggerSchema = Joi.object({
+  includeHistory: Joi.boolean().optional().default(false),
+  isEncrypted: Joi.boolean().optional().default(false),
+  encryptionPassword: Joi.string().min(8).when('isEncrypted', {
+    is: true,
+    then: Joi.required(),
+    otherwise: Joi.allow('', null).optional(),
+  }).messages({
+    'string.min': 'Senha de criptografia deve ter ao menos 8 caracteres',
+    'any.required': 'Senha de criptografia é obrigatória quando o backup é criptografado',
+  }),
+});
+
+export const backupRestoreSchema = Joi.object({
+  adminPassword: Joi.string().min(1).required().messages({
+    'string.empty': 'Senha do administrador é obrigatória',
+    'any.required': 'Senha do administrador é obrigatória',
+  }),
+  encryptionPassword: Joi.string().min(8).allow('', null).optional().messages({
+    'string.min': 'Senha de criptografia deve ter ao menos 8 caracteres',
+  }),
+});
+
+export const backupScheduleUpsertSchema = Joi.object({
+  hour: Joi.number().integer().min(0).max(23).required().messages({
+    'number.base': 'Hora deve ser numérica',
+    'number.min': 'Hora deve estar entre 0 e 23',
+    'number.max': 'Hora deve estar entre 0 e 23',
+    'any.required': 'Hora é obrigatória',
+  }),
+  minute: Joi.number().integer().min(0).max(59).required().messages({
+    'number.base': 'Minuto deve ser numérico',
+    'number.min': 'Minuto deve estar entre 0 e 59',
+    'number.max': 'Minuto deve estar entre 0 e 59',
+    'any.required': 'Minuto é obrigatório',
+  }),
+  enabled: Joi.boolean().required().messages({
+    'any.required': 'Flag enabled é obrigatória',
+  }),
+  retentionDays: Joi.number().integer().min(7).max(90).optional().default(30).messages({
+    'number.min': 'Retenção mínima é de 7 dias',
+    'number.max': 'Retenção máxima é de 90 dias',
+  }),
+});

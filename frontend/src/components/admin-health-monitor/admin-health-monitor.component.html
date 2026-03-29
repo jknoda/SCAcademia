@@ -1,0 +1,108 @@
+<section class="health-monitor" *ngIf="!isLoading || snapshot">
+  <header class="health-header">
+    <div>
+      <p class="eyebrow">Admin > Saúde do Sistema</p>
+      <h2>Health Monitor</h2>
+      <p class="muted">
+        Uptime atual: <strong>{{ snapshot?.uptimePercentage || 0 }}%</strong>
+        <span *ngIf="snapshot?.generatedAt"> · Atualizado em {{ formatDateTime(snapshot?.generatedAt) }}</span>
+      </p>
+    </div>
+    <div class="header-actions">
+      <button class="action-btn" type="button" (click)="goBack()">Voltar</button>
+      <button class="action-btn primary" type="button" (click)="refresh()" [disabled]="isRefreshing">
+        {{ isRefreshing ? 'Atualizando...' : 'Atualizar agora' }}
+      </button>
+    </div>
+  </header>
+
+  <p class="status-message error" *ngIf="errorMessage">{{ errorMessage }}</p>
+
+  <section class="components-grid">
+    <article class="component-card" *ngFor="let component of components" [ngClass]="getStatusClass(component.status)">
+      <header>
+        <span class="component-status">{{ getStatusIcon(component.status) }} {{ component.statusLabel }}</span>
+        <h3>{{ component.label }}</h3>
+      </header>
+      <p class="component-detail">{{ component.details }}</p>
+      <div class="component-metrics">
+        <p><strong>{{ component.metrics.primaryLabel }}:</strong> {{ component.metrics.primaryValue }}</p>
+        <p *ngIf="component.metrics.secondaryLabel"><strong>{{ component.metrics.secondaryLabel }}:</strong> {{ component.metrics.secondaryValue }}</p>
+        <p *ngIf="component.metrics.tertiaryLabel"><strong>{{ component.metrics.tertiaryLabel }}:</strong> {{ component.metrics.tertiaryValue }}</p>
+      </div>
+    </article>
+  </section>
+
+  <section class="alerts-section" *ngIf="alerts.length > 0">
+    <div class="section-heading">
+      <h3>Alertas Contextuais</h3>
+      <p class="muted">Dicas operacionais com ação recomendada.</p>
+    </div>
+    <div class="alert-list">
+      <article class="alert-item" *ngFor="let alert of alerts">
+        <div>
+          <strong>{{ alert.title }}</strong>
+          <p>{{ alert.message }}</p>
+          <small [title]="alert.recommendation">Recomendação: {{ alert.recommendation }}</small>
+        </div>
+        <button class="action-btn" type="button" (click)="openTargetPath(alert.targetPath)">Abrir</button>
+      </article>
+    </div>
+  </section>
+
+  <section class="history-section">
+    <div class="section-heading">
+      <div>
+        <h3>Histórico de Métricas</h3>
+        <p class="muted">Visualização de 24h e 30 dias para análise de tendências.</p>
+      </div>
+      <div class="window-actions">
+        <button class="action-btn" [class.active]="selectedWindow === '24h'" (click)="selectWindow('24h')">24h</button>
+        <button class="action-btn" [class.active]="selectedWindow === '30d'" (click)="selectWindow('30d')">Ver Histórico 30 dias</button>
+      </div>
+    </div>
+
+    <p class="muted" *ngIf="isHistoryLoading">Carregando séries temporais...</p>
+    <p class="status-message error" *ngIf="historyError">{{ historyError }}</p>
+
+    <div class="chart-grid" *ngIf="history as data">
+      <article class="chart-card">
+        <h4>API Response Time</h4>
+        <div class="sparkline">
+          <span class="bar" *ngFor="let point of data.series.apiResponseMs" [style.height.%]="(point.value / 3000) * 100"></span>
+        </div>
+      </article>
+      <article class="chart-card">
+        <h4>CPU Usage</h4>
+        <div class="sparkline">
+          <span class="bar cpu" *ngFor="let point of data.series.cpuUsage" [style.height.%]="point.value"></span>
+        </div>
+      </article>
+      <article class="chart-card">
+        <h4>Memory Usage</h4>
+        <div class="sparkline">
+          <span class="bar memory" *ngFor="let point of data.series.memoryUsage" [style.height.%]="point.value"></span>
+        </div>
+      </article>
+      <article class="chart-card">
+        <h4>Database Connections</h4>
+        <div class="sparkline">
+          <span class="bar db" *ngFor="let point of data.series.databaseConnections" [style.height.%]="point.value"></span>
+        </div>
+      </article>
+    </div>
+
+    <ul class="patterns" *ngIf="history?.patterns?.length">
+      <li *ngFor="let pattern of history?.patterns">{{ pattern }}</li>
+    </ul>
+  </section>
+
+  <section class="backup-cta" *ngIf="hasBackupAttention()">
+    <p><strong>Backup em atenção.</strong> Detectamos estado de risco no storage/backup.</p>
+    <button class="action-btn primary" type="button" (click)="openBackup()">Tentar Backup Manual</button>
+  </section>
+</section>
+
+<section class="health-monitor loading" *ngIf="isLoading && !snapshot">
+  <p>Carregando Health Monitor...</p>
+</section>

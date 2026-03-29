@@ -1,0 +1,245 @@
+.backup-page {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 28px 18px 56px;
+}
+
+.backup-header,
+.backup-card,
+.jobs-table-wrapper {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+}
+
+.backup-header {
+  padding: 24px;
+  margin-bottom: 18px;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.header-actions,
+.modal-actions,
+.actions-cell {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.backup-card {
+  padding: 24px;
+  margin-bottom: 18px;
+}
+
+.status-grid,
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+}
+
+.label,
+small,
+.muted {
+  color: #667085;
+}
+
+.form-grid label,
+.checkbox-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.checkbox-row {
+  flex-direction: row;
+  align-items: center;
+  margin: 14px 0;
+}
+
+.checkbox-row.compact {
+  margin: 0 0 12px;
+}
+
+input,
+select {
+  border: 1px solid #d0d5dd;
+  border-radius: 10px;
+  padding: 10px 12px;
+  background: #fff;
+}
+
+.status-message {
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+}
+
+.status-message.success {
+  background: #ecfdf3;
+  color: #027a48;
+}
+
+.status-message.error {
+  background: #fef3f2;
+  color: #b42318;
+}
+
+.jobs-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.jobs-table th,
+.jobs-table td {
+  text-align: left;
+  padding: 12px 10px;
+  border-bottom: 1px solid #eaecf0;
+  vertical-align: top;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  background: #f2f4f7;
+  color: #344054;
+}
+
+.badge.ok {
+  background: #dcfae6;
+  color: #05603a;
+}
+
+.badge.running {
+  background: #fef0c7;
+  color: #b54708;
+}
+
+.badge.failed {
+  background: #fee4e2;
+  color: #b42318;
+}
+
+.badge.expired {
+  background: #eaecf0;
+  color: #475467;
+}
+
+.action-btn {
+  border: 1px solid #d0d5dd;
+  border-radius: 10px;
+  background: #fff;
+  padding: 10px 14px;
+  cursor: pointer;
+}
+
+.action-btn.primary {
+  background: #0052cc;
+  border-color: #0052cc;
+  color: #fff;
+}
+
+.action-btn.danger {
+  background: #b42318;
+  border-color: #b42318;
+  color: #fff;
+}
+
+.action-btn.small {
+  padding: 8px 10px;
+  font-size: 12px;
+}
+
+.action-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.56);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  z-index: 50;
+}
+
+.modal-card {
+  width: min(620px, 100%);
+  background: #fff;
+  border-radius: 14px;
+  padding: 24px;
+  box-shadow: 0 24px 64px rgba(15, 23, 42, 0.35);
+}
+
+.danger-card {
+  border: 2px solid #d92d20;
+  background: linear-gradient(180deg, #fff5f4 0%, #ffffff 100%);
+}
+
+.progress-panel,
+.verification-result {
+  margin-top: 14px;
+  border: 1px solid #dbeafe;
+  border-radius: 10px;
+  padding: 12px;
+  background: #f8fbff;
+}
+
+.progress-track {
+  width: 100%;
+  height: 10px;
+  border-radius: 999px;
+  background: #e4e7ec;
+  overflow: hidden;
+  margin: 10px 0;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #0052cc, #4c82f7);
+}
+
+.progress-fill.indeterminate {
+  width: 45%;
+  animation: backup-indeterminate 1.2s ease-in-out infinite alternate;
+}
+
+.success-text {
+  color: #027a48;
+}
+
+.error-text {
+  color: #b42318;
+}
+
+@keyframes backup-indeterminate {
+  from {
+    transform: translateX(-20%);
+  }
+  to {
+    transform: translateX(120%);
+  }
+}
+
+@media (max-width: 768px) {
+  .backup-header,
+  .modal-actions,
+  .actions-cell {
+    flex-direction: column;
+  }
+
+  .jobs-table {
+    display: block;
+    overflow-x: auto;
+  }
+}

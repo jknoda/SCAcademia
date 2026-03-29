@@ -1,3 +1,4 @@
+import { randomUUID } from 'crypto';
 import { Response } from 'express';
 import {
   AuthenticatedRequest,
@@ -12,6 +13,10 @@ import {
   StudentStatusUpdateRequest,
   CreateAndLinkGuardianRequest,
   LinkGuardianRequest,
+  AdminManagedUserCreateRequest,
+  AdminManagedUserUpdateRequest,
+  AdminManagedUserDeleteRequest,
+  AdminManagedUserRole,
 } from '../types';
 import {
   getUserByIdIncludingDeleted,
@@ -36,6 +41,15 @@ import {
   assignStudentToTurma,
   getTurmaByIdInAcademy,
   getStudentProfileView,
+  getStudentProgressDashboard,
+  getStudentAttendanceHistory,
+  getStudentCommentHistory,
+  getStudentBadgesHistory,
+  getStudentMonthlyComparison,
+  listStudentNotifications,
+  markStudentNotificationRead,
+  markAllStudentNotificationsRead,
+  getStudentBeltHistory,
   searchGuardianByEmail,
   getGuardianById,
   getGuardianByEmail,
@@ -43,9 +57,15 @@ import {
   unlinkGuardianFromStudent,
   listMinorsWithoutGuardian,
   listStudentsWithoutHealthScreening,
+  listAcademyUsersPaginated,
+  updateAcademyManagedUser,
+  softDeleteAcademyUser,
+  storeAuthToken,
 } from '../lib/database';
 import { hashPassword, validatePasswordStrength } from '../lib/password';
 import { logAudit } from '../lib/audit';
+import { sign } from '../lib/jwt';
+import { sendPasswordResetEmail } from '../lib/email';
 
 const calculateAge = (birthDate: Date | string | null | undefined): number | null => {
   if (!birthDate) return null;
@@ -72,6 +92,47 @@ const buildTemporaryGuardianPassword = (): string => {
   const nonce = Math.floor(Math.random() * 9000 + 1000);
   return `RespTemp!${nonce}`;
 };
+
+const toExpiresAt = (seconds: number): Date => new Date(Date.now() + seconds * 1000);
+
+const buildTemporaryPassword = (): string => {
+  const entropy = randomUUID().replace(/-/g, '').slice(0, 10);
+  return `Tmp@${entropy}A1`;
+};
+
+const escapeCsvField = (value: string): string =>
+  `"${String(value ?? '').replace(/"/g, '""')}"`;
+
+const normalizeManagedRole = (role: string | undefined): AdminManagedUserRole | undefined => {
+  if (!role) {
+    return undefined;
+  }
+  if (role === 'Admin' || role === 'Professor' || role === 'Aluno' || role === 'Responsavel') {
+    return role;
+  }
+  return undefined;
+};
+
+const resolveManagedStatus = (user: any): 'active' | 'blocked' | 'pending' => {
+  if (user.isActive === false) {
+    return 'blocked';
+  }
+  if (!user.passwordChangedAt) {
+    return 'pending';
+  }
+  return 'active';
+};
+
+const toManagedUserListItem = (user: any) => ({
+  id: user.id,
+  fullName: user.fullName,
+  email: user.email,
+  role: user.role,
+  isActive: user.isActive !== false,
+  status: resolveManagedStatus(user),
+  createdAt: user.createdAt,
+  deletedAt: user.deletedAt || null,
+});
 
 const toUserProfileResponse = (user: any) => ({
   id: user.id,
@@ -190,19 +251,265 @@ export const updateOwnUserProfile = async (req: AuthenticatedRequest, res: Respo
 export const listAcademyUsers = async (req: AuthenticatedRequest, res: Response) => {
   try {
     const academyId = req.user!.academyId;
-    const users = await getUsersByAcademy(academyId);
+    const page = Math.max(1, parseInt((req.query['page'] as string) || '1', 10) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt((req.query['limit'] as string) || '20', 10) || 20));
+    const role = normalizeManagedRole(req.query['role'] as string | undefined);
+    const statusQuery = ((req.query['status'] as string | undefined) || 'all').toLowerCase();
+    const status = statusQuery === 'active' || statusQuery === 'blocked' || statusQuery === 'pending'
+      ? statusQuery
+      : 'all';
+    const search = ((req.query['search'] as string | undefined) || '').trim();
+
+    const result = await listAcademyUsersPaginated(academyId, {
+      page,
+      limit,
+      role,
+      status,
+      search,
+      includeDeleted: false,
+    });
+    const users = result.items;
 
     res.json({
-      users: users.map((u) => ({
-        id: u.id,
-        email: u.email,
-        fullName: u.fullName,
-        role: u.role,
-        academyId: u.academyId,
-      })),
+      users: users.map(toManagedUserListItem),
+      pagination: {
+        page: result.page,
+        limit: result.limit,
+        total: result.total,
+        totalPages: result.totalPages,
+      },
+      filters: {
+        role: role || 'all',
+        status,
+        search,
+      },
     });
   } catch (error) {
     res.status(500).json({ error: 'Erro ao listar usuários' });
+  }
+};
+
+export const createManagedUserHandler = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const academyId = req.user!.academyId;
+    const adminUserId = req.user!.userId;
+    const payload = req.body as AdminManagedUserCreateRequest;
+
+    const existingUser = await getUserByEmail(payload.email, academyId);
+    if (existingUser) {
+      return res.status(409).json({
+        error: 'Email ja cadastrado para outro usuario desta academia',
+      });
+    }
+
+    const temporaryPassword = buildTemporaryPassword();
+    const passwordValidation = validatePasswordStrength(temporaryPassword);
+    if (!passwordValidation.valid) {
+      return res.status(500).json({ error: 'Erro ao gerar senha temporaria segura' });
+    }
+
+    const passwordHash = await hashPassword(temporaryPassword);
+    const created = await createUser(
+      payload.email,
+      payload.fullName,
+      passwordHash,
+      academyId,
+      payload.role,
+      undefined,
+      undefined,
+      new Date()
+    );
+
+    let finalUser = created;
+    if (payload.isActive === false) {
+      const updated = await updateAcademyManagedUser(created.id, academyId, { isActive: false });
+      if (updated) {
+        finalUser = updated;
+      }
+    }
+
+    let inviteSent = false;
+    let inviteLink: string | undefined;
+    const shouldSendInvite = payload.sendInvite !== false;
+
+    if (shouldSendInvite) {
+      await revokeAuthTokensByUser(finalUser.id, 'password_reset');
+
+      const resetToken = sign(
+        {
+          userId: finalUser.id,
+          email: finalUser.email,
+          academyId,
+          role: finalUser.role,
+        },
+        60 * 60
+      );
+
+      await storeAuthToken(
+        finalUser.id,
+        academyId,
+        'password_reset',
+        resetToken,
+        toExpiresAt(60 * 60),
+        req.ip,
+        req.get('user-agent')
+      );
+
+      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:4200';
+      inviteLink = `${frontendUrl}/reset-password?token=${encodeURIComponent(resetToken)}`;
+      inviteSent = await sendPasswordResetEmail(finalUser.email, inviteLink);
+    }
+
+    logAudit(adminUserId, 'USER_CREATED', 'User', finalUser.id, academyId, req.ip, {
+      managedByAdmin: true,
+      role: finalUser.role,
+      isActive: finalUser.isActive !== false,
+      sendInvite: shouldSendInvite,
+      inviteSent,
+    });
+
+    return res.status(201).json({
+      message: shouldSendInvite
+        ? 'Usuario criado e convite enviado'
+        : 'Usuario criado com sucesso',
+      user: toManagedUserListItem(finalUser),
+      inviteSent,
+      ...(process.env.NODE_ENV === 'test' && inviteLink ? { inviteLink } : {}),
+    });
+  } catch (error) {
+    return res.status(500).json({ error: 'Erro ao criar usuário' });
+  }
+};
+
+export const updateManagedUserHandler = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const academyId = req.user!.academyId;
+    const adminUserId = req.user!.userId;
+    const userId = req.params['userId'] as string;
+    const payload = req.body as AdminManagedUserUpdateRequest;
+
+    if (userId === adminUserId && (payload.isActive === false || payload.role)) {
+      return res.status(400).json({
+        error: 'Nao e permitido desativar ou alterar o proprio role',
+      });
+    }
+
+    const updated = await updateAcademyManagedUser(userId, academyId, {
+      fullName: payload.fullName,
+      role: payload.role,
+      isActive: payload.isActive,
+    });
+
+    if (!updated) {
+      return res.status(404).json({ error: 'Usuário não encontrado' });
+    }
+
+    logAudit(adminUserId, 'USER_UPDATED', 'User', updated.id, academyId, req.ip, {
+      managedByAdmin: true,
+      fullNameChanged: typeof payload.fullName === 'string',
+      roleChanged: typeof payload.role === 'string',
+      statusChanged: typeof payload.isActive === 'boolean',
+      reason: payload.reason || undefined,
+      role: updated.role,
+      isActive: updated.isActive !== false,
+    });
+
+    return res.json({
+      message: 'Usuario atualizado com sucesso',
+      user: toManagedUserListItem(updated),
+    });
+  } catch (error) {
+    return res.status(500).json({ error: 'Erro ao atualizar usuário' });
+  }
+};
+
+export const softDeleteManagedUserHandler = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const academyId = req.user!.academyId;
+    const adminUserId = req.user!.userId;
+    const userId = req.params['userId'] as string;
+    const payload = (req.body || {}) as AdminManagedUserDeleteRequest;
+
+    if (userId === adminUserId) {
+      return res.status(400).json({ error: 'Nao e permitido deletar o proprio usuario' });
+    }
+
+    const deleted = await softDeleteAcademyUser(userId, academyId);
+    if (!deleted) {
+      return res.status(404).json({ error: 'Usuário não encontrado' });
+    }
+
+    await revokeAuthTokensByUser(userId);
+
+    logAudit(adminUserId, 'USER_SOFT_DELETED', 'User', deleted.id, academyId, req.ip, {
+      managedByAdmin: true,
+      reason: payload.reason || undefined,
+      deletedAt: deleted.deletedAt,
+    });
+
+    return res.json({
+      message: 'Usuario removido com soft delete',
+      user: toManagedUserListItem(deleted),
+    });
+  } catch (error) {
+    return res.status(500).json({ error: 'Erro ao remover usuário' });
+  }
+};
+
+export const exportManagedUsersCsvHandler = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const academyId = req.user!.academyId;
+    const adminUserId = req.user!.userId;
+    const role = normalizeManagedRole(req.query['role'] as string | undefined);
+    const statusQuery = ((req.query['status'] as string | undefined) || 'all').toLowerCase();
+    const status = statusQuery === 'active' || statusQuery === 'blocked' || statusQuery === 'pending'
+      ? statusQuery
+      : 'all';
+    const search = ((req.query['search'] as string | undefined) || '').trim();
+
+    const result = await listAcademyUsersPaginated(academyId, {
+      page: 1,
+      limit: 10000,
+      role,
+      status,
+      search,
+      includeDeleted: false,
+    });
+
+    const header = ['Nome', 'Email', 'Role', 'Status', 'Criado Em'];
+    const rows = result.items.map((user) => {
+      const item = toManagedUserListItem(user);
+      const statusLabel = item.status === 'blocked' ? 'Bloqueado' : item.status === 'pending' ? 'Pendente' : 'Ativo';
+      return [
+        escapeCsvField(item.fullName),
+        escapeCsvField(item.email),
+        escapeCsvField(item.role),
+        escapeCsvField(statusLabel),
+        escapeCsvField(item.createdAt ? new Date(item.createdAt).toISOString().slice(0, 10) : ''),
+      ].join(',');
+    });
+
+    const csv = [header.join(','), ...rows].join('\n');
+    const academy = await getAcademyById(academyId);
+    const academyName = (academy?.fantasyName || academy?.name || 'Academia')
+      .replace(/\s+/g, '_')
+      .replace(/[^a-zA-Z0-9_-]/g, '');
+    const date = new Date().toISOString().slice(0, 10);
+    const fileName = `Usuarios_${academyName}_${date}.csv`;
+
+    logAudit(adminUserId, 'USER_EXPORT_CSV', 'User', 'admin-users', academyId, req.ip, {
+      managedByAdmin: true,
+      role: role || 'all',
+      status,
+      search,
+      total: result.total,
+    });
+
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
+    return res.status(200).send(csv);
+  } catch (error) {
+    return res.status(500).json({ error: 'Erro ao exportar usuarios em CSV' });
   }
 };
 
@@ -732,6 +1039,207 @@ export const getStudentProfileViewHandler = async (req: AuthenticatedRequest, re
     });
   } catch (error) {
     return res.status(500).json({ error: 'Erro ao carregar ficha completa do aluno' });
+  }
+};
+
+export const getMyStudentProgressDashboardHandler = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const academyId = req.user!.academyId;
+    const studentId = req.user!.userId;
+
+    const student = await getStudentById(studentId, academyId);
+    if (!student) {
+      return res.status(404).json({ error: 'Aluno não encontrado' });
+    }
+
+    const dashboard = await getStudentProgressDashboard(academyId, studentId);
+
+    return res.json({
+      heading: `Olá, ${student.fullName}!`,
+      subheading: 'Seu progresso em judô',
+      cards: {
+        evolucaoMes: {
+          ...dashboard.evolution,
+        },
+        frequencia: {
+          ...dashboard.attendance,
+        },
+        comentariosProfessor: {
+          ...dashboard.comments,
+        },
+        faixaConquistas: {
+          ...dashboard.beltAndAchievements,
+          beltHistory: dashboard.beltHistory,
+        },
+      },
+      generatedAt: new Date().toISOString(),
+    });
+  } catch (error) {
+    return res.status(500).json({ error: 'Erro ao carregar dashboard de progresso do aluno' });
+  }
+};
+
+export const getMyStudentAttendanceHistoryHandler = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const academyId = req.user!.academyId;
+    const studentId = req.user!.userId;
+
+    const student = await getStudentById(studentId, academyId);
+    if (!student) {
+      return res.status(404).json({ error: 'Aluno não encontrado' });
+    }
+
+    const dateFrom = typeof req.query['dateFrom'] === 'string' ? req.query['dateFrom'] : undefined;
+    const dateTo = typeof req.query['dateTo'] === 'string' ? req.query['dateTo'] : undefined;
+    const limit = typeof req.query['limit'] === 'string' ? Number(req.query['limit']) : 20;
+    const offset = typeof req.query['offset'] === 'string' ? Number(req.query['offset']) : 0;
+
+    const history = await getStudentAttendanceHistory(academyId, studentId, {
+      dateFrom,
+      dateTo,
+      limit,
+      offset,
+    });
+
+    return res.json({
+      studentName: student.fullName,
+      ...history,
+      generatedAt: new Date().toISOString(),
+    });
+  } catch (error) {
+    return res.status(500).json({ error: 'Erro ao carregar histórico de frequência do aluno' });
+  }
+};
+
+// Story 4-4: Histórico completo de comentários do professor com paginação e busca por keyword
+export const getMyStudentCommentHistoryHandler = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const academyId = req.user!.academyId;
+    const studentId = req.user!.userId;
+
+    const keyword = typeof req.query['keyword'] === 'string' ? req.query['keyword'].trim() : undefined;
+    const limit = typeof req.query['limit'] === 'string' ? Number(req.query['limit']) : 20;
+    const offset = typeof req.query['offset'] === 'string' ? Number(req.query['offset']) : 0;
+
+    const result = await getStudentCommentHistory(academyId, studentId, {
+      keyword: keyword || undefined,
+      limit,
+      offset,
+    });
+
+    return res.json(result);
+  } catch (error) {
+    return res.status(500).json({ error: 'Erro ao carregar histórico de comentários do aluno' });
+  }
+};
+
+// Story 4-5: Histórico completo de badges e milestones com desbloqueados e próximos
+export const getMyStudentBadgesHistoryHandler = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const academyId = req.user!.academyId;
+    const studentId = req.user!.userId;
+
+    const limitUnlocked = typeof req.query['limitUnlocked'] === 'string'
+      ? Number(req.query['limitUnlocked'])
+      : 20;
+    const limitUpcoming = typeof req.query['limitUpcoming'] === 'string'
+      ? Number(req.query['limitUpcoming'])
+      : 5;
+
+    const result = await getStudentBadgesHistory(academyId, studentId, {
+      limitUnlocked,
+      limitUpcoming,
+    });
+
+    return res.json(result);
+  } catch (error) {
+    return res.status(500).json({ error: 'Erro ao carregar badges e milestones do aluno' });
+  }
+};
+
+export const getMyStudentMonthlyComparisonHandler = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const academyId = req.user!.academyId;
+    const studentId = req.user!.userId;
+
+    const months = typeof req.query['months'] === 'string'
+      ? Number(req.query['months'])
+      : 6;
+
+    const result = await getStudentMonthlyComparison(academyId, studentId, months);
+
+    return res.json(result);
+  } catch (error) {
+    return res.status(500).json({ error: 'Erro ao carregar comparação mês-a-mês do aluno' });
+  }
+};
+
+export const getMyStudentNotificationsHandler = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const academyId = req.user!.academyId;
+    const studentId = req.user!.userId;
+
+    const allowedStatuses = ['pending', 'sent', 'failed', 'bounced'] as const;
+    const rawStatus = typeof req.query['status'] === 'string' ? req.query['status'] : undefined;
+    if (rawStatus !== undefined && !(allowedStatuses as readonly string[]).includes(rawStatus)) {
+      return res.status(400).json({ error: 'Parâmetro status inválido' });
+    }
+    const status = rawStatus as 'pending' | 'sent' | 'failed' | 'bounced' | undefined;
+    const limit = typeof req.query['limit'] === 'string' ? Number(req.query['limit']) : 20;
+    const offset = typeof req.query['offset'] === 'string' ? Number(req.query['offset']) : 0;
+
+    const result = await listStudentNotifications(academyId, studentId, {
+      status,
+      limit,
+      offset,
+    });
+
+    return res.json(result);
+  } catch (error) {
+    return res.status(500).json({ error: 'Erro ao carregar notificações do aluno' });
+  }
+};
+
+export const markMyStudentNotificationReadHandler = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const academyId = req.user!.academyId;
+    const studentId = req.user!.userId;
+    const notificationId = req.params['notificationId'] as string;
+
+    const updated = await markStudentNotificationRead(academyId, studentId, notificationId);
+    if (!updated) {
+      return res.status(404).json({ error: 'Notificação não encontrada' });
+    }
+
+    return res.json({ success: true });
+  } catch (error) {
+    return res.status(500).json({ error: 'Erro ao marcar notificação como lida' });
+  }
+};
+
+export const getMyStudentBeltHistoryHandler = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const academyId = req.user!.academyId;
+    const studentId = req.user!.userId;
+
+    const result = await getStudentBeltHistory(academyId, studentId);
+
+    return res.json(result);
+  } catch (error) {
+    return res.status(500).json({ error: 'Erro ao carregar histórico de faixas do aluno' });
+  }
+};
+
+export const markAllMyStudentNotificationsReadHandler = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const academyId = req.user!.academyId;
+    const studentId = req.user!.userId;
+
+    const affected = await markAllStudentNotificationsRead(academyId, studentId);
+
+    return res.json({ success: true, affected });
+  } catch (error) {
+    return res.status(500).json({ error: 'Erro ao marcar notificações como lidas' });
   }
 };
 

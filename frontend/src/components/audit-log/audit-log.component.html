@@ -3,11 +3,15 @@
     <div class="header-content">
       <div class="header-left">
         <button class="btn-back" (click)="goBack()">← Voltar</button>
-        <h1>🔍 Log de Auditoria LGPD</h1>
+        <h1>Timeline de Acessos a Dados Sensíveis</h1>
       </div>
       <div class="header-right">
-        <button class="btn-export" (click)="exportCsv()" [disabled]="exporting">
-          {{ exporting ? 'Exportando...' : '⬇ Exportar CSV' }}
+        <select class="export-select" [(ngModel)]="exportFormat" [disabled]="exporting" name="exportFormat">
+          <option value="csv">CSV</option>
+          <option value="pdf">PDF</option>
+        </select>
+        <button class="btn-export" (click)="exportSelected()" [disabled]="exporting">
+          {{ exporting ? 'Exportando...' : '⬇ Exportar' }}
         </button>
       </div>
     </div>
@@ -30,6 +34,12 @@
             <label for="resourceType">Tipo de Recurso</label>
             <select id="resourceType" formControlName="resourceType">
               <option *ngFor="let opt of resourceOptions" [value]="opt.value">{{ opt.label }}</option>
+            </select>
+          </div>
+          <div class="filter-field">
+            <label for="outcome">Resultado</label>
+            <select id="outcome" formControlName="outcome">
+              <option *ngFor="let opt of outcomeOptions" [value]="opt.value">{{ opt.label }}</option>
             </select>
           </div>
           <div class="filter-field">
@@ -68,18 +78,25 @@
 
       <!-- Timeline -->
       <div class="timeline" *ngIf="!loading && logs.length > 0">
-        <div class="timeline-item" *ngFor="let log of logs">
+        <div class="timeline-item" *ngFor="let log of logs" [class.timeline-item--anomaly]="log.anomalyFlag">
           <div class="timeline-dot" [ngClass]="getActionColor(log.action)"></div>
           <div class="timeline-content">
             <div class="timeline-row">
-              <span class="action-badge" [ngClass]="getActionColor(log.action)">
-                {{ getActionLabel(log.action) }}
-              </span>
+              <div class="timeline-badges">
+                <span class="action-badge" [ngClass]="getActionColor(log.action)">
+                  {{ getActionLabel(log.action) }}
+                </span>
+                <span class="outcome-badge" [ngClass]="getOutcomeClass(log.outcome)">
+                  {{ getOutcomeLabel(log.outcome) }}
+                </span>
+                <span class="anomaly-badge" *ngIf="log.anomalyFlag">⚠️ Anomalia</span>
+              </div>
               <span class="timestamp">{{ formatTimestamp(log.timestamp) }}</span>
             </div>
             <div class="timeline-meta">
               <span class="meta-item" *ngIf="log.actorName">
                 <strong>Usuário:</strong> {{ log.actorName }}
+                <span *ngIf="log.actorRole">({{ log.actorRole }})</span>
               </span>
               <span class="meta-item">
                 <strong>Recurso:</strong> {{ log.resourceType }} / {{ log.resourceId }}
@@ -87,10 +104,40 @@
               <span class="meta-item" *ngIf="log.ipAddress">
                 <strong>IP:</strong> {{ log.ipAddress }}
               </span>
+              <span class="meta-item" *ngIf="log.userAgent">
+                <strong>Navegador:</strong> {{ log.userAgent }}
+              </span>
             </div>
-            <div class="changes-json" *ngIf="log.changesJson">
-              <details>
-                <summary>Detalhes</summary>
+            <div class="timeline-actions">
+              <button type="button" class="btn-secondary btn-sm" (click)="toggleLogDetail(log.logId)">
+                {{ expandedLogId === log.logId ? 'Ocultar detalhes' : 'Ver detalhes' }}
+              </button>
+              <button
+                type="button"
+                class="btn-secondary btn-sm"
+                *ngIf="log.anomalyFlag"
+                (click)="investigateLog(log)"
+              >
+                Investigar
+              </button>
+              <button
+                type="button"
+                class="btn-primary btn-sm"
+                *ngIf="log.anomalyFlag"
+                (click)="blockUser(log)"
+              >
+                Bloquear Usuário?
+              </button>
+            </div>
+            <div class="changes-json" *ngIf="expandedLogId === log.logId">
+              <details open>
+                <summary>Detalhes completos</summary>
+                <div class="detail-grid">
+                  <div><strong>Usuário ID:</strong> {{ log.actorId || '-' }}</div>
+                  <div><strong>Timestamp:</strong> {{ formatTimestamp(log.timestamp) }}</div>
+                  <div><strong>Resultado:</strong> {{ getOutcomeLabel(log.outcome) }}</div>
+                  <div *ngIf="log.outcome === 'DENIED'"><strong>Motivo:</strong> {{ getDeniedReason(log) }}</div>
+                </div>
                 <pre>{{ log.changesJson | json }}</pre>
               </details>
             </div>
@@ -117,6 +164,10 @@
         </button>
         <button class="page-btn" (click)="goToPage(page + 1)" [disabled]="page === totalPages">›</button>
         <button class="page-btn" (click)="goToPage(totalPages)" [disabled]="page === totalPages">»</button>
+      </div>
+
+      <div class="immutability-note">
+        Logs de auditoria são imutáveis por lei (LGPD Art. 37).
       </div>
     </section>
 

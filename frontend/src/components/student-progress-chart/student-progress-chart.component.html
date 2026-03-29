@@ -1,0 +1,140 @@
+<div class="student-progress-chart-wrapper">
+  <!-- Insufficient Data State -->
+  <div *ngIf="showInsufficientData" class="insufficient-data-message">
+    <p>Ainda não há dados suficientes para análise</p>
+    <p class="subtext">Dados começarão a acumular após 2ª semana de treinamento</p>
+  </div>
+
+  <!-- Chart Section -->
+  <ng-container *ngIf="!showInsufficientData && weeklyData.length >= 2">
+    <div class="chart-toolbar">
+      <button class="chart-nav-btn" type="button" (click)="goToPreviousPeriod()" [disabled]="!canGoToPreviousPeriod()">
+        Semana anterior
+      </button>
+      <p class="chart-period-label">
+        Semanas {{ visibleData[0]?.weekNumber }} a {{ visibleData[visibleData.length - 1]?.weekNumber }}
+      </p>
+      <button class="chart-nav-btn" type="button" (click)="goToNextPeriod()" [disabled]="!canGoToNextPeriod()">
+        Semana seguinte
+      </button>
+    </div>
+
+    <div class="chart-container" [class.is-transitioning]="isTransitioning">
+      <svg
+        [attr.width]="CHART_WIDTH"
+        [attr.height]="CHART_HEIGHT"
+        class="progress-chart"
+        viewBox="0 0 {{CHART_WIDTH}} {{CHART_HEIGHT}}"
+        preserveAspectRatio="xMidYMid meet"
+      >
+        <!-- Grid lines (optional) -->
+        <g class="grid-lines">
+          <line
+            *ngFor="let i of [0, 1, 2, 3, 4, 5]"
+            [attr.x1]="PADDING.left"
+            [attr.x2]="CHART_WIDTH - PADDING.right"
+            [attr.y1]="PADDING.top + (i * (CHART_HEIGHT - PADDING.top - PADDING.bottom)) / 5"
+            [attr.y2]="PADDING.top + (i * (CHART_HEIGHT - PADDING.top - PADDING.bottom)) / 5"
+            class="grid-line"
+          />
+        </g>
+
+        <!-- Axes -->
+        <g class="axes">
+          <!-- Y-axis -->
+          <line
+            [attr.x1]="PADDING.left"
+            [attr.y1]="PADDING.top"
+            [attr.x2]="PADDING.left"
+            [attr.y2]="CHART_HEIGHT - PADDING.bottom"
+            class="axis"
+          />
+
+          <!-- X-axis -->
+          <line
+            [attr.x1]="PADDING.left"
+            [attr.y1]="CHART_HEIGHT - PADDING.bottom"
+            [attr.x2]="CHART_WIDTH - PADDING.right"
+            [attr.y2]="CHART_HEIGHT - PADDING.bottom"
+            class="axis"
+          />
+        </g>
+
+        <!-- Y-axis labels (0, 25, 50, 75, 100) -->
+        <g class="y-axis-labels">
+          <text
+            *ngFor="let percent of [0, 25, 50, 75, 100]"
+            [attr.x]="PADDING.left - 15"
+            [attr.y]="
+              PADDING.top +
+              ((100 - percent) * (CHART_HEIGHT - PADDING.top - PADDING.bottom)) / 100 +
+              5
+            "
+            text-anchor="end"
+            class="axis-label y-label"
+          >
+            {{ percent }}%
+          </text>
+        </g>
+
+        <!-- X-axis labels (weeks) -->
+        <g class="x-axis-labels" *ngIf="points.length > 0">
+          <text
+            *ngFor="let point of points"
+            [attr.x]="point.x"
+            [attr.y]="CHART_HEIGHT - PADDING.bottom + 25"
+            text-anchor="middle"
+            class="axis-label x-label"
+          >
+            Sem {{ point.week.weekNumber }}
+          </text>
+        </g>
+
+        <!-- Line path -->
+        <path
+          *ngIf="svgPath"
+          [attr.d]="svgPath"
+          class="chart-line"
+          [ngClass]="'trend-' + trend"
+          fill="none"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+
+        <!-- Points (circles) -->
+        <g class="data-points" *ngIf="points.length > 0">
+          <ng-container *ngFor="let point of points; let i = index">
+            <circle
+              [attr.cx]="point.x"
+              [attr.cy]="point.y"
+              [attr.r]="POINT_RADIUS"
+              class="data-point"
+              [ngClass]="'color-' + (getPointColor(i) === '#D32F2F' ? 'red' : 'orange')"
+              (mouseenter)="onPointHover(i)"
+              (mouseleave)="onPointHoverOut()"
+              (click)="onPointHover(i)"
+              (touchstart)="onPointHover(i)"
+            ></circle>
+          </ng-container>
+        </g>
+      </svg>
+
+      <div
+        *ngIf="activeTooltip"
+        class="chart-tooltip"
+        [style.left.px]="activeTooltip.x"
+        [style.top.px]="activeTooltip.y"
+      >
+        {{ activeTooltip.label }}
+      </div>
+    </div>
+
+    <!-- Interpretation Section -->
+    <div class="chart-interpretation">
+      <p class="trend-message" [ngClass]="'trend-' + trend">
+        {{ trendMessage }}
+      </p>
+    </div>
+  </ng-container>
+</div>

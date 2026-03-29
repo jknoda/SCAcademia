@@ -1,0 +1,860 @@
+warning: in the working copy of 'backend/src/controllers/users.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/src/routes/users.ts', LF will be replaced by CRLF the next time Git touches it
+diff --git a/backend/src/controllers/users.ts b/backend/src/controllers/users.ts
+index 8e48638..8cad7ed 100644
+--- a/backend/src/controllers/users.ts
++++ b/backend/src/controllers/users.ts
+@@ -36,6 +36,8 @@ import {
+   assignStudentToTurma,
+   getTurmaByIdInAcademy,
+   getStudentProfileView,
++  getStudentProgressDashboard,
++  getStudentAttendanceHistory,
+   searchGuardianByEmail,
+   getGuardianById,
+   getGuardianByEmail,
+@@ -735,6 +737,75 @@ export const getStudentProfileViewHandler = async (req: AuthenticatedRequest, re
+   }
+ };
+ 
++export const getMyStudentProgressDashboardHandler = async (req: AuthenticatedRequest, res: Response) => {
++  try {
++    const academyId = req.user!.academyId;
++    const studentId = req.user!.userId;
++
++    const student = await getStudentById(studentId, academyId);
++    if (!student) {
++      return res.status(404).json({ error: 'Aluno n├úo encontrado' });
++    }
++
++    const dashboard = await getStudentProgressDashboard(academyId, studentId);
++
++    return res.json({
++      heading: `Ol├í, ${student.fullName}!`,
++      subheading: 'Seu progresso em jud├┤',
++      cards: {
++        evolucaoMes: {
++          ...dashboard.evolution,
++        },
++        frequencia: {
++          ...dashboard.attendance,
++        },
++        comentariosProfessor: {
++          ...dashboard.comments,
++        },
++        faixaConquistas: {
++          ...dashboard.beltAndAchievements,
++          beltHistory: dashboard.beltHistory,
++        },
++      },
++      generatedAt: new Date().toISOString(),
++    });
++  } catch (error) {
++    return res.status(500).json({ error: 'Erro ao carregar dashboard de progresso do aluno' });
++  }
++};
++
++export const getMyStudentAttendanceHistoryHandler = async (req: AuthenticatedRequest, res: Response) => {
++  try {
++    const academyId = req.user!.academyId;
++    const studentId = req.user!.userId;
++
++    const student = await getStudentById(studentId, academyId);
++    if (!student) {
++      return res.status(404).json({ error: 'Aluno n├úo encontrado' });
++    }
++
++    const dateFrom = typeof req.query['dateFrom'] === 'string' ? req.query['dateFrom'] : undefined;
++    const dateTo = typeof req.query['dateTo'] === 'string' ? req.query['dateTo'] : undefined;
++    const limit = typeof req.query['limit'] === 'string' ? Number(req.query['limit']) : 20;
++    const offset = typeof req.query['offset'] === 'string' ? Number(req.query['offset']) : 0;
++
++    const history = await getStudentAttendanceHistory(academyId, studentId, {
++      dateFrom,
++      dateTo,
++      limit,
++      offset,
++    });
++
++    return res.json({
++      studentName: student.fullName,
++      ...history,
++      generatedAt: new Date().toISOString(),
++    });
++  } catch (error) {
++    return res.status(500).json({ error: 'Erro ao carregar hist├│rico de frequ├¬ncia do aluno' });
++  }
++};
++
+ export const searchGuardianByEmailHandler = async (req: AuthenticatedRequest, res: Response) => {
+   try {
+     const academyId = req.user!.academyId;
+diff --git a/backend/src/lib/database.ts b/backend/src/lib/database.ts
+index 10cd326..a1f7187 100644
+--- a/backend/src/lib/database.ts
++++ b/backend/src/lib/database.ts
+@@ -517,6 +517,90 @@ export interface StudentWithoutHealthScreeningItem {
+   hasGuardian: boolean;
+ }
+ 
++export interface StudentDashboardCommentItem {
++  content: string;
++  professorName: string;
++  sessionDate?: Date;
++  createdAt: Date;
++}
++
++export interface StudentDashboardBeltHistoryItem {
++  belt: string;
++  receivedDate: Date;
++  promotedBy?: string;
++  notes?: string;
++  durationDays: number;
++}
++
++export interface StudentProgressDashboard {
++  evolution: {
++    currentMonthPresentCount: number;
++    previousMonthPresentCount: number;
++    delta: number;
++    monthlySeries: Array<{
++      monthStart: string;
++      presentCount: number;
++      totalCount: number;
++    }>;
++    weeklySeries: Array<{
++      weekNumber: number;
++      date: string;
++      proficiencyPercent: number;
++    }>;
++  };
++  attendance: {
++    presentCount90d: number;
++    totalCount90d: number;
++    attendancePercentage90d: number;
++    nextClass?: {
++      turmaName: string;
++      sessionDate: string;
++      sessionTime: string;
++    };
++    recentSessions: Array<{
++      sessionDate: string;
++      status: 'present' | 'absent' | 'justified';
++    }>;
++  };
++  comments: {
++    latest?: StudentDashboardCommentItem;
++    totalComments: number;
++    timeline: StudentDashboardCommentItem[];
++  };
++  beltAndAchievements: {
++    currentBelt?: string;
++    beltDate?: Date;
++    isFederated: boolean;
++    federationDate?: Date;
++    federationRegistration?: string;
++    totalBadges: number;
++    latestBadges: Array<{
++      name: string;
++      earnedAt: Date;
++    }>;
++    currentStreak: number;
++  };
++  beltHistory: StudentDashboardBeltHistoryItem[];
++}
++
++export interface StudentAttendanceHistoryItem {
++  sessionDate: string;
++  turmaName: string;
++  status: 'present' | 'absent' | 'justified';
++  absenceReason?: string;
++}
++
++export interface StudentAttendanceHistoryResult {
++  items: StudentAttendanceHistoryItem[];
++  total: number;
++  limit: number;
++  offset: number;
++  attendancePercentage: number;
++  warningBelow70: boolean;
++  currentStreak: number;
++  currentStreakDays: number;
++}
++
+ export const updateUserProfile = async (
+   userId: string,
+   academyId: string,
+@@ -1338,6 +1422,473 @@ export const getStudentProfileView = async (
+   };
+ };
+ 
++export const getStudentProgressDashboard = async (
++  academyId: string,
++  studentId: string
++): Promise<StudentProgressDashboard> => {
++  const [
++    monthlyEvolutionRes,
++    weeklyEvolutionRes,
++    attendance90dRes,
++    nextClassRes,
++    recentAttendanceRes,
++    latestCommentRes,
++    commentsTimelineRes,
++    commentsCountRes,
++    judoProfileRes,
++    beltHistoryRes,
++    badgesRes,
++    badgesCountRes,
++    progressRes,
++  ] = await Promise.all([
++    pool.query(
++      `SELECT
++        date_trunc('month', ts.session_date)::date AS month_start,
++        SUM(CASE WHEN sa.status = 'present' THEN 1 ELSE 0 END)::int AS present_count,
++        COUNT(*)::int AS total_count
++       FROM session_attendance sa
++       INNER JOIN training_sessions ts
++         ON ts.session_id = sa.session_id
++        AND ts.academy_id = sa.academy_id
++       WHERE sa.academy_id = $1
++         AND sa.student_id = $2
++         AND ts.deleted_at IS NULL
++         AND ts.session_date >= (date_trunc('month', CURRENT_DATE) - INTERVAL '3 months')::date
++       GROUP BY date_trunc('month', ts.session_date)
++       ORDER BY month_start ASC`,
++      [academyId, studentId]
++    ),
++    // Story 4-2: Weekly evolution data for chart
++    pool.query(
++      `SELECT
++        DATE_TRUNC('week', ts.session_date)::date AS week_start,
++        EXTRACT(WEEK FROM ts.session_date)::int AS week_number,
++        SUM(CASE WHEN sa.status = 'present' THEN 1 ELSE 0 END)::int AS present_count,
++        COUNT(*)::int AS total_count
++       FROM session_attendance sa
++       INNER JOIN training_sessions ts
++         ON ts.session_id = sa.session_id
++        AND ts.academy_id = sa.academy_id
++       WHERE sa.academy_id = $1
++         AND sa.student_id = $2
++         AND ts.deleted_at IS NULL
++         AND ts.session_date >= (CURRENT_DATE - INTERVAL '12 weeks')::date
++       GROUP BY DATE_TRUNC('week', ts.session_date), EXTRACT(WEEK FROM ts.session_date)
++       ORDER BY week_start ASC`,
++      [academyId, studentId]
++    ),
++    pool.query(
++      `SELECT
++        SUM(CASE WHEN sa.status = 'present' THEN 1 ELSE 0 END)::int AS present_count,
++        COUNT(*)::int AS total_count
++       FROM session_attendance sa
++       INNER JOIN training_sessions ts
++         ON ts.session_id = sa.session_id
++        AND ts.academy_id = sa.academy_id
++       WHERE sa.academy_id = $1
++         AND sa.student_id = $2
++         AND ts.deleted_at IS NULL
++         AND ts.session_date >= (CURRENT_DATE - INTERVAL '90 days')::date`,
++      [academyId, studentId]
++    ),
++    pool.query(
++      `SELECT t.name AS turma_name, ts.session_date, ts.session_time
++       FROM turma_students tstu
++       INNER JOIN turmas t
++         ON t.turma_id = tstu.turma_id
++        AND t.academy_id = tstu.academy_id
++       INNER JOIN training_sessions ts
++         ON ts.turma_id = tstu.turma_id
++        AND ts.academy_id = tstu.academy_id
++       WHERE tstu.academy_id = $1
++         AND tstu.student_id = $2
++         AND tstu.status = 'active'
++         AND t.deleted_at IS NULL
++         AND t.is_active = true
++         AND ts.deleted_at IS NULL
++         AND (
++           ts.session_date > CURRENT_DATE
++           OR (ts.session_date = CURRENT_DATE AND ts.session_time >= CURRENT_TIME)
++         )
++       ORDER BY ts.session_date ASC, ts.session_time ASC
++       LIMIT 1`,
++      [academyId, studentId]
++    ),
++    pool.query(
++      `SELECT ts.session_date, sa.status
++       FROM session_attendance sa
++       INNER JOIN training_sessions ts
++         ON ts.session_id = sa.session_id
++        AND ts.academy_id = sa.academy_id
++       WHERE sa.academy_id = $1
++         AND sa.student_id = $2
++         AND ts.deleted_at IS NULL
++       ORDER BY ts.session_date DESC, ts.session_time DESC
++       LIMIT 8`,
++      [academyId, studentId]
++    ),
++    pool.query(
++      `SELECT sc.content, sc.created_at, ts.session_date, p.full_name AS professor_name
++       FROM session_comments sc
++       LEFT JOIN training_sessions ts
++         ON ts.session_id = sc.session_id
++        AND ts.academy_id = sc.academy_id
++       LEFT JOIN users p
++         ON p.user_id = sc.professor_id
++        AND p.academy_id = sc.academy_id
++       WHERE sc.academy_id = $1
++         AND sc.student_id = $2
++         AND sc.deleted_at IS NULL
++       ORDER BY sc.created_at DESC
++       LIMIT 1`,
++      [academyId, studentId]
++    ),
++    pool.query(
++      `SELECT sc.content, sc.created_at, ts.session_date, p.full_name AS professor_name
++       FROM session_comments sc
++       LEFT JOIN training_sessions ts
++         ON ts.session_id = sc.session_id
++        AND ts.academy_id = sc.academy_id
++       LEFT JOIN users p
++         ON p.user_id = sc.professor_id
++        AND p.academy_id = sc.academy_id
++       WHERE sc.academy_id = $1
++         AND sc.student_id = $2
++         AND sc.deleted_at IS NULL
++       ORDER BY sc.created_at DESC
++       LIMIT 10`,
++      [academyId, studentId]
++    ),
++    pool.query(
++      `SELECT COUNT(*)::int AS total_comments
++       FROM session_comments
++       WHERE academy_id = $1
++         AND student_id = $2
++         AND deleted_at IS NULL`,
++      [academyId, studentId]
++    ),
++    pool.query(
++      `SELECT current_belt, belt_date, is_federated, federation_date, federation_registration
++       FROM judo_profile
++       WHERE academy_id = $1
++         AND student_id = $2
++       LIMIT 1`,
++      [academyId, studentId]
++    ),
++    pool.query(
++      `SELECT h.belt, h.received_date, h.notes, p.full_name AS promoted_by
++       FROM judo_belt_history h
++       LEFT JOIN users p
++         ON p.user_id = h.promoted_by_user_id
++        AND p.academy_id = h.academy_id
++       WHERE h.academy_id = $1
++         AND h.student_id = $2
++       ORDER BY h.received_date ASC`,
++      [academyId, studentId]
++    ),
++    pool.query(
++      `SELECT b.name, sb.earned_at
++       FROM student_badges sb
++       INNER JOIN badges b
++         ON b.badge_id = sb.badge_id
++        AND b.academy_id = sb.academy_id
++       WHERE sb.academy_id = $1
++         AND sb.student_id = $2
++       ORDER BY sb.earned_at DESC
++       LIMIT 5`,
++      [academyId, studentId]
++    ),
++    pool.query(
++      `SELECT COUNT(*)::int AS total_badges
++       FROM student_badges
++       WHERE academy_id = $1
++         AND student_id = $2`,
++      [academyId, studentId]
++    ),
++    pool.query(
++      `SELECT streak_current
++       FROM student_progress
++       WHERE academy_id = $1
++         AND student_id = $2
++       LIMIT 1`,
++      [academyId, studentId]
++    ),
++  ]);
++
++  const now = new Date();
++  const currentMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
++  const previousMonthDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
++  const previousMonthKey = `${previousMonthDate.getFullYear()}-${String(previousMonthDate.getMonth() + 1).padStart(2, '0')}`;
++
++  let currentMonthPresentCount = 0;
++  let previousMonthPresentCount = 0;
++
++  const monthlySeries = monthlyEvolutionRes.rows.map((row) => {
++    const monthStartDate = new Date(row.month_start);
++    const monthStart = monthStartDate.toISOString().slice(0, 10);
++    const monthKey = monthStart.slice(0, 7);
++    const presentCount = Number(row.present_count || 0);
++    const totalCount = Number(row.total_count || 0);
++
++    if (monthKey === currentMonthKey) {
++      currentMonthPresentCount = presentCount;
++    }
++    if (monthKey === previousMonthKey) {
++      previousMonthPresentCount = presentCount;
++    }
++
++    return {
++      monthStart,
++      presentCount,
++      totalCount,
++    };
++  });
++
++  // Story 4-2: Process weekly evolution for chart
++  const weeklySeries = weeklyEvolutionRes.rows.map((row, index) => {
++    const weekStartDate = new Date(row.week_start);
++    const date = weekStartDate.toISOString().slice(0, 10);
++    const presentCount = Number(row.present_count || 0);
++    const totalCount = Number(row.total_count || 0);
++    const proficiencyPercent = totalCount > 0
++      ? Math.round((presentCount / totalCount) * 100)
++      : 0;
++
++    return {
++      weekNumber: index + 1,
++      date,
++      proficiencyPercent,
++    };
++  });
++
++  const attendance90d = attendance90dRes.rows[0] || {};
++  const presentCount90d = Number(attendance90d.present_count || 0);
++  const totalCount90d = Number(attendance90d.total_count || 0);
++  const attendancePercentage90d = totalCount90d > 0
++    ? Math.round((presentCount90d / totalCount90d) * 100)
++    : 0;
++
++  const nextClassRow = nextClassRes.rows[0];
++  const latestCommentRow = latestCommentRes.rows[0];
++  const judoProfileRow = judoProfileRes.rows[0];
++
++  const commentsTimeline: StudentDashboardCommentItem[] = commentsTimelineRes.rows.map((row) => ({
++    content: String(row.content || ''),
++    professorName: String(row.professor_name || 'Professor'),
++    sessionDate: row.session_date ? new Date(row.session_date) : undefined,
++    createdAt: new Date(row.created_at),
++  }));
++
++  const beltHistoryChronological = beltHistoryRes.rows.map((row) => ({
++    belt: String(row.belt || '-'),
++    receivedDate: new Date(row.received_date),
++    promotedBy: row.promoted_by ? String(row.promoted_by) : undefined,
++    notes: row.notes ? String(row.notes) : undefined,
++  }));
++
++  const beltHistory: StudentDashboardBeltHistoryItem[] = beltHistoryChronological
++    .map((item, index, allItems) => {
++      const nextDate = allItems[index + 1]?.receivedDate;
++      const endDate = nextDate || new Date();
++      const durationDays = Math.max(
++        0,
++        Math.floor((endDate.getTime() - item.receivedDate.getTime()) / (1000 * 60 * 60 * 24))
++      );
++
++      return {
++        ...item,
++        durationDays,
++      };
++    })
++    .sort((a, b) => b.receivedDate.getTime() - a.receivedDate.getTime());
++
++  return {
++    evolution: {
++      currentMonthPresentCount,
++      previousMonthPresentCount,
++      delta: currentMonthPresentCount - previousMonthPresentCount,
++      monthlySeries,
++      weeklySeries,
++    },
++    attendance: {
++      presentCount90d,
++      totalCount90d,
++      attendancePercentage90d,
++      nextClass: nextClassRow
++        ? {
++          turmaName: String(nextClassRow.turma_name || '-'),
++          sessionDate: new Date(nextClassRow.session_date).toISOString().slice(0, 10),
++          sessionTime: String(nextClassRow.session_time || '').slice(0, 5),
++        }
++        : undefined,
++      recentSessions: recentAttendanceRes.rows.map((row) => ({
++        sessionDate: new Date(row.session_date).toISOString().slice(0, 10),
++        status: String(row.status) as 'present' | 'absent' | 'justified',
++      })),
++    },
++    comments: {
++      latest: latestCommentRow
++        ? {
++          content: String(latestCommentRow.content || ''),
++          professorName: String(latestCommentRow.professor_name || 'Professor'),
++          sessionDate: latestCommentRow.session_date ? new Date(latestCommentRow.session_date) : undefined,
++          createdAt: new Date(latestCommentRow.created_at),
++        }
++        : undefined,
++      totalComments: Number(commentsCountRes.rows[0]?.total_comments || 0),
++      timeline: commentsTimeline,
++    },
++    beltAndAchievements: {
++      currentBelt: judoProfileRow?.current_belt ? String(judoProfileRow.current_belt) : undefined,
++      beltDate: judoProfileRow?.belt_date ? new Date(judoProfileRow.belt_date) : undefined,
++      isFederated: judoProfileRow?.is_federated === true,
++      federationDate: judoProfileRow?.federation_date ? new Date(judoProfileRow.federation_date) : undefined,
++      federationRegistration: judoProfileRow?.federation_registration
++        ? String(judoProfileRow.federation_registration)
++        : undefined,
++      totalBadges: Number(badgesCountRes.rows[0]?.total_badges || 0),
++      latestBadges: badgesRes.rows.map((row) => ({
++        name: String(row.name || ''),
++        earnedAt: new Date(row.earned_at),
++      })),
++      currentStreak: Number(progressRes.rows[0]?.streak_current || 0),
++    },
++    beltHistory,
++  };
++};
++
++export const getStudentAttendanceHistory = async (
++  academyId: string,
++  studentId: string,
++  options?: {
++    dateFrom?: string;
++    dateTo?: string;
++    limit?: number;
++    offset?: number;
++  }
++): Promise<StudentAttendanceHistoryResult> => {
++  const limit = Math.min(Math.max(Number(options?.limit || 20), 1), 100);
++  const offset = Math.max(Number(options?.offset || 0), 0);
++
++  const whereConditions = [
++    'sa.academy_id = $1',
++    'sa.student_id = $2',
++    'ts.deleted_at IS NULL',
++  ];
++  const params: Array<string | number> = [academyId, studentId];
++
++  if (options?.dateFrom) {
++    params.push(options.dateFrom);
++    whereConditions.push(`ts.session_date >= $${params.length}::date`);
++  }
++  if (options?.dateTo) {
++    params.push(options.dateTo);
++    whereConditions.push(`ts.session_date <= $${params.length}::date`);
++  }
++
++  const whereClause = whereConditions.join(' AND ');
++
++  const [historyRes, totalRes, attendanceRes, streakRes] = await Promise.all([
++    pool.query(
++      `SELECT
++        ts.session_date,
++        t.name AS turma_name,
++        sa.status
++       FROM session_attendance sa
++       INNER JOIN training_sessions ts
++         ON ts.session_id = sa.session_id
++        AND ts.academy_id = sa.academy_id
++       LEFT JOIN turmas t
++         ON t.turma_id = ts.turma_id
++        AND t.academy_id = ts.academy_id
++       WHERE ${whereClause}
++       ORDER BY ts.session_date DESC, ts.session_time DESC
++       LIMIT $${params.length + 1}
++       OFFSET $${params.length + 2}`,
++      [...params, limit, offset]
++    ),
++    pool.query(
++      `SELECT COUNT(*)::int AS total
++       FROM session_attendance sa
++       INNER JOIN training_sessions ts
++         ON ts.session_id = sa.session_id
++        AND ts.academy_id = sa.academy_id
++       WHERE ${whereClause}`,
++      params
++    ),
++    pool.query(
++      `SELECT
++        SUM(CASE WHEN sa.status = 'present' THEN 1 ELSE 0 END)::int AS present_count,
++        COUNT(*)::int AS total_count
++       FROM session_attendance sa
++       INNER JOIN training_sessions ts
++         ON ts.session_id = sa.session_id
++        AND ts.academy_id = sa.academy_id
++       WHERE ${whereClause}`,
++      params
++    ),
++    pool.query(
++      `WITH ordered AS (
++         SELECT
++           ts.session_date,
++           sa.status,
++           ROW_NUMBER() OVER (ORDER BY ts.session_date DESC, ts.session_time DESC) AS rn
++         FROM session_attendance sa
++         INNER JOIN training_sessions ts
++           ON ts.session_id = sa.session_id
++          AND ts.academy_id = sa.academy_id
++         WHERE sa.academy_id = $1
++           AND sa.student_id = $2
++           AND ts.deleted_at IS NULL
++       ),
++       first_absence AS (
++         SELECT MIN(rn) AS rn
++         FROM ordered
++         WHERE status <> 'present'
++       )
++       SELECT
++         COUNT(*)::int AS streak_count,
++         CASE
++           WHEN COUNT(*) = 0 THEN 0
++           ELSE GREATEST(
++             1,
++             (MAX(session_date)::date - MIN(session_date)::date + 1)
++           )::int
++         END AS streak_days
++       FROM ordered
++       WHERE status = 'present'
++         AND rn < COALESCE((SELECT rn FROM first_absence), 1000000)`,
++      [academyId, studentId]
++    ),
++  ]);
++
++  const attendanceRow = attendanceRes.rows[0] || {};
++  const presentCount = Number(attendanceRow.present_count || 0);
++  const totalCount = Number(attendanceRow.total_count || 0);
++  const attendancePercentage = totalCount > 0
++    ? Math.round((presentCount / totalCount) * 100)
++    : 0;
++
++  const streakRow = streakRes.rows[0] || {};
++  const currentStreak = Number(streakRow.streak_count || 0);
++  const currentStreakDays = Number(streakRow.streak_days || 0);
++
++  return {
++    items: historyRes.rows.map((row) => ({
++      sessionDate: new Date(row.session_date).toISOString().slice(0, 10),
++      turmaName: String(row.turma_name || 'Turma'),
++      status: String(row.status) as 'present' | 'absent' | 'justified',
++    })),
++    total: Number(totalRes.rows[0]?.total || 0),
++    limit,
++    offset,
++    attendancePercentage,
++    warningBelow70: totalCount > 0 && attendancePercentage < 70,
++    currentStreak,
++    currentStreakDays,
++  };
++};
++
+ export const revokeAuthTokensByUser = async (userId: string, tokenType?: string): Promise<void> => {
+   if (tokenType) {
+     await pool.query(
+diff --git a/backend/src/routes/users.ts b/backend/src/routes/users.ts
+index 23cdc14..ae891c6 100644
+--- a/backend/src/routes/users.ts
++++ b/backend/src/routes/users.ts
+@@ -14,6 +14,8 @@ import {
+   updateStudentHandler,
+   updateStudentStatusHandler,
+   getStudentProfileViewHandler,
++  getMyStudentProgressDashboardHandler,
++  getMyStudentAttendanceHistoryHandler,
+   searchGuardianByEmailHandler,
+   linkGuardianToStudentHandler,
+   createAndLinkGuardianHandler,
+@@ -78,6 +80,12 @@ router.put('/alunos/:userId', authMiddleware, requireRole(['Admin', 'Professor']
+ // PUT /api/users/alunos/:userId/status ÔÇö ativa/desativa aluno (Admin only)
+ router.put('/alunos/:userId/status', authMiddleware, requireRole(['Admin']), validate(studentStatusSchema), updateStudentStatusHandler);
+ 
++// GET /api/users/alunos/me/progresso ÔÇö dashboard de progresso do aluno logado
++router.get('/alunos/me/progresso', authMiddleware, requireRole(['Aluno']), getMyStudentProgressDashboardHandler);
++
++// GET /api/users/alunos/me/frequencia ÔÇö hist├│rico detalhado de frequ├¬ncia do aluno logado
++router.get('/alunos/me/frequencia', authMiddleware, requireRole(['Aluno']), getMyStudentAttendanceHistoryHandler);
++
+ // GET /api/users/alunos/:userId/ficha ÔÇö ficha completa do aluno (Admin/Professor)
+ router.get('/alunos/:userId/ficha', authMiddleware, requireRole(['Admin', 'Professor']), getStudentProfileViewHandler);
+ 
+diff --git a/frontend/src/services/api.service.ts b/frontend/src/services/api.service.ts
+index 9f2abc6..60f7953 100644
+--- a/frontend/src/services/api.service.ts
++++ b/frontend/src/services/api.service.ts
+@@ -1,6 +1,7 @@
+ import { Injectable } from '@angular/core';
+ import { HttpClient, HttpHeaders } from '@angular/common/http';
+ import { Observable } from 'rxjs';
++import { map } from 'rxjs/operators';
+ import {
+   Academy,
+   AcademyProfile,
+@@ -76,6 +77,9 @@ import {
+   ReorderSessionTechniquesResponse,
+   RecentTrainingSummary,
+   GetRecentTrainingsResponse,
++  StudentProgressDashboardResponse,
++  StudentAttendanceHistoryResponse,
++  StudentProgressWeekly,
+   TrainingHistoryFilters,
+   TrainingHistoryResponse,
+   TrainingDetailsResponse,
+@@ -844,6 +848,37 @@ export class ApiService {
+     );
+   }
+ 
++  getStudentProgressDashboard(): Observable<StudentProgressDashboardResponse> {
++    return this.http.get<StudentProgressDashboardResponse>(
++      `${this.apiUrl}/users/alunos/me/progresso`,
++      { headers: this.getHeaders() }
++    );
++  }
++
++  getStudentProgressChart(): Observable<StudentProgressWeekly[]> {
++    return this.getStudentProgressDashboard().pipe(
++      map((response) => response.cards.evolucaoMes.weeklySeries || [])
++    );
++  }
++
++  getStudentAttendanceHistory(filters?: {
++    dateFrom?: string;
++    dateTo?: string;
++    limit?: number;
++    offset?: number;
++  }): Observable<StudentAttendanceHistoryResponse> {
++    const params: Record<string, string> = {};
++    if (filters?.dateFrom) params['dateFrom'] = filters.dateFrom;
++    if (filters?.dateTo) params['dateTo'] = filters.dateTo;
++    if (filters?.limit !== undefined) params['limit'] = String(filters.limit);
++    if (filters?.offset !== undefined) params['offset'] = String(filters.offset);
++
++    return this.http.get<StudentAttendanceHistoryResponse>(
++      `${this.apiUrl}/users/alunos/me/frequencia`,
++      { headers: this.getHeaders(), params }
++    );
++  }
++
+   // Story 3-7: Training History
+   getTrainingHistory(filters?: TrainingHistoryFilters, limit = 20, offset = 0): Observable<{ success: boolean; data: TrainingHistoryResponse }> {
+     const params: Record<string, string> = { limit: String(limit), offset: String(offset) };
+diff --git a/frontend/src/types/index.ts b/frontend/src/types/index.ts
+index cb558af..e0a3fc6 100644
+--- a/frontend/src/types/index.ts
++++ b/frontend/src/types/index.ts
+@@ -915,6 +915,109 @@ export interface GetRecentTrainingsResponse {
+   trainings: RecentTrainingSummary[];
+ }
+ 
++export interface StudentProgressMonthlyItem {
++  monthStart: string;
++  presentCount: number;
++  totalCount: number;
++}
++
++export interface StudentProgressCommentItem {
++  content: string;
++  professorName: string;
++  sessionDate?: string;
++  createdAt: string;
++}
++
++export interface StudentProgressBeltHistoryItem {
++  belt: string;
++  receivedDate: string;
++  promotedBy?: string;
++  notes?: string;
++  durationDays: number;
++}
++
++// Story 4-2: Card 1 Expandido - Chart Data
++export interface StudentProgressWeekly {
++  weekNumber: number;
++  date: string;
++  proficiencyPercent: number;
++}
++
++export interface StudentProgressChartData {
++  weeklyEvolution: StudentProgressWeekly[];
++  minValue: number;
++  maxValue: number;
++  trend: 'up' | 'down' | 'flat';
++}
++
++export interface StudentAttendanceHistoryItem {
++  sessionDate: string;
++  turmaName: string;
++  status: 'present' | 'absent' | 'justified';
++  absenceReason?: string;
++}
++
++export interface StudentAttendanceHistoryResponse {
++  studentName: string;
++  items: StudentAttendanceHistoryItem[];
++  total: number;
++  limit: number;
++  offset: number;
++  attendancePercentage: number;
++  warningBelow70: boolean;
++  currentStreak: number;
++  currentStreakDays: number;
++  generatedAt: string;
++}
++
++export interface StudentProgressDashboardResponse {
++  heading: string;
++  subheading: string;
++  cards: {
++    evolucaoMes: {
++      currentMonthPresentCount: number;
++      previousMonthPresentCount: number;
++      delta: number;
++      monthlySeries: StudentProgressMonthlyItem[];
++      weeklySeries: StudentProgressWeekly[];
++    };
++    frequencia: {
++      presentCount90d: number;
++      totalCount90d: number;
++      attendancePercentage90d: number;
++      nextClass?: {
++        turmaName: string;
++        sessionDate: string;
++        sessionTime: string;
++      };
++      recentSessions: Array<{
++        sessionDate: string;
++        status: 'present' | 'absent' | 'justified';
++      }>;
++    };
++    comentariosProfessor: {
++      latest?: StudentProgressCommentItem;
++      totalComments: number;
++      timeline: StudentProgressCommentItem[];
++    };
++    faixaConquistas: {
++      currentBelt?: string;
++      beltDate?: string;
++      isFederated: boolean;
++      federationDate?: string;
++      federationRegistration?: string;
++      totalBadges: number;
++      latestBadges: Array<{
++        name: string;
++        earnedAt: string;
++      }>;
++      currentStreak: number;
++      beltHistory: StudentProgressBeltHistoryItem[];
++    };
++  };
++  generatedAt: string;
++}
++
+ // Story 3-7: Training History types
+ export interface TrainingHistoryItem {
+   session_id: string;

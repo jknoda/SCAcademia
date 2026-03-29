@@ -1,0 +1,244 @@
+.student-progress-chart-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px;
+  background: #FAFAFA;
+  border-radius: 8px;
+
+  .chart-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+
+    .chart-period-label {
+      margin: 0;
+      color: #424242;
+      font-size: 14px;
+      font-weight: 600;
+      text-align: center;
+      flex: 1;
+    }
+
+    .chart-nav-btn {
+      border: 1px solid #dbeafe;
+      background: #ffffff;
+      color: #0052cc;
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s ease, opacity 0.2s ease;
+
+      &:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+      }
+    }
+  }
+
+  .insufficient-data-message {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+    color: #757575;
+    text-align: center;
+
+    p {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 500;
+
+      &.subtext {
+        font-size: 14px;
+        font-weight: 400;
+        margin-top: 8px;
+      }
+    }
+  }
+
+  .chart-container {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    overflow-x: auto;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+
+    &.is-transitioning {
+      opacity: 0.72;
+      transform: translateY(4px);
+    }
+
+    .progress-chart {
+      max-width: 100%;
+      height: auto;
+
+      // Grid lines
+      .grid-lines {
+        .grid-line {
+          stroke: #E0E0E0;
+          stroke-width: 1;
+          opacity: 0.5;
+        }
+      }
+
+      // Axes
+      .axes {
+        .axis {
+          stroke: #212121;
+          stroke-width: 2;
+        }
+      }
+
+      // Axis labels
+      .y-axis-labels,
+      .x-axis-labels {
+        .axis-label {
+          font-size: 12px;
+          fill: #757575;
+          font-family: Roboto, sans-serif;
+
+          &.y-label {
+            text-anchor: end;
+          }
+
+          &.x-label {
+            text-anchor: middle;
+          }
+        }
+      }
+
+      // Chart line styling
+      .chart-line {
+        stroke: #FF6B35; // Default orange
+        transition: stroke 0.3s ease;
+
+        &.trend-up {
+          stroke: #FF6B35;
+        }
+
+        &.trend-down {
+          stroke: #D32F2F;
+        }
+
+        &.trend-flat {
+          stroke: #FF6B35;
+        }
+      }
+
+      // Data points (circles)
+      .data-points {
+        .data-point {
+          cursor: pointer;
+          transition: r 0.2s ease;
+
+          &.color-orange {
+            fill: #FF6B35;
+          }
+
+          &.color-red {
+            fill: #D32F2F;
+          }
+
+          &:hover {
+            r: 6;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+          }
+        }
+      }
+    }
+
+    .chart-tooltip {
+      position: absolute;
+      transform: translate(-50%, -100%);
+      background: #212121;
+      color: #ffffff;
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-size: 12px;
+      line-height: 1.2;
+      white-space: nowrap;
+      pointer-events: none;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+      z-index: 2;
+    }
+  }
+
+  .chart-interpretation {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+    background: #FFFFFF;
+    border-radius: 6px;
+    border-left: 4px solid #FF6B35;
+
+    .trend-message {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 500;
+      line-height: 1.5;
+
+      &.trend-up {
+        color: #388E3C;
+        border-left-color: #388E3C;
+      }
+
+      &.trend-down {
+        color: #D32F2F;
+        border-left-color: #D32F2F;
+      }
+
+      &.trend-flat {
+        color: #FF6B35;
+        border-left-color: #FF6B35;
+      }
+    }
+  }
+}
+
+// Mobile responsiveness
+@media (max-width: 599px) {
+  .student-progress-chart-wrapper {
+    padding: 16px;
+
+    .chart-toolbar {
+      flex-direction: column;
+
+      .chart-nav-btn {
+        width: 100%;
+      }
+    }
+
+    .chart-container {
+      .progress-chart {
+        width: 100%;
+      }
+    }
+
+    .chart-interpretation {
+      .trend-message {
+        font-size: 14px;
+      }
+    }
+  }
+}
+
+// Tablet
+@media (min-width: 600px) and (max-width: 1199px) {
+  .student-progress-chart-wrapper {
+    padding: 18px;
+
+    .chart-interpretation {
+      .trend-message {
+        font-size: 15px;
+      }
+    }
+  }
+}
