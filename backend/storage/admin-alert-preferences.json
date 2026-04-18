@@ -494,5 +494,37 @@
     "digestWindowMinutes": 60,
     "silencedUntil": null,
     "updatedAt": "2026-03-29T20:02:54.962Z"
+  },
+  {
+    "academyId": "b8317aff-fee6-4d9c-b941-f38b56e8085c",
+    "channels": {
+      "inApp": true,
+      "push": true,
+      "email": true
+    },
+    "severity": {
+      "critical": true,
+      "preventive": true,
+      "informative": true
+    },
+    "digestWindowMinutes": 60,
+    "silencedUntil": null,
+    "updatedAt": "2026-04-17T17:24:58.579Z"
+  },
+  {
+    "academyId": "6794404a-96f4-4082-bfdb-59debe10a07c",
+    "channels": {
+      "inApp": true,
+      "push": true,
+      "email": true
+    },
+    "severity": {
+      "critical": true,
+      "preventive": true,
+      "informative": true
+    },
+    "digestWindowMinutes": 60,
+    "silencedUntil": null,
+    "updatedAt": "2026-04-17T20:30:26.057Z"
   }
 ]

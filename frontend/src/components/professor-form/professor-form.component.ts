@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, NgZone, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { finalize, timeout } from 'rxjs/operators';
 import { ApiService } from '../../services/api.service';
 import { compressImage } from '../../utils/image.utils';
 import { CreateProfessorPayload, UpdateProfessorPayload } from '../../types';
@@ -34,7 +35,9 @@ export class ProfessorFormComponent implements OnInit {
     private fb: FormBuilder,
     private api: ApiService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private ngZone: NgZone,
+    private cdr: ChangeDetectorRef
   ) {
     this.form = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -90,12 +93,14 @@ export class ProfessorFormComponent implements OnInit {
   }
 
   private loadProfessor(): void {
-    this.isLoading = true;
+    this.setLoadingState(true);
     this.errorMessage = '';
 
-    this.api.getProfessorById(this.professorId).subscribe({
+    this.api.getProfessorById(this.professorId).pipe(
+      timeout(10000),
+      finalize(() => this.setLoadingState(false))
+    ).subscribe({
       next: (professor) => {
-        this.isLoading = false;
         this.form.patchValue({
           email: professor.email || '',
           fullName: professor.fullName || '',
@@ -112,10 +117,11 @@ export class ProfessorFormComponent implements OnInit {
           addressState: (professor.addressState || '').toUpperCase(),
           dataEntrada: this.toDateInput(professor.dataEntrada),
         });
+        this.refreshView();
       },
       error: (error) => {
-        this.isLoading = false;
         this.errorMessage = error?.error?.error || 'Erro ao carregar dados do professor.';
+        this.refreshView();
       },
     });
   }
@@ -126,38 +132,44 @@ export class ProfessorFormComponent implements OnInit {
       return;
     }
 
-    this.isSaving = true;
+    this.setSavingState(true);
     this.errorMessage = '';
     this.successMessage = '';
 
     if (this.isEditMode) {
       const payload: UpdateProfessorPayload = this.buildUpdatePayload();
-      this.api.updateProfessor(this.professorId, payload).subscribe({
+      this.api.updateProfessor(this.professorId, payload).pipe(
+        timeout(10000),
+        finalize(() => this.setSavingState(false))
+      ).subscribe({
         next: (res) => {
-          this.isSaving = false;
           this.successMessage = res.message;
+          this.refreshView();
         },
         error: (error) => {
-          this.isSaving = false;
           this.errorMessage = error?.error?.error || 'Erro ao atualizar professor.';
+          this.refreshView();
         },
       });
       return;
     }
 
     const payload: CreateProfessorPayload = this.buildCreatePayload();
-    this.api.createProfessor(payload).subscribe({
+    this.api.createProfessor(payload).pipe(
+      timeout(10000),
+      finalize(() => this.setSavingState(false))
+    ).subscribe({
       next: (res) => {
-        this.isSaving = false;
         this.successMessage = res.message;
         if (res.temporaryPassword) {
           this.generatedPassword = res.temporaryPassword;
           this.generatedPasswordModalOpen = true;
         }
+        this.refreshView();
       },
       error: (error) => {
-        this.isSaving = false;
         this.errorMessage = error?.error?.error || 'Erro ao cadastrar professor.';
+        this.refreshView();
       },
     });
   }
@@ -174,7 +186,7 @@ export class ProfessorFormComponent implements OnInit {
       return;
     }
 
-    this.isResettingPassword = true;
+    this.setResettingPasswordState(true);
     this.resetPasswordMessage = '';
 
     this.api
@@ -182,15 +194,19 @@ export class ProfessorFormComponent implements OnInit {
         newPassword: formValue.newPassword,
         confirmPassword: formValue.confirmPassword,
       })
+      .pipe(
+        timeout(10000),
+        finalize(() => this.setResettingPasswordState(false))
+      )
       .subscribe({
         next: (res) => {
-          this.isResettingPassword = false;
           this.resetPasswordMessage = res.message;
           this.resetPasswordForm.reset();
+          this.refreshView();
         },
         error: (error) => {
-          this.isResettingPassword = false;
           this.resetPasswordMessage = error?.error?.error || 'Erro ao redefinir senha.';
+          this.refreshView();
         },
       });
   }
@@ -253,9 +269,11 @@ export class ProfessorFormComponent implements OnInit {
         this.form.get('photoUrl')?.setValue(dataUrl);
         this.errorMessage = '';
         this.successMessage = 'Foto carregada. Clique em salvar para confirmar.';
+        this.refreshView();
       },
       () => {
         this.errorMessage = 'Não foi possível processar a imagem selecionada.';
+        this.refreshView();
       }
     );
   }
@@ -308,6 +326,33 @@ export class ProfessorFormComponent implements OnInit {
     const value = (input.value || '').replace(/[^A-Za-z]/g, '').slice(0, 2).toUpperCase();
     input.value = value;
     this.form.get('addressState')?.setValue(value, { emitEvent: false });
+  }
+
+  private setLoadingState(value: boolean): void {
+    this.ngZone.run(() => {
+      this.isLoading = value;
+      this.cdr.detectChanges();
+    });
+  }
+
+  private setSavingState(value: boolean): void {
+    this.ngZone.run(() => {
+      this.isSaving = value;
+      this.cdr.detectChanges();
+    });
+  }
+
+  private setResettingPasswordState(value: boolean): void {
+    this.ngZone.run(() => {
+      this.isResettingPassword = value;
+      this.cdr.detectChanges();
+    });
+  }
+
+  private refreshView(): void {
+    this.ngZone.run(() => {
+      this.cdr.detectChanges();
+    });
   }
 
   getFieldError(fieldName: string): string | null {

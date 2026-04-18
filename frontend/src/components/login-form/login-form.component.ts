@@ -1,4 +1,4 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, NgZone, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
@@ -23,7 +23,9 @@ export class LoginFormComponent implements OnInit {
     private fb: FormBuilder,
     private auth: AuthService,
     private api: ApiService,
-    private router: Router
+    private router: Router,
+    private ngZone: NgZone,
+    private cdr: ChangeDetectorRef
   ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -70,7 +72,7 @@ export class LoginFormComponent implements OnInit {
       return;
     }
 
-    this.isLoading = true;
+    this.setLoadingState(true);
     this.errorMessage = '';
     this.pendingConsentLink = '';
 
@@ -78,8 +80,9 @@ export class LoginFormComponent implements OnInit {
 
     this.auth.login(email, password).subscribe(
       (response: any) => {
-        this.isLoading = false;
+        this.setLoadingState(false);
         this.showSuccess = true;
+        this.cdr.detectChanges();
         setTimeout(() => {
           if (this.loginSuccess.observers.length > 0) {
             this.loginSuccess.emit();
@@ -90,7 +93,7 @@ export class LoginFormComponent implements OnInit {
         }, 1500);
       },
       (error: any) => {
-        this.isLoading = false;
+        this.setLoadingState(false);
 
         if (error?.status === 403 && error?.error?.consentPending && error?.error?.consentLink) {
           this.pendingConsentLink = error.error.consentLink;
@@ -101,6 +104,13 @@ export class LoginFormComponent implements OnInit {
         this.errorMessage = error.error?.error || 'Email ou senha incorretos';
       }
     );
+  }
+
+  private setLoadingState(value: boolean): void {
+    this.ngZone.run(() => {
+      this.isLoading = value;
+      this.cdr.detectChanges();
+    });
   }
 
   getFieldError(fieldName: string): string | null {

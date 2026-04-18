@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
 
 import { AcademyProfileComponent } from './academy-profile.component';
@@ -10,6 +11,7 @@ describe('AcademyProfileComponent', () => {
   let component: AcademyProfileComponent;
   let fixture: ComponentFixture<AcademyProfileComponent>;
   let apiSpy: jasmine.SpyObj<ApiService>;
+  let routerSpy: jasmine.SpyObj<Router>;
 
   const mockProfile: AcademyProfile = {
     academyId: 'academy-1',
@@ -34,6 +36,7 @@ describe('AcademyProfileComponent', () => {
       'getAdminAcademyProfile',
       'updateAdminAcademyProfile',
     ]);
+    routerSpy = jasmine.createSpyObj<Router>('Router', ['navigate']);
 
     apiSpy.getAdminAcademyProfile.and.returnValue(of(mockProfile));
     apiSpy.updateAdminAcademyProfile.and.returnValue(
@@ -46,7 +49,10 @@ describe('AcademyProfileComponent', () => {
     await TestBed.configureTestingModule({
       declarations: [AcademyProfileComponent],
       imports: [ReactiveFormsModule],
-      providers: [{ provide: ApiService, useValue: apiSpy }],
+      providers: [
+        { provide: ApiService, useValue: apiSpy },
+        { provide: Router, useValue: routerSpy },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(AcademyProfileComponent);
@@ -136,5 +142,20 @@ describe('AcademyProfileComponent', () => {
     expect(component.errorMessage).toBe('Validacao falhou');
     expect(component.serverErrors['documentId']).toBe('Documento duplicado');
     expect(component.isSaving).toBeFalse();
+  });
+
+  it('abre o atalho da evolução a partir do perfil da academia', () => {
+    component.goToEpic10();
+
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['/admin/alunos'], {
+      queryParams: { highlight: 'athlete-progress' },
+    });
+  });
+
+  it('mostra a chamada da evolução sem a nomenclatura interna do epic', () => {
+    const content = fixture.nativeElement.textContent as string;
+
+    expect(content).toContain('Evolução do Atleta');
+    expect(content).not.toContain('Epic 10');
   });
 });

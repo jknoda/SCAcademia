@@ -285,6 +285,28 @@ export class HomeComponent implements OnInit, OnDestroy {
     });
   }
 
+  goToAthleteProgressDashboard(studentId?: string): void {
+    const targetStudentId = studentId || (this.isAluno() ? this.currentUser?.id : this.selectedStudentId);
+    if (!targetStudentId) {
+      return;
+    }
+
+    this.router.navigate(['/athlete-progress', targetStudentId, 'dashboard'], {
+      queryParams: { returnTo: '/home' },
+    });
+  }
+
+  goToEpic10Entry(): void {
+    if (this.isProfessor()) {
+      this.router.navigate(['/professores/meus-alunos'], {
+        queryParams: { highlight: 'athlete-progress' },
+      });
+      return;
+    }
+
+    this.goToAthleteProgressDashboard();
+  }
+
   logout(): void {
     this.auth.logout();
     this.router.navigate(['/login']);
@@ -319,6 +341,22 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   getUserPhoto(): string {
     return this.currentUser?.photoUrl || 'assets/default-user-photo.svg';
+  }
+
+  get isPageBusy(): boolean {
+    return this.isLoadingRecentTrainings
+      || this.isLoadingTurmasForTraining
+      || this.isStartingTraining
+      || this.isLoadingStatus
+      || this.isLoadingLinkedStudents
+      || this.isLoadingStudentProgress
+      || this.isLoadingAttendanceHistory
+      || this.isLoadingCommentHistory
+      || this.isLoadingBadgesHistory
+      || this.isLoadingComparacao
+      || this.isLoadingNotifications
+      || this.isLoadingBeltHistory
+      || this.isSubmittingDeletion;
   }
 
   getHomeTitle(): string {

@@ -85,6 +85,8 @@
           <td class="actions-cell">
             <button class="btn btn-small" (click)="editStudent(student.id)">Editar</button>
             <button class="btn btn-small" (click)="viewFicha(student.id)">Ficha</button>
+            <button class="btn btn-small" (click)="goToAthleteDashboard(student.id)">Evolução</button>
+            <button class="btn btn-small btn-primary" (click)="goToAthleteEvaluation(student.id)">Avaliar</button>
             <button
               *ngIf="isAdmin && student.operationalStatus?.hasHealthScreening === false"
               class="btn btn-small btn-primary"

@@ -4,6 +4,7 @@ import request from 'supertest';
 import app from '../app';
 import { pool } from '../lib/db';
 import { runStartupSchemaChecks } from '../lib/startupSchema';
+import { runBackupSchedulerTick } from '../lib/backupSchedule';
 
 const strongPassword = 'AdminSenha1!';
 
@@ -237,5 +238,40 @@ describe('Story 5.6 - Backup & Recovery (Admin)', () => {
     expect(getRes.body.hour).toBe(3);
     expect(getRes.body.minute).toBe(15);
     expect(getRes.body.retentionDays).toBe(45);
+  });
+
+  it('remove agenda órfã quando academy_id não existe e não lança erro no tick', async () => {
+    const schedulesFile = path.resolve(process.cwd(), 'storage', 'backup-schedules.json');
+    const dueDate = new Date(Date.now() - 60_000).toISOString();
+
+    await fs.promises.mkdir(path.dirname(schedulesFile), { recursive: true });
+    await fs.promises.writeFile(
+      schedulesFile,
+      JSON.stringify(
+        [
+          {
+            academyId: '8eda3630-ba1a-452a-b46c-c4d51f60d394',
+            generatedBy: 'system',
+            frequency: 'daily',
+            hour: 2,
+            minute: 30,
+            enabled: true,
+            retentionDays: 30,
+            nextRunAt: dueDate,
+            updatedAt: dueDate,
+          },
+        ],
+        null,
+        2
+      ),
+      'utf-8'
+    );
+
+    await expect(runBackupSchedulerTick()).resolves.toBeUndefined();
+
+    const content = await fs.promises.readFile(schedulesFile, 'utf-8');
+    const saved = JSON.parse(content);
+    expect(Array.isArray(saved)).toBe(true);
+    expect(saved).toHaveLength(0);
   });
 });

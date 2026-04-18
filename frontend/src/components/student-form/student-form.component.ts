@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, NgZone, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { finalize, timeout } from 'rxjs/operators';
 import { ApiService } from '../../services/api.service';
 import { compressImage } from '../../utils/image.utils';
 import { AuthService } from '../../services/auth.service';
@@ -40,7 +41,9 @@ export class StudentFormComponent implements OnInit {
     private api: ApiService,
     private auth: AuthService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private ngZone: NgZone,
+    private cdr: ChangeDetectorRef
   ) {
     const user = this.auth.getCurrentUser();
     this.isAdmin = user?.role === 'Admin';
@@ -103,40 +106,46 @@ export class StudentFormComponent implements OnInit {
       return;
     }
 
-    this.isSaving = true;
+    this.setSavingState(true);
     this.errorMessage = '';
     this.successMessage = '';
     this.warningMessage = '';
 
     if (this.isEditMode) {
       const payload = this.buildUpdatePayload();
-      this.api.updateStudent(this.studentId, payload).subscribe({
+      this.api.updateStudent(this.studentId, payload).pipe(
+        timeout(10000),
+        finalize(() => this.setSavingState(false))
+      ).subscribe({
         next: (res) => {
-          this.isSaving = false;
           this.successMessage = res.message;
+          this.refreshView();
         },
         error: (error) => {
-          this.isSaving = false;
           this.errorMessage = error?.error?.error || 'Erro ao atualizar aluno.';
+          this.refreshView();
         },
       });
       return;
     }
 
     const payload = this.buildCreatePayload();
-    this.api.createStudent(payload).subscribe({
+    this.api.createStudent(payload).pipe(
+      timeout(10000),
+      finalize(() => this.setSavingState(false))
+    ).subscribe({
       next: (res) => {
-        this.isSaving = false;
         this.successMessage = res.message;
         this.warningMessage = res.warning || '';
         if (res.temporaryPassword) {
           this.generatedPassword = res.temporaryPassword;
           this.generatedPasswordModalOpen = true;
         }
+        this.refreshView();
       },
       error: (error) => {
-        this.isSaving = false;
         this.errorMessage = error?.error?.error || 'Erro ao cadastrar aluno.';
+        this.refreshView();
       },
     });
   }
@@ -247,9 +256,11 @@ export class StudentFormComponent implements OnInit {
         this.form.get('photoUrl')?.setValue(dataUrl);
         this.errorMessage = '';
         this.successMessage = 'Foto carregada. Clique em salvar para confirmar.';
+        this.refreshView();
       },
       () => {
         this.errorMessage = 'Não foi possível processar a imagem selecionada.';
+        this.refreshView();
       }
     );
   }
@@ -279,12 +290,14 @@ export class StudentFormComponent implements OnInit {
   }
 
   private loadStudent(): void {
-    this.isLoading = true;
+    this.setLoadingState(true);
     this.errorMessage = '';
 
-    this.api.getStudentById(this.studentId).subscribe({
+    this.api.getStudentById(this.studentId).pipe(
+      timeout(10000),
+      finalize(() => this.setLoadingState(false))
+    ).subscribe({
       next: (student) => {
-        this.isLoading = false;
         this.form.patchValue({
           email: student.email || '',
           fullName: student.fullName || '',
@@ -303,10 +316,11 @@ export class StudentFormComponent implements OnInit {
         });
 
         this.recalculateMinority(this.toDateInput(student.birthDate));
+        this.refreshView();
       },
       error: (error) => {
-        this.isLoading = false;
         this.errorMessage = error?.error?.error || 'Erro ao carregar dados do aluno.';
+        this.refreshView();
       },
     });
   }
@@ -398,6 +412,26 @@ export class StudentFormComponent implements OnInit {
     }
 
     return trimmed;
+  }
+
+  private setLoadingState(value: boolean): void {
+    this.ngZone.run(() => {
+      this.isLoading = value;
+      this.cdr.detectChanges();
+    });
+  }
+
+  private setSavingState(value: boolean): void {
+    this.ngZone.run(() => {
+      this.isSaving = value;
+      this.cdr.detectChanges();
+    });
+  }
+
+  private refreshView(): void {
+    this.ngZone.run(() => {
+      this.cdr.detectChanges();
+    });
   }
 
   private patchAddressField(controlName: string, nextValue: string): void {

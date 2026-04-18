@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { createBackupJob } from './database';
+import { createBackupJob, getAcademyById } from './database';
 import { cleanupOldBackups, runBackupJob } from './backupJobs';
 
 export interface BackupScheduleConfig {
@@ -103,36 +103,66 @@ export const upsertBackupSchedule = (input: {
 const processDueSchedules = async (): Promise<void> => {
   const schedules = loadSchedules();
   const now = new Date();
+  const nextSchedules: BackupScheduleConfig[] = [];
 
   for (const schedule of schedules) {
-    if (!schedule.enabled || new Date(schedule.nextRunAt) > now) {
+    const academy = await getAcademyById(schedule.academyId);
+    if (!academy) {
+      console.warn(
+        `[BackupScheduler] Removendo agenda órfã da academia ${schedule.academyId} (academia inexistente ou removida).`
+      );
       continue;
     }
 
-    const job = await createBackupJob({
-      academyId: schedule.academyId,
-      type: 'auto',
-      includeHistory: true,
-      isEncrypted: false,
-      initiatedBy: schedule.generatedBy,
-      retentionDays: schedule.retentionDays,
-    });
+    if (!schedule.enabled || new Date(schedule.nextRunAt) > now) {
+      nextSchedules.push(schedule);
+      continue;
+    }
 
-    await runBackupJob(job.id, schedule.academyId, {
-      initiatedBy: schedule.generatedBy,
-    }).catch((error) => {
-      console.error('Erro ao executar backup automático agendado:', error);
-    });
+    try {
+      const job = await createBackupJob({
+        academyId: schedule.academyId,
+        type: 'auto',
+        includeHistory: true,
+        isEncrypted: false,
+        initiatedBy: schedule.generatedBy,
+        retentionDays: schedule.retentionDays,
+      });
 
-    await cleanupOldBackups(schedule.academyId, schedule.retentionDays).catch((error) => {
-      console.error('Erro ao limpar backups expirados:', error);
-    });
+      await runBackupJob(job.id, schedule.academyId, {
+        initiatedBy: schedule.generatedBy,
+      }).catch((error) => {
+        console.error('Erro ao executar backup automático agendado:', error);
+      });
 
-    schedule.nextRunAt = computeNextRunAt(schedule.hour, schedule.minute);
-    schedule.updatedAt = new Date().toISOString();
+      await cleanupOldBackups(schedule.academyId, schedule.retentionDays).catch((error) => {
+        console.error('Erro ao limpar backups expirados:', error);
+      });
+
+      schedule.nextRunAt = computeNextRunAt(schedule.hour, schedule.minute);
+      schedule.updatedAt = new Date().toISOString();
+      nextSchedules.push(schedule);
+    } catch (error: any) {
+      if (error?.code === '23503') {
+        console.warn(
+          `[BackupScheduler] Agenda removida após falha de FK para academia ${schedule.academyId}.`
+        );
+        continue;
+      }
+
+      console.error('Erro ao processar backup automático agendado:', error);
+      // Defensive retry window: move to next planned run to avoid retry loop every minute.
+      schedule.nextRunAt = computeNextRunAt(schedule.hour, schedule.minute);
+      schedule.updatedAt = new Date().toISOString();
+      nextSchedules.push(schedule);
+    }
   }
 
-  saveSchedules(schedules);
+  saveSchedules(nextSchedules);
+};
+
+export const runBackupSchedulerTick = async (): Promise<void> => {
+  await processDueSchedules();
 };
 
 export const initializeBackupScheduler = (): void => {

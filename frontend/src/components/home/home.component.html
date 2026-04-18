@@ -1,21 +1,4 @@
-<div class="dashboard-container" *ngIf="currentUser">
-  <header class="dashboard-header">
-    <div class="header-content">
-      <div class="logo">
-        <img [src]="getAcademyLogo()" alt="Logotipo da academia" class="banner-logo" />
-        <h1>{{ currentUser.academy.fantasyName || currentUser.academy.name }}</h1>
-      </div>
-      <div class="header-info">
-        <img [src]="getUserPhoto()" alt="Foto do usuário" class="user-avatar" />
-        <span class="welcome">Bem-vindo, {{ currentUser.fullName }}</span>
-        <button (click)="logout()" class="btn-logout">
-          <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-          <span class="btn-label">Sair</span>
-        </button>
-      </div>
-    </div>
-  </header>
-
+<div class="dashboard-container" *ngIf="currentUser" [attr.aria-busy]="isPageBusy">
   <main class="dashboard-main">
     <section class="hero">
       <h2>{{ getHomeTitle() }}</h2>
@@ -29,6 +12,10 @@
 
     <section class="status-badge-section" *ngIf="isProfessor() || isAluno() || isResponsavel()">
       <span class="badge success">{{ getRoleLabel() }} ativo</span>
+    </section>
+
+    <section class="status-message" *ngIf="isPageBusy && !hasStudentProgressError">
+      Atualizando informações da sua área...
     </section>
 
     <section *ngIf="isAluno()" class="student-progress-section">
@@ -139,6 +126,7 @@
         <button class="action-btn" (click)="goToProfessorTurmas()">Gerenciar turmas</button>
         <button class="action-btn" (click)="goToCreateProfessorTurma()">Cadastrar turma</button>
         <button class="action-btn" (click)="goToProfessorTechniques()">Técnicas da academia</button>
+        <button class="action-btn" (click)="goToEpic10Entry()">Evolução dos atletas</button>
         <button class="action-btn" (click)="goToProfessorProfile()">Meu cadastro</button>
       </div>
     </section>
@@ -238,6 +226,7 @@
       <div class="action-buttons">
         <button class="action-btn" (click)="goToMyProfile()">Editar meu cadastro</button>
         <button class="action-btn" (click)="goToMyHealthScreening()">Atualizar anamnese</button>
+        <button class="action-btn" (click)="goToEpic10Entry()">Minha evolução</button>
       </div>
     </section>
 
@@ -815,6 +804,7 @@
       <h3>Próximas Ações</h3>
       <div class="action-buttons">
         <button class="action-btn" (click)="loadLinkedStudents()">Atualizar filhos vinculados</button>
+        <button class="action-btn" (click)="goToEpic10Entry()" [disabled]="!selectedStudentId">Evolução do aluno</button>
         <button class="action-btn" (click)="loadDeletionStatus()" [disabled]="!selectedStudentId">Consultar status LGPD</button>
       </div>
     </section>
@@ -853,7 +843,10 @@
             <p><strong>{{ student.studentName }}</strong></p>
             <p class="muted">Anamnese pendente. Recomendamos preencher antes do próximo treino.</p>
           </div>
-          <button class="action-btn primary" (click)="goToStudentHealthScreening(student.studentId)">Preencher saúde</button>
+          <div class="action-buttons">
+            <button class="action-btn" (click)="goToAthleteProgressDashboard(student.studentId)">Ver evolução</button>
+            <button class="action-btn primary" (click)="goToStudentHealthScreening(student.studentId)">Preencher saúde</button>
+          </div>
         </div>
       </div>
     </section>
@@ -925,10 +918,6 @@
       <p class="muted">Funcionalidades do seu perfil estão sendo implementadas.</p>
     </section>
   </main>
-
-  <footer class="dashboard-footer">
-    <p>&copy; 2026 SCAcademia. Sistema de Gerenciamento de Treinamentos com Conformidade LGPD.</p>
-  </footer>
 </div>
 
 <div class="loading" *ngIf="!currentUser">

@@ -77,4 +77,23 @@ describe('StudentProfileComponent', () => {
       queryParams: { returnTo: '/admin/alunos/student-1/ficha' },
     });
   });
+
+  it('navega para a tela de avaliacao de evolucao', () => {
+    component.goToAthleteEvaluation();
+
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['/athlete-progress', 'student-1', 'evaluation'], {
+      queryParams: { returnTo: '/admin/alunos/student-1/ficha' },
+    });
+  });
+
+  it('reflete visualmente o loading de vínculo do responsável', () => {
+    component.loadingLink = true;
+    fixture.detectChanges();
+
+    const content = fixture.nativeElement.textContent as string;
+    const root = fixture.nativeElement.querySelector('.profile-page') as HTMLElement;
+
+    expect(content).toContain('Atualizando vínculo do responsável...');
+    expect(root.getAttribute('aria-busy')).toBe('true');
+  });
 });

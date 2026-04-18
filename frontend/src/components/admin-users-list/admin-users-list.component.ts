@@ -1,7 +1,7 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, NgZone, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
-import { debounceTime, takeUntil } from 'rxjs/operators';
+import { debounceTime, finalize, takeUntil, timeout } from 'rxjs/operators';
 import {
   AdminManagedUserListItem,
   AdminManagedUserRole,
@@ -56,7 +56,9 @@ export class AdminUsersListComponent implements OnInit, OnDestroy {
 
   constructor(
     private api: ApiService,
-    private router: Router
+    private router: Router,
+    private ngZone: NgZone,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -89,7 +91,7 @@ export class AdminUsersListComponent implements OnInit, OnDestroy {
   }
 
   loadUsers(): void {
-    this.isLoading = true;
+    this.setLoadingState(true);
     this.errorMessage = '';
 
     this.api
@@ -100,7 +102,11 @@ export class AdminUsersListComponent implements OnInit, OnDestroy {
         status: this.filterStatus,
         search: this.filterSearch.trim() || undefined,
       })
-      .pipe(takeUntil(this.destroy$))
+      .pipe(
+        timeout(10000),
+        takeUntil(this.destroy$),
+        finalize(() => this.setLoadingState(false))
+      )
       .subscribe({
         next: (res) => {
           this.users = res.users || [];
@@ -108,12 +114,12 @@ export class AdminUsersListComponent implements OnInit, OnDestroy {
           this.totalPages = res.pagination?.totalPages || 1;
           this.page = res.pagination?.page || this.page;
           this.limit = res.pagination?.limit || this.limit;
-          this.isLoading = false;
+          this.refreshView();
         },
         error: (error) => {
           this.errorMessage = error?.error?.error || 'Erro ao carregar usuários.';
           this.users = [];
-          this.isLoading = false;
+          this.refreshView();
         },
       });
   }
@@ -151,22 +157,26 @@ export class AdminUsersListComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.isSubmitting = true;
+    this.setSubmittingState(true);
     this.errorMessage = '';
 
     this.api
       .createAdminManagedUser(this.createPayload)
-      .pipe(takeUntil(this.destroy$))
+      .pipe(
+        timeout(10000),
+        takeUntil(this.destroy$),
+        finalize(() => this.setSubmittingState(false))
+      )
       .subscribe({
         next: (res) => {
           this.successMessage = res.message || 'Usuário criado com sucesso.';
           this.showCreateModal = false;
-          this.isSubmitting = false;
           this.loadUsers();
+          this.refreshView();
         },
         error: (error) => {
           this.errorMessage = error?.error?.error || 'Erro ao criar usuário.';
-          this.isSubmitting = false;
+          this.refreshView();
         },
       });
   }
@@ -187,23 +197,27 @@ export class AdminUsersListComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.isSubmitting = true;
+    this.setSubmittingState(true);
     this.errorMessage = '';
 
     this.api
       .updateAdminManagedUser(this.editingUser.id, this.editPayload)
-      .pipe(takeUntil(this.destroy$))
+      .pipe(
+        timeout(10000),
+        takeUntil(this.destroy$),
+        finalize(() => this.setSubmittingState(false))
+      )
       .subscribe({
         next: (res) => {
           this.successMessage = res.message || 'Usuário atualizado com sucesso.';
           this.showEditModal = false;
           this.editingUser = null;
-          this.isSubmitting = false;
           this.loadUsers();
+          this.refreshView();
         },
         error: (error) => {
           this.errorMessage = error?.error?.error || 'Erro ao atualizar usuário.';
-          this.isSubmitting = false;
+          this.refreshView();
         },
       });
   }
@@ -284,7 +298,27 @@ export class AdminUsersListComponent implements OnInit, OnDestroy {
     this.showCreateModal = false;
     this.showEditModal = false;
     this.editingUser = null;
-    this.isSubmitting = false;
+    this.setSubmittingState(false);
+  }
+
+  private setLoadingState(value: boolean): void {
+    this.ngZone.run(() => {
+      this.isLoading = value;
+      this.cdr.detectChanges();
+    });
+  }
+
+  private setSubmittingState(value: boolean): void {
+    this.ngZone.run(() => {
+      this.isSubmitting = value;
+      this.cdr.detectChanges();
+    });
+  }
+
+  private refreshView(): void {
+    this.ngZone.run(() => {
+      this.cdr.detectChanges();
+    });
   }
 
   formatRole(role: AdminManagedUserRole): string {

@@ -81,6 +81,7 @@ describe('StudentFormComponent', () => {
     expect(component.successMessage).toContain('cadastrado com sucesso');
     expect(component.generatedPasswordModalOpen).toBeTrue();
     expect(component.generatedPassword).toBe('Gerada@123');
+    expect(component.isSaving).toBeFalse();
   });
 
   it('recalcula menoridade ao mudar birthDate', () => {

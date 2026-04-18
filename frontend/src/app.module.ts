@@ -15,6 +15,9 @@ import { RegisterFormComponent } from './components/register-form/register-form.
 import { ForgotPasswordFormComponent } from './components/forgot-password-form/forgot-password-form.component';
 import { ResetPasswordFormComponent } from './components/reset-password-form/reset-password-form.component';
 import { HealthScreeningFormComponent } from './components/health-screening-form/health-screening-form.component';
+import { AthleteEvaluationFormComponent } from './components/athlete-evaluation-form/athlete-evaluation-form.component';
+import { AthleteIndicatorConfigComponent } from './components/athlete-indicator-config/athlete-indicator-config.component';
+import { AthleteProgressDashboardComponent } from './components/athlete-progress-dashboard/athlete-progress-dashboard.component';
 import { HomeComponent } from './components/home/home.component';
 import { ConsentWizardComponent } from './components/consent-wizard/consent-wizard.component';
 import { ConsentTemplatesAdminComponent } from './components/consent-templates-admin/consent-templates-admin.component';
@@ -43,6 +46,7 @@ import { AdminUsersListComponent } from './components/admin-users-list/admin-use
 import { AdminBackupRecoveryComponent } from './components/admin-backup-recovery/admin-backup-recovery.component';
 import { AdminHealthMonitorComponent } from './components/admin-health-monitor/admin-health-monitor.component';
 import { StudentProgressChartComponent } from './components/student-progress-chart/student-progress-chart.component';
+import { AuthenticatedShellComponent } from './components/authenticated-shell/authenticated-shell.component';
 import { AuthGuard } from './guards/auth.guard';
 import { RoleGuard } from './guards/role.guard';
 import { AuthInterceptor } from './services/auth.interceptor';
@@ -59,6 +63,9 @@ import { AuthInterceptor } from './services/auth.interceptor';
     ForgotPasswordFormComponent,
     ResetPasswordFormComponent,
     HealthScreeningFormComponent,
+    AthleteEvaluationFormComponent,
+    AthleteIndicatorConfigComponent,
+    AthleteProgressDashboardComponent,
     HomeComponent,
     ConsentWizardComponent,
     ConsentTemplatesAdminComponent,
@@ -86,6 +93,7 @@ import { AuthInterceptor } from './services/auth.interceptor';
     StudentsListComponent,
     StudentFormComponent,
     StudentProfileComponent,
+    AuthenticatedShellComponent,
   ],
   imports: [
     BrowserModule,

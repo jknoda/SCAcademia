@@ -111,6 +111,7 @@ describe('AdminProfileComponent', () => {
       photoUrl: undefined,
     });
     expect(component.successMessage).toBe('Perfil atualizado');
+    expect(component.isSaving).toBeFalse();
   });
 
   it('nao salva com formulario invalido', () => {
@@ -133,6 +134,7 @@ describe('AdminProfileComponent', () => {
     expect(apiSpy.changePassword).toHaveBeenCalled();
     expect(component.passwordSuccessMessage).toBe('Senha alterada com sucesso');
     expect(component.passwordForm.get('currentPassword')?.value).toBeNull();
+    expect(component.isChangingPassword).toBeFalse();
   });
 
   it('nao envia troca de senha quando confirmacao diverge', () => {
@@ -169,5 +171,33 @@ describe('AdminProfileComponent', () => {
     const content = fixture.nativeElement.textContent as string;
     expect(content).toContain('Carregando perfil...');
     expect(content).not.toContain('Trocar Senha');
+  });
+
+  it('abre o caminho da evolução conforme o perfil autenticado', () => {
+    component.openEpic10();
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['/admin/alunos'], {
+      queryParams: { highlight: 'athlete-progress' },
+    });
+
+    routerSpy.navigate.calls.reset();
+    component.currentUser = { ...currentUser, role: 'Professor' } as User;
+    component.openEpic10();
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['/professores/meus-alunos'], {
+      queryParams: { highlight: 'athlete-progress' },
+    });
+
+    routerSpy.navigate.calls.reset();
+    component.currentUser = { ...currentUser, id: 'student-1', role: 'Aluno' } as User;
+    component.openEpic10();
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['/athlete-progress', 'student-1', 'dashboard'], {
+      queryParams: { returnTo: '/aluno/meu-perfil' },
+    });
+  });
+
+  it('exibe o acesso à evolução sem mostrar o nome interno do epic', () => {
+    const content = fixture.nativeElement.textContent as string;
+
+    expect(content).toContain('Evolução do atleta');
+    expect(content).not.toContain('Epic 10');
   });
 });

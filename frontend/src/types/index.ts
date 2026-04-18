@@ -561,6 +561,166 @@ export interface HealthScreeningPayload {
   emergencyContactPhone: string;
 }
 
+export type AthleteMetricCategory = 'technical' | 'physical' | 'psychological' | 'training' | 'tactical' | 'competition';
+export type AthleteMetricValueType = 'score' | 'integer' | 'decimal' | 'structured';
+
+export interface AthleteStructuredMetricValue {
+  primaryValue: number;
+  secondaryValue?: number;
+  textValue?: string;
+  [key: string]: unknown;
+}
+
+export interface AthleteIndicatorDefinition {
+  code: string;
+  name: string;
+  category: AthleteMetricCategory;
+  unit: string;
+  valueType: AthleteMetricValueType;
+  displayFormat: string;
+  description?: string;
+  inputInstruction?: string;
+  allowPeriodAggregation: boolean;
+  isActive: boolean;
+  displayOrder: number;
+  groupCode: string;
+}
+
+export interface AthleteIndicatorGroup {
+  code: string;
+  name: string;
+  description?: string;
+  displayOrder: number;
+  isActive: boolean;
+  indicators: AthleteIndicatorDefinition[];
+}
+
+export interface AthleteAssessmentMetricInput {
+  metricCode: string;
+  metricName: string;
+  category: AthleteMetricCategory;
+  value: number;
+  unit: string;
+  groupCode?: string;
+  description?: string;
+  inputInstruction?: string;
+  valueType?: AthleteMetricValueType;
+  displayFormat?: string;
+  allowPeriodAggregation?: boolean;
+  displayOrder?: number;
+  displayValue?: string;
+  secondaryValue?: number;
+  structuredValue?: AthleteStructuredMetricValue;
+}
+
+export interface AthleteAssessmentPayload {
+  athleteId: string;
+  assessmentDate: string;
+  notes?: string;
+  metrics: AthleteAssessmentMetricInput[];
+}
+
+export interface AthleteAssessmentRecord {
+  assessmentId: string;
+  athleteId: string;
+  assessmentDate: string;
+  notes?: string;
+  source?: string;
+  recordedByUserId?: string;
+  createdAt?: string;
+  metrics: AthleteAssessmentMetricInput[];
+}
+
+export interface AthleteAssessmentMutationResponse {
+  success: boolean;
+  data: AthleteAssessmentRecord;
+}
+
+export interface AthletePeriodComparisonChange {
+  metricCode: string;
+  metricName: string;
+  currentValue: number | null;
+  previousValue: number | null;
+  delta: number | null;
+  deltaPercent: number | null;
+  trend: 'up' | 'down' | 'stable' | 'no-data';
+}
+
+export interface AthletePeriodComparisonSummary {
+  from: string | null;
+  to: string | null;
+  assessmentCount: number;
+}
+
+export interface AthletePeriodComparison {
+  currentPeriodLabel: string;
+  previousPeriodLabel: string;
+  hasPartialData: boolean;
+  current: AthletePeriodComparisonSummary;
+  previous: AthletePeriodComparisonSummary;
+  changes: AthletePeriodComparisonChange[];
+}
+
+export interface AthleteProgressQueryParams {
+  period?: '7d' | '30d' | '90d' | 'all' | 'week' | 'month';
+  from?: string;
+  to?: string;
+  limit?: number;
+  offset?: number;
+  groupBy?: 'day' | 'week' | 'month';
+}
+
+export interface AthleteProgressGroupedPoint {
+  label: string;
+  date: string;
+  assessmentCount: number;
+  averageScore: number;
+}
+
+export interface AthleteProgressAlert {
+  alertId: string;
+  type: string;
+  kind?: 'alert' | 'insight';
+  severity: 'high' | 'medium' | 'low';
+  title: string;
+  message: string;
+  createdAt?: string;
+  isActive?: boolean;
+  context?: Record<string, unknown>;
+}
+
+export interface AthleteProgressHistoryResponse {
+  athleteId: string;
+  athleteName: string;
+  summary: {
+    totalAssessments: number;
+    lastAssessmentDate: string | null;
+    totalSessions: number;
+    totalAttendance: number;
+    attendancePercentage: number;
+    streakCurrent: number;
+    streakLongest: number;
+    lastUpdatedAt?: string;
+    latestMetrics?: Record<string, { value: number; unit: string; category: AthleteMetricCategory }>;
+    trendStatus?: 'positive' | 'attention' | 'stable' | 'insufficient-data';
+  };
+  assessments: AthleteAssessmentRecord[];
+  comparisons: Record<string, AthletePeriodComparison>;
+  alerts: AthleteProgressAlert[];
+  indicatorGroups?: AthleteIndicatorGroup[];
+  pagination?: {
+    total: number;
+    limit: number;
+    offset: number;
+    hasMore: boolean;
+  };
+  groupedSeries?: AthleteProgressGroupedPoint[];
+  range?: {
+    from: string | null;
+    to: string | null;
+  };
+}
+
 export interface ConsentValidation {
   isValid: boolean;
   studentName: string;
@@ -970,7 +1130,17 @@ export interface HealthHistoryResponse {
 }
 
 export interface AdminDashboardQuickAction {
-  key: 'audit' | 'export-report' | 'manage-users' | 'settings' | 'backup' | 'health-monitor' | 'professors' | 'profile' | 'consent-templates';
+  key:
+    | 'audit'
+    | 'export-report'
+    | 'manage-users'
+    | 'athlete-progress'
+    | 'settings'
+    | 'backup'
+    | 'health-monitor'
+    | 'professors'
+    | 'profile'
+    | 'consent-templates';
   label: string;
   description: string;
   icon: string;

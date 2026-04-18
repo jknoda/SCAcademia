@@ -4,6 +4,14 @@
 
   <div class="loading" *ngIf="isLoading">Carregando perfil...</div>
 
+  <div *ngIf="!isLoading" class="success-alert">
+    <strong>Evolução do Atleta</strong>
+    <p>A partir deste perfil você pode abrir a lista de alunos e acompanhar o progresso esportivo da academia.</p>
+    <div class="actions-row">
+      <button type="button" class="btn-secondary" (click)="goToEpic10()">Abrir evolução dos atletas</button>
+    </div>
+  </div>
+
   <form *ngIf="!isLoading" [formGroup]="form" (ngSubmit)="save()">
     <div class="logo-section">
       <img [src]="getAcademyLogoPreview()" alt="Logotipo da academia" class="logo-preview" />

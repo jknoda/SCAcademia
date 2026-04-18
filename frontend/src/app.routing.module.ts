@@ -8,6 +8,9 @@ import { AdminDashboardComponent } from './components/admin-dashboard/admin-dash
 import { ForgotPasswordFormComponent } from './components/forgot-password-form/forgot-password-form.component';
 import { ResetPasswordFormComponent } from './components/reset-password-form/reset-password-form.component';
 import { HealthScreeningFormComponent } from './components/health-screening-form/health-screening-form.component';
+import { AthleteEvaluationFormComponent } from './components/athlete-evaluation-form/athlete-evaluation-form.component';
+import { AthleteIndicatorConfigComponent } from './components/athlete-indicator-config/athlete-indicator-config.component';
+import { AthleteProgressDashboardComponent } from './components/athlete-progress-dashboard/athlete-progress-dashboard.component';
 import { HomeComponent } from './components/home/home.component';
 import { ConsentWizardComponent } from './components/consent-wizard/consent-wizard.component';
 import { ConsentTemplatesAdminComponent } from './components/consent-templates-admin/consent-templates-admin.component';
@@ -77,6 +80,9 @@ const routes: Routes = [
   { path: 'training/history', component: TrainingHistoryComponent, canActivate: [AuthGuard] },
   { path: 'home', component: HomeComponent, canActivate: [AuthGuard] },
   { path: 'health-screening/:studentId', component: HealthScreeningFormComponent, canActivate: [AuthGuard] },
+  { path: 'athlete-progress/configuration', component: AthleteIndicatorConfigComponent, canActivate: [AuthGuard] },
+  { path: 'athlete-progress/:studentId/dashboard', component: AthleteProgressDashboardComponent, canActivate: [AuthGuard] },
+  { path: 'athlete-progress/:studentId/evaluation', component: AthleteEvaluationFormComponent, canActivate: [AuthGuard] },
   { path: 'consent/:token', component: ConsentWizardComponent },
   { path: '**', redirectTo: '/setup' },
 ];

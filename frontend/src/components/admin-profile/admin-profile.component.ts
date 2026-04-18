@@ -1,6 +1,7 @@
 import { ChangeDetectorRef, Component, NgZone, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { finalize, timeout } from 'rxjs/operators';
 import { ApiService } from '../../services/api.service';
 import { compressImage } from '../../utils/image.utils';
 import { AuthService } from '../../services/auth.service';
@@ -83,9 +84,11 @@ export class AdminProfileComponent implements OnInit {
     this.setLoadingState(true);
     this.errorMessage = '';
 
-    this.api.getUserProfile(this.currentUser.id).subscribe({
+    this.api.getUserProfile(this.currentUser.id).pipe(
+      timeout(10000),
+      finalize(() => this.setLoadingState(false))
+    ).subscribe({
       next: (profile) => {
-        this.setLoadingState(false);
         this.profileForm.patchValue({
           fullName: profile.fullName || '',
           photoUrl: profile.photoUrl || '',
@@ -101,10 +104,11 @@ export class AdminProfileComponent implements OnInit {
           addressCity: profile.addressCity || '',
           addressState: (profile.addressState || '').toUpperCase(),
         });
+        this.refreshView();
       },
       error: (error) => {
-        this.setLoadingState(false);
         this.errorMessage = error?.error?.error || 'Erro ao carregar perfil.';
+        this.refreshView();
       },
     });
   }
@@ -116,7 +120,7 @@ export class AdminProfileComponent implements OnInit {
       return;
     }
 
-    this.isSaving = true;
+    this.setSavingState(true);
     this.errorMessage = '';
     this.successMessage = '';
 
@@ -136,18 +140,21 @@ export class AdminProfileComponent implements OnInit {
       addressState: (raw.addressState || '').toUpperCase(),
     };
 
-    this.api.updateUserProfile(this.currentUser.id, payload).subscribe({
+    this.api.updateUserProfile(this.currentUser.id, payload).pipe(
+      timeout(10000),
+      finalize(() => this.setSavingState(false))
+    ).subscribe({
       next: (res) => {
-        this.isSaving = false;
         this.successMessage = 'Perfil atualizado';
         this.auth.updateCurrentUserProfile({
           fullName: res.user.fullName,
           photoUrl: res.user.photoUrl,
         });
+        this.refreshView();
       },
       error: (error) => {
-        this.isSaving = false;
         this.errorMessage = error?.error?.error || 'Erro ao atualizar perfil.';
+        this.refreshView();
       },
     });
   }
@@ -165,7 +172,7 @@ export class AdminProfileComponent implements OnInit {
       return;
     }
 
-    this.isChangingPassword = true;
+    this.setChangingPasswordState(true);
     this.passwordErrorMessage = '';
     this.passwordSuccessMessage = '';
 
@@ -175,15 +182,19 @@ export class AdminProfileComponent implements OnInit {
         newPassword: value.newPassword,
         confirmPassword: value.confirmPassword,
       })
+      .pipe(
+        timeout(10000),
+        finalize(() => this.setChangingPasswordState(false))
+      )
       .subscribe({
         next: () => {
-          this.isChangingPassword = false;
           this.passwordSuccessMessage = 'Senha alterada com sucesso';
           this.passwordForm.reset();
+          this.refreshView();
         },
         error: (error) => {
-          this.isChangingPassword = false;
           this.passwordErrorMessage = error?.error?.error || 'Erro ao alterar senha.';
+          this.refreshView();
         },
       });
   }
@@ -239,6 +250,56 @@ export class AdminProfileComponent implements OnInit {
     this.router.navigate(['/home']);
   }
 
+  openEpic10(): void {
+    if (!this.currentUser) {
+      return;
+    }
+
+    if (this.currentUser.role === 'Admin') {
+      this.router.navigate(['/admin/alunos'], {
+        queryParams: { highlight: 'athlete-progress' },
+      });
+      return;
+    }
+
+    if (this.currentUser.role === 'Professor') {
+      this.router.navigate(['/professores/meus-alunos'], {
+        queryParams: { highlight: 'athlete-progress' },
+      });
+      return;
+    }
+
+    if (this.currentUser.role === 'Aluno') {
+      this.router.navigate(['/athlete-progress', this.currentUser.id, 'dashboard'], {
+        queryParams: { returnTo: '/aluno/meu-perfil' },
+      });
+    }
+  }
+
+  getEpic10Description(): string {
+    if (this.currentUser?.role === 'Professor') {
+      return 'Acesse rapidamente a evolução dos seus atletas para registrar avaliações e acompanhar alertas.';
+    }
+
+    if (this.currentUser?.role === 'Aluno') {
+      return 'Abra seu painel de evolução para acompanhar histórico, comparações e insights recentes.';
+    }
+
+    return 'Abra a central de acompanhamento para consultar a evolução esportiva dos alunos da academia.';
+  }
+
+  getEpic10ButtonLabel(): string {
+    if (this.currentUser?.role === 'Professor') {
+      return 'Abrir evolução dos atletas';
+    }
+
+    if (this.currentUser?.role === 'Aluno') {
+      return 'Abrir minha evolução';
+    }
+
+    return 'Abrir evolução dos atletas';
+  }
+
   getAcademyLogo(): string {
     return this.currentUser?.academy?.logoUrl || 'assets/default-academy-logo.svg';
   }
@@ -265,11 +326,11 @@ export class AdminProfileComponent implements OnInit {
         this.profileForm.get('photoUrl')?.setValue(dataUrl);
         this.errorMessage = '';
         this.successMessage = 'Foto carregada. Clique em salvar para confirmar.';
-        this.cdr.detectChanges();
+        this.refreshView();
       },
       () => {
         this.errorMessage = 'Não foi possível processar a imagem selecionada.';
-        this.cdr.detectChanges();
+        this.refreshView();
       }
     );
   }
@@ -345,6 +406,26 @@ export class AdminProfileComponent implements OnInit {
   private setLoadingState(value: boolean): void {
     this.ngZone.run(() => {
       this.isLoading = value;
+      this.cdr.detectChanges();
+    });
+  }
+
+  private setSavingState(value: boolean): void {
+    this.ngZone.run(() => {
+      this.isSaving = value;
+      this.cdr.detectChanges();
+    });
+  }
+
+  private setChangingPasswordState(value: boolean): void {
+    this.ngZone.run(() => {
+      this.isChangingPassword = value;
+      this.cdr.detectChanges();
+    });
+  }
+
+  private refreshView(): void {
+    this.ngZone.run(() => {
       this.cdr.detectChanges();
     });
   }

@@ -1,3 +1,5 @@
+/// <reference types="jasmine" />
+
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -990,5 +992,16 @@ describe('HomeComponent', () => {
 
     expect(component.beltHistoryData!.entries[0].belt).toBe('azul');
     expect(component.beltHistoryErrorMessage).toBe('');
+  });
+
+  it('reflete o loading geral na tela inicial', () => {
+    component.isLoadingLinkedStudents = true;
+    fixture.detectChanges();
+
+    const content = fixture.nativeElement.textContent as string;
+    const root = fixture.nativeElement.querySelector('.dashboard-container') as HTMLElement;
+
+    expect(content).toContain('Atualizando informações da sua área...');
+    expect(root.getAttribute('aria-busy')).toBe('true');
   });
 });

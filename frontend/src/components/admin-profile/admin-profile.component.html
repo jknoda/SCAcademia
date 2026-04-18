@@ -1,21 +1,4 @@
-<div class="dashboard-container" *ngIf="currentUser">
-  <header class="dashboard-header">
-    <div class="header-content">
-      <div class="logo">
-        <img [src]="getAcademyLogo()" alt="Logotipo da academia" class="banner-logo" />
-        <h1>{{ currentUser.academy.fantasyName || currentUser.academy.name }}</h1>
-      </div>
-      <div class="header-info">
-        <img [src]="getCurrentUserPhoto()" alt="Foto do usuário" class="user-avatar" />
-        <span class="welcome">{{ currentUser.fullName }}</span>
-        <button type="button" class="btn-ghost" (click)="backToDashboard()">
-          <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-          <span class="btn-label">Voltar</span>
-        </button>
-      </div>
-    </div>
-  </header>
-
+<div class="dashboard-container" *ngIf="currentUser" [attr.aria-busy]="isLoading || isSaving || isChangingPassword">
   <main class="dashboard-main">
     <section class="hero">
       <h2>{{ getProfileTitle() }}</h2>
@@ -28,6 +11,14 @@
     </section>
 
     <div class="loading" *ngIf="isLoading">Carregando perfil...</div>
+
+    <section *ngIf="!isLoading" class="status-message success">
+      <strong>Evolução do atleta</strong>
+      <p class="muted">{{ getEpic10Description() }}</p>
+      <div class="actions-row single-action">
+        <button type="button" class="btn-primary" (click)="openEpic10()">{{ getEpic10ButtonLabel() }}</button>
+      </div>
+    </section>
 
     <section *ngIf="!isLoading">
       <div class="section-heading">

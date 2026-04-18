@@ -1,7 +1,7 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, NgZone, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { finalize, takeUntil, timeout } from 'rxjs/operators';
 import { ApiService } from '../../services/api.service';
 import {
   BackupIntegrityResponse,
@@ -61,7 +61,9 @@ export class AdminBackupRecoveryComponent implements OnInit, OnDestroy {
 
   constructor(
     private api: ApiService,
-    private router: Router
+    private router: Router,
+    private ngZone: NgZone,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -79,12 +81,16 @@ export class AdminBackupRecoveryComponent implements OnInit, OnDestroy {
   }
 
   loadData(): void {
-    this.isLoading = true;
+    this.setLoadingState(true);
     this.errorMessage = '';
 
     this.api
       .listAdminBackups()
-      .pipe(takeUntil(this.destroy$))
+      .pipe(
+        timeout(10000),
+        takeUntil(this.destroy$),
+        finalize(() => this.setLoadingState(false))
+      )
       .subscribe({
         next: (res) => {
           this.jobs = res.jobs || [];
@@ -98,11 +104,11 @@ export class AdminBackupRecoveryComponent implements OnInit, OnDestroy {
               retentionDays: res.schedule.retentionDays,
             };
           }
-          this.isLoading = false;
+          this.refreshView();
         },
         error: (error) => {
           this.errorMessage = error?.error?.error || 'Erro ao carregar backup e recovery.';
-          this.isLoading = false;
+          this.refreshView();
         },
       });
   }
@@ -122,24 +128,28 @@ export class AdminBackupRecoveryComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.isTriggeringBackup = true;
+    this.setTriggeringBackupState(true);
     this.errorMessage = '';
     this.successMessage = '';
 
     this.api
       .triggerAdminBackup(this.triggerPayload)
-      .pipe(takeUntil(this.destroy$))
+      .pipe(
+        timeout(10000),
+        takeUntil(this.destroy$),
+        finalize(() => this.setTriggeringBackupState(false))
+      )
       .subscribe({
         next: (res) => {
-          this.isTriggeringBackup = false;
           this.showTriggerForm = false;
           this.successMessage = res.message;
           this.activeJobId = res.jobId;
           this.startPolling(res.jobId);
+          this.refreshView();
         },
         error: (error) => {
-          this.isTriggeringBackup = false;
           this.errorMessage = error?.error?.error || 'Erro ao iniciar backup.';
+          this.refreshView();
         },
       });
   }
@@ -163,6 +173,7 @@ export class AdminBackupRecoveryComponent implements OnInit, OnDestroy {
                   : res.job.errorMessage || 'Falha ao gerar backup.';
               this.loadData();
             }
+            this.refreshView();
           },
           error: () => {
             this.clearPolling();
@@ -289,19 +300,23 @@ export class AdminBackupRecoveryComponent implements OnInit, OnDestroy {
   }
 
   saveSchedule(): void {
-    this.isSavingSchedule = true;
+    this.setSavingScheduleState(true);
     this.api
       .upsertAdminBackupSchedule(this.schedulePayload)
-      .pipe(takeUntil(this.destroy$))
+      .pipe(
+        timeout(10000),
+        takeUntil(this.destroy$),
+        finalize(() => this.setSavingScheduleState(false))
+      )
       .subscribe({
         next: (schedule) => {
           this.schedule = schedule;
           this.successMessage = 'Agendamento de backup salvo com sucesso.';
-          this.isSavingSchedule = false;
+          this.refreshView();
         },
         error: (error) => {
           this.errorMessage = error?.error?.error || 'Erro ao salvar agendamento de backup.';
-          this.isSavingSchedule = false;
+          this.refreshView();
         },
       });
   }
@@ -312,6 +327,33 @@ export class AdminBackupRecoveryComponent implements OnInit, OnDestroy {
     this.showVerifyModal = false;
     this.restoreTargetJob = null;
     this.verifyTargetJob = null;
+  }
+
+  private setLoadingState(value: boolean): void {
+    this.ngZone.run(() => {
+      this.isLoading = value;
+      this.cdr.detectChanges();
+    });
+  }
+
+  private setTriggeringBackupState(value: boolean): void {
+    this.ngZone.run(() => {
+      this.isTriggeringBackup = value;
+      this.cdr.detectChanges();
+    });
+  }
+
+  private setSavingScheduleState(value: boolean): void {
+    this.ngZone.run(() => {
+      this.isSavingSchedule = value;
+      this.cdr.detectChanges();
+    });
+  }
+
+  private refreshView(): void {
+    this.ngZone.run(() => {
+      this.cdr.detectChanges();
+    });
   }
 
   formatDateTime(value: string | null): string {

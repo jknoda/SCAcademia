@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, NgZone, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
@@ -20,7 +20,9 @@ export class ResetPasswordFormComponent implements OnInit {
     private fb: FormBuilder,
     private auth: AuthService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private ngZone: NgZone,
+    private cdr: ChangeDetectorRef
   ) {
     this.resetForm = this.fb.group(
       {
@@ -64,20 +66,27 @@ export class ResetPasswordFormComponent implements OnInit {
       return;
     }
 
-    this.isLoading = true;
+    this.setLoadingState(true);
     this.errorMessage = '';
 
     const { newPassword } = this.resetForm.value;
     this.auth.resetPassword(this.token, newPassword).subscribe({
       next: (response) => {
-        this.isLoading = false;
+        this.setLoadingState(false);
         this.successMessage = response.message;
         setTimeout(() => this.router.navigate(['/login']), 1500);
       },
       error: (error: any) => {
-        this.isLoading = false;
+        this.setLoadingState(false);
         this.errorMessage = error.error?.error || 'Erro ao redefinir senha';
       },
+    });
+  }
+
+  private setLoadingState(value: boolean): void {
+    this.ngZone.run(() => {
+      this.isLoading = value;
+      this.cdr.detectChanges();
     });
   }
 

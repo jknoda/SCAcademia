@@ -67,12 +67,20 @@ export class StudentProfileComponent implements OnInit {
     });
   }
 
+  get isBusy(): boolean {
+    return this.loading || this.loadingGuardianSearch || this.loadingLink || this.loadingCreateAndLink;
+  }
+
   goBack(): void {
     this.router.navigate([this.isProfessorView ? '/professores/meus-alunos' : '/admin/alunos']);
   }
 
   canManageHealth(): boolean {
     return !this.isProfessorView;
+  }
+
+  canManageProgress(): boolean {
+    return !!this.studentId;
   }
 
   getPageTitle(): string {
@@ -92,6 +100,34 @@ export class StudentProfileComponent implements OnInit {
 
     this.router.navigate(['/health-screening', this.studentId], {
       queryParams: { returnTo: this.router.url || `/admin/alunos/${this.studentId}/ficha` },
+    });
+  }
+
+  goToAthleteDashboard(): void {
+    if (!this.studentId || !this.canManageProgress()) {
+      return;
+    }
+
+    this.router.navigate(['/athlete-progress', this.studentId, 'dashboard'], {
+      queryParams: {
+        returnTo: this.router.url || (this.isProfessorView
+          ? `/professores/meus-alunos/${this.studentId}/ficha`
+          : `/admin/alunos/${this.studentId}/ficha`),
+      },
+    });
+  }
+
+  goToAthleteEvaluation(): void {
+    if (!this.studentId || !this.canManageProgress()) {
+      return;
+    }
+
+    this.router.navigate(['/athlete-progress', this.studentId, 'evaluation'], {
+      queryParams: {
+        returnTo: this.router.url || (this.isProfessorView
+          ? `/professores/meus-alunos/${this.studentId}/ficha`
+          : `/admin/alunos/${this.studentId}/ficha`),
+      },
     });
   }
 

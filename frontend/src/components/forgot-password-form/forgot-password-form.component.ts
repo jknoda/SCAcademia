@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component, NgZone } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
@@ -15,7 +15,13 @@ export class ForgotPasswordFormComponent {
   errorMessage = '';
   successMessage = '';
 
-  constructor(private fb: FormBuilder, private auth: AuthService, private router: Router) {
+  constructor(
+    private fb: FormBuilder,
+    private auth: AuthService,
+    private router: Router,
+    private ngZone: NgZone,
+    private cdr: ChangeDetectorRef
+  ) {
     this.forgotForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
     });
@@ -31,20 +37,27 @@ export class ForgotPasswordFormComponent {
       return;
     }
 
-    this.isLoading = true;
+    this.setLoadingState(true);
     this.errorMessage = '';
     this.successMessage = '';
 
     const { email } = this.forgotForm.value;
     this.auth.forgotPassword(email).subscribe({
       next: (response) => {
-        this.isLoading = false;
+        this.setLoadingState(false);
         this.successMessage = response.message;
       },
       error: (error: any) => {
-        this.isLoading = false;
+        this.setLoadingState(false);
         this.errorMessage = error.error?.error || 'Erro ao solicitar recuperação de senha';
       },
+    });
+  }
+
+  private setLoadingState(value: boolean): void {
+    this.ngZone.run(() => {
+      this.isLoading = value;
+      this.cdr.detectChanges();
     });
   }
 

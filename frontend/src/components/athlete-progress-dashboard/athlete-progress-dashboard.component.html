@@ -1,0 +1,177 @@
+<div class="progress-page" [attr.aria-busy]="isLoading">
+  <div class="progress-shell">
+    <header class="progress-hero">
+      <div class="hero-copy-block">
+        <p class="eyebrow">Acompanhamento do atleta</p>
+        <h2>{{ dashboard?.athleteName || 'Evolução do atleta' }}</h2>
+        <p>Resumo visual da frequência, do desempenho recente e das observações técnicas em um único painel.</p>
+
+        <div class="hero-highlights" *ngIf="dashboard as heroData">
+          <span class="hero-pill">{{ heroData.summary.attendancePercentage }}% de frequência</span>
+          <span class="hero-pill">{{ heroData.summary.totalAssessments }} avaliações</span>
+          <span class="hero-pill">{{ getTrendLabel() }}</span>
+        </div>
+      </div>
+
+      <div class="hero-actions">
+        <button type="button" class="app-btn app-btn-secondary" (click)="goBack()">Voltar</button>
+        <button *ngIf="canEditEvaluation()" type="button" class="app-btn app-btn-secondary" (click)="goToIndicatorConfiguration()">
+          Configurar indicadores
+        </button>
+        <button *ngIf="canEditEvaluation()" type="button" class="app-btn app-btn-primary" (click)="goToEvaluation()">
+          Registrar avaliação
+        </button>
+      </div>
+    </header>
+
+    <div class="toolbar" *ngIf="dashboard">
+      <span class="toolbar-label">Período:</span>
+      <button type="button" class="filter-btn" [class.active]="selectedPeriod === '30d'" (click)="applyPeriodFilter('30d')">30 dias</button>
+      <button type="button" class="filter-btn" [class.active]="selectedPeriod === '90d'" (click)="applyPeriodFilter('90d')">90 dias</button>
+      <button type="button" class="filter-btn" [class.active]="selectedPeriod === 'all'" (click)="applyPeriodFilter('all')">Tudo</button>
+    </div>
+
+    <div *ngIf="isLoading" class="app-status-message">Carregando painel de evolução...</div>
+    <div *ngIf="errorMessage" class="app-status-message error">{{ errorMessage }}</div>
+
+    <ng-container *ngIf="!isLoading && !errorMessage && dashboard as data">
+      <div class="summary-grid">
+        <article class="summary-card">
+          <h3>Avaliações</h3>
+          <p class="summary-number">{{ data.summary.totalAssessments }}</p>
+          <p class="muted">Última: {{ data.summary.lastAssessmentDate ? (data.summary.lastAssessmentDate | date: 'dd/MM/yyyy') : '-' }}</p>
+        </article>
+
+        <article class="summary-card">
+          <h3>Frequência</h3>
+          <p class="summary-number">{{ data.summary.attendancePercentage }}%</p>
+          <p class="muted">{{ data.summary.totalAttendance }} presenças em {{ data.summary.totalSessions }} sessões</p>
+        </article>
+
+        <article class="summary-card">
+          <h3>Progresso geral</h3>
+          <p class="summary-number">{{ getSummaryValue('overall_progress') }}</p>
+          <p class="muted">Tendência: {{ getTrendLabel() }}</p>
+        </article>
+
+        <article class="summary-card">
+          <h3>Status recente</h3>
+          <p class="summary-number">{{ getSummaryValue('technical_score') }}</p>
+          <p class="muted">Físico: {{ getSummaryValue('physical_score') }} · Comportamental: {{ getSummaryValue('behavior_score') }}</p>
+        </article>
+
+        <article class="summary-card" *ngIf="getLatestMetric('competition_count') as competitionCount">
+          <h3>Competições</h3>
+          <p class="summary-number">{{ getMetricDisplayValue(competitionCount) }}</p>
+          <p class="muted">Saldo: {{ getSummaryValue('competition_record') }}</p>
+        </article>
+      </div>
+
+      <section *ngIf="getVisibleAlerts().length > 0" class="content-card content-card--wide">
+        <div class="section-heading">
+          <div>
+            <h3>Alertas e insights</h3>
+            <p class="muted">Leituras automáticas para apoiar a decisão do professor e o acompanhamento da família.</p>
+          </div>
+        </div>
+
+        <div class="alert-grid">
+          <article
+            class="alert-item"
+            *ngFor="let alert of getVisibleAlerts()"
+            [class.alert-item--high]="alert.severity === 'high'"
+            [class.alert-item--medium]="alert.severity === 'medium'"
+            [class.alert-item--low]="alert.severity === 'low'"
+            [class.alert-item--insight]="alert.kind === 'insight'">
+            <div class="history-header">
+              <strong>{{ alert.title }}</strong>
+              <span [class]="getAlertBadgeClass(alert)">{{ getAlertBadge(alert) }}</span>
+            </div>
+            <p class="muted">{{ alert.message }}</p>
+          </article>
+        </div>
+      </section>
+
+      <section *ngIf="getActiveComparison() as comparison" class="content-card content-card--wide comparison-card">
+        <div class="section-heading">
+          <div>
+            <h3>Comparação entre períodos</h3>
+            <p class="muted">{{ comparison.currentPeriodLabel }} versus {{ comparison.previousPeriodLabel }}</p>
+          </div>
+          <span *ngIf="comparison.hasPartialData" class="mini-badge mini-badge--neutral">Dados parciais</span>
+        </div>
+
+        <div class="comparison-grid">
+          <article class="comparison-item" *ngFor="let change of comparison.changes">
+            <div class="history-header">
+              <strong>{{ change.metricName }}</strong>
+              <span class="mini-badge"
+                [class.mini-badge--success]="change.trend === 'up'"
+                [class.mini-badge--danger]="change.trend === 'down'"
+                [class.mini-badge--neutral]="change.trend === 'stable' || change.trend === 'no-data'">
+                {{ getComparisonBadge(change) }}
+              </span>
+            </div>
+            <p class="comparison-delta">{{ getComparisonDeltaText(change) }}</p>
+            <p class="muted">Atual: {{ formatComparisonValue(change.currentValue) }} · Anterior: {{ formatComparisonValue(change.previousValue) }}</p>
+          </article>
+        </div>
+      </section>
+
+      <div *ngIf="filteredAssessments.length === 0" class="empty-state">
+        <h3>Nenhum registro no período selecionado</h3>
+        <p class="muted">Ajuste o filtro para visualizar dados anteriores ou registre uma nova avaliação.</p>
+      </div>
+
+      <div *ngIf="filteredAssessments.length > 0" class="content-grid">
+        <section class="content-card content-card--wide">
+          <div class="section-heading">
+            <div>
+              <h3>Evolução temporal</h3>
+              <p class="muted">Leitura visual da tendência com base nas avaliações registradas.</p>
+            </div>
+          </div>
+
+          <app-student-progress-chart [weeklyData]="chartData" [period]="'current'"></app-student-progress-chart>
+        </section>
+
+        <section class="content-card">
+          <div class="section-heading">
+            <div>
+              <h3>Observação mais recente</h3>
+              <p class="muted">Resumo qualitativo do professor.</p>
+            </div>
+          </div>
+
+          <p class="notes-preview">{{ getNotesPreview(getLatestAssessment()?.notes) }}</p>
+        </section>
+
+        <section class="content-card content-card--wide">
+          <div class="section-heading">
+            <div>
+              <h3>Histórico resumido</h3>
+              <p class="muted">Linha do tempo das avaliações mais recentes.</p>
+            </div>
+          </div>
+
+          <div class="history-list">
+            <article class="history-item" *ngFor="let assessment of filteredAssessments; trackBy: trackByAssessment">
+              <div class="history-header">
+                <strong>{{ assessment.assessmentDate | date: 'dd/MM/yyyy' }}</strong>
+                <span class="mini-badge">{{ assessment.source || 'manual' }}</span>
+              </div>
+
+              <p class="muted">{{ getNotesPreview(assessment.notes) }}</p>
+
+              <div class="metric-badges">
+                <span class="metric-chip" *ngFor="let metric of assessment.metrics">
+                  {{ metric.metricName }}: {{ getMetricDisplayValue(metric) }}
+                </span>
+              </div>
+            </article>
+          </div>
+        </section>
+      </div>
+    </ng-container>
+  </div>
+</div>

@@ -44,6 +44,11 @@ import {
   StudentWithoutHealthScreeningItem,
   HealthRecord,
   HealthScreeningPayload,
+  AthleteAssessmentMutationResponse,
+  AthleteAssessmentPayload,
+  AthleteIndicatorGroup,
+  AthleteProgressHistoryResponse,
+  AthleteProgressQueryParams,
   ConsentValidation,
   ConsentTemplate,
   AdminConsentTemplatesResponse,
@@ -626,6 +631,81 @@ export class ApiService {
   ): Observable<{ message: string }> {
     return this.http.put<{ message: string }>(
       `${this.apiUrl}/health-screening/${studentId}`,
+      data,
+      { headers: this.getHeaders() }
+    );
+  }
+
+  private buildAthleteProgressParams(params?: AthleteProgressQueryParams): Record<string, string> {
+    const queryParams: Record<string, string> = {};
+
+    if (!params) {
+      return queryParams;
+    }
+
+    if (params.period) queryParams['period'] = params.period;
+    if (params.from) queryParams['from'] = params.from;
+    if (params.to) queryParams['to'] = params.to;
+    if (typeof params.limit === 'number') queryParams['limit'] = String(params.limit);
+    if (typeof params.offset === 'number') queryParams['offset'] = String(params.offset);
+    if (params.groupBy) queryParams['groupBy'] = params.groupBy;
+
+    return queryParams;
+  }
+
+  getAthleteProgress(studentId: string, params?: AthleteProgressQueryParams): Observable<AthleteProgressHistoryResponse> {
+    return this.http.get<{ success: boolean; data: AthleteProgressHistoryResponse }>(
+      `${this.apiUrl}/athlete-progress/athletes/${studentId}`,
+      { headers: this.getHeaders(), params: this.buildAthleteProgressParams(params) }
+    ).pipe(map((response) => response.data));
+  }
+
+  getAthleteProgressSummary(studentId: string, params?: AthleteProgressQueryParams): Observable<AthleteProgressHistoryResponse> {
+    return this.http.get<{ success: boolean; data: AthleteProgressHistoryResponse }>(
+      `${this.apiUrl}/athlete-progress/athletes/${studentId}/summary`,
+      { headers: this.getHeaders(), params: this.buildAthleteProgressParams(params) }
+    ).pipe(map((response) => response.data));
+  }
+
+  getAthleteProgressHistory(studentId: string, params?: AthleteProgressQueryParams): Observable<AthleteProgressHistoryResponse> {
+    return this.http.get<{ success: boolean; data: AthleteProgressHistoryResponse }>(
+      `${this.apiUrl}/athlete-progress/athletes/${studentId}/history`,
+      { headers: this.getHeaders(), params: this.buildAthleteProgressParams(params) }
+    ).pipe(map((response) => response.data));
+  }
+
+  getAthleteIndicatorConfiguration(): Observable<AthleteIndicatorGroup[]> {
+    return this.http.get<{ success: boolean; data: { groups: AthleteIndicatorGroup[] } }>(
+      `${this.apiUrl}/athlete-progress/configuration`,
+      { headers: this.getHeaders() }
+    ).pipe(map((response) => response.data.groups || []));
+  }
+
+  updateAthleteIndicatorConfiguration(groups: AthleteIndicatorGroup[]): Observable<AthleteIndicatorGroup[]> {
+    return this.http.put<{ success: boolean; data: { groups: AthleteIndicatorGroup[] } }>(
+      `${this.apiUrl}/athlete-progress/configuration`,
+      { groups },
+      { headers: this.getHeaders() }
+    ).pipe(map((response) => response.data.groups || []));
+  }
+
+  createAthleteAssessment(
+    studentId: string,
+    data: AthleteAssessmentPayload
+  ): Observable<AthleteAssessmentMutationResponse> {
+    return this.http.post<AthleteAssessmentMutationResponse>(
+      `${this.apiUrl}/athlete-progress/assessments`,
+      { ...data, athleteId: studentId },
+      { headers: this.getHeaders() }
+    );
+  }
+
+  updateAthleteAssessment(
+    assessmentId: string,
+    data: AthleteAssessmentPayload
+  ): Observable<AthleteAssessmentMutationResponse> {
+    return this.http.put<AthleteAssessmentMutationResponse>(
+      `${this.apiUrl}/athlete-progress/assessments/${assessmentId}`,
       data,
       { headers: this.getHeaders() }
     );

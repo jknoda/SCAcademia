@@ -1,7 +1,7 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, NgZone, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { finalize, takeUntil, timeout } from 'rxjs/operators';
 import { ApiService } from '../../services/api.service';
 import {
   HealthAlertHint,
@@ -39,7 +39,9 @@ export class AdminHealthMonitorComponent implements OnInit, OnDestroy {
 
   constructor(
     private api: ApiService,
-    private router: Router
+    private router: Router,
+    private ngZone: NgZone,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -144,22 +146,30 @@ export class AdminHealthMonitorComponent implements OnInit, OnDestroy {
     }
 
     if (!silent) {
-      this.isLoading = true;
+      this.setLoadingState(true);
       this.errorMessage = '';
     } else {
-      this.isRefreshing = true;
+      this.setRefreshingState(true);
     }
 
     this.api
       .getAdminHealthMonitor()
-      .pipe(takeUntil(this.destroy$))
+      .pipe(
+        timeout(10000),
+        takeUntil(this.destroy$),
+        finalize(() => {
+          if (!silent) {
+            this.setLoadingState(false);
+          } else {
+            this.setRefreshingState(false);
+          }
+        })
+      )
       .subscribe({
         next: (response) => {
           this.snapshot = response;
           this.components = response.components || [];
           this.alerts = response.alerts || [];
-          this.isLoading = false;
-          this.isRefreshing = false;
 
           const hasOffline = this.components.some((component) => component.status === 'offline');
           if (hasOffline && !this.hadOfflineState && !document.hidden) {
@@ -172,35 +182,43 @@ export class AdminHealthMonitorComponent implements OnInit, OnDestroy {
             this.pollIntervalMs = 15000;
             this.restartPollingWithBackoff();
           }
+          this.refreshView();
         },
         error: (error) => {
-          this.isLoading = false;
-          this.isRefreshing = false;
           this.errorMessage = error?.error?.error || 'Erro ao carregar status de saude do sistema.';
           this.consecutiveErrors += 1;
           this.pollIntervalMs = Math.min(60000, 15000 + this.consecutiveErrors * 5000);
           this.restartPollingWithBackoff();
+          this.refreshView();
         },
       });
   }
 
   private loadHistory(window: HealthMonitorWindow, silent: boolean = false): void {
     if (!silent) {
-      this.isHistoryLoading = true;
+      this.setHistoryLoadingState(true);
       this.historyError = '';
     }
 
     this.api
       .getAdminHealthMonitorHistory(window)
-      .pipe(takeUntil(this.destroy$))
+      .pipe(
+        timeout(10000),
+        takeUntil(this.destroy$),
+        finalize(() => {
+          if (!silent) {
+            this.setHistoryLoadingState(false);
+          }
+        })
+      )
       .subscribe({
         next: (response) => {
           this.history = response;
-          this.isHistoryLoading = false;
+          this.refreshView();
         },
         error: (error) => {
-          this.isHistoryLoading = false;
           this.historyError = error?.error?.error || 'Erro ao carregar historico de metricas.';
+          this.refreshView();
         },
       });
   }
@@ -208,6 +226,33 @@ export class AdminHealthMonitorComponent implements OnInit, OnDestroy {
   private restartPollingWithBackoff(): void {
     this.stopPolling();
     this.startPolling();
+  }
+
+  private setLoadingState(value: boolean): void {
+    this.ngZone.run(() => {
+      this.isLoading = value;
+      this.cdr.detectChanges();
+    });
+  }
+
+  private setRefreshingState(value: boolean): void {
+    this.ngZone.run(() => {
+      this.isRefreshing = value;
+      this.cdr.detectChanges();
+    });
+  }
+
+  private setHistoryLoadingState(value: boolean): void {
+    this.ngZone.run(() => {
+      this.isHistoryLoading = value;
+      this.cdr.detectChanges();
+    });
+  }
+
+  private refreshView(): void {
+    this.ngZone.run(() => {
+      this.cdr.detectChanges();
+    });
   }
 
   private playCriticalBeep(): void {

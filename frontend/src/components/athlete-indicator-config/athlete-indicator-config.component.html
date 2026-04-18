@@ -1,0 +1,188 @@
+<div class="indicator-page">
+  <div class="indicator-shell">
+      <header class="indicator-hero">
+        <div>
+          <p class="eyebrow">Configuração da evolução</p>
+          <h2>Cadastro de indicadores</h2>
+          <p>Professor e administrador podem criar grupos e indicadores para personalizar a avaliação dos atletas.</p>
+        </div>
+
+        <div class="hero-actions">
+          <button type="button" class="app-btn app-btn-secondary" (click)="goBack()">Voltar</button>
+          <button type="button" class="app-btn app-btn-primary" (click)="save()" [disabled]="isSaving || isLoading || !canManage()">
+            {{ isSaving ? 'Salvando...' : 'Salvar indicadores' }}
+          </button>
+        </div>
+      </header>
+
+      <div *ngIf="isLoading" class="app-status-message">Carregando configuração...</div>
+      <div *ngIf="errorMessage" class="app-status-message error">{{ errorMessage }}</div>
+      <div *ngIf="successMessage" class="app-status-message success">{{ successMessage }}</div>
+
+      <div *ngIf="canManage() && !isLoading" class="config-layout">
+        <aside class="list-panel">
+          <div class="panel-heading">
+            <h3>Consulta em lista</h3>
+            <p class="muted">Clique em um grupo ou indicador para abrir a edição.</p>
+          </div>
+
+          <div class="toolbar toolbar--list">
+            <button type="button" class="app-btn app-btn-secondary" (click)="addGroup()">Adicionar grupo</button>
+            <button
+              *ngIf="getSelectedGroup() as selectedGroup"
+              type="button"
+              class="app-btn app-btn-secondary"
+              (click)="addIndicator(selectedGroup)">
+              Adicionar indicador
+            </button>
+          </div>
+
+          <div class="list-groups" *ngIf="groups.length; else emptyList">
+            <section class="list-group-card" *ngFor="let group of groups; let groupIndex = index; trackBy: trackByGroup">
+              <button type="button" class="list-group-item" [class.active]="isGroupSelected(groupIndex)" (click)="selectGroup(groupIndex)">
+                <div>
+                  <strong>{{ group.name || 'Novo grupo' }}</strong>
+                  <div class="item-meta">{{ group.code || 'sem código' }}</div>
+                </div>
+                <span class="item-badge">{{ group.indicators.length }}</span>
+              </button>
+
+              <div class="list-indicators">
+                <button
+                  type="button"
+                  class="list-indicator-item"
+                  *ngFor="let indicator of group.indicators; let indicatorIndex = index; trackBy: trackByIndicator"
+                  [class.active]="isIndicatorSelected(groupIndex, indicatorIndex)"
+                  (click)="selectIndicator(groupIndex, indicatorIndex)">
+                  <div>
+                    <strong>{{ indicator.name || 'Novo indicador' }}</strong>
+                    <div class="item-meta">{{ indicator.code || 'sem código' }} • {{ indicator.category }}</div>
+                  </div>
+                </button>
+              </div>
+            </section>
+          </div>
+
+          <ng-template #emptyList>
+            <div class="empty-editor">Nenhum indicador cadastrado ainda.</div>
+          </ng-template>
+        </aside>
+
+        <section class="editor-panel" *ngIf="getSelectedGroup() as selectedGroup">
+          <section class="group-card">
+            <div class="group-header">
+              <div>
+                <h3>{{ selectedGroup.name || 'Novo grupo' }}</h3>
+                <p class="muted">Edite os dados do grupo selecionado.</p>
+              </div>
+              <button type="button" class="remove-btn" (click)="removeGroup(selectedGroupIndex)">Remover grupo</button>
+            </div>
+
+            <div class="grid grid--group">
+              <label>
+                <span>Nome do grupo</span>
+                <input [(ngModel)]="selectedGroup.name" [ngModelOptions]="{standalone: true}" class="form-control" placeholder="Ex.: Competição" />
+              </label>
+
+              <label>
+                <span>Código do grupo</span>
+                <input [(ngModel)]="selectedGroup.code" [ngModelOptions]="{standalone: true}" class="form-control" placeholder="Ex.: competition" />
+              </label>
+
+              <label>
+                <span>Ordem</span>
+                <input [(ngModel)]="selectedGroup.displayOrder" [ngModelOptions]="{standalone: true}" type="number" class="form-control" min="1" />
+              </label>
+
+              <label class="checkbox-field">
+                <input [(ngModel)]="selectedGroup.isActive" [ngModelOptions]="{standalone: true}" type="checkbox" />
+                <span>Grupo ativo</span>
+              </label>
+            </div>
+
+            <label>
+              <span>Descrição do grupo</span>
+              <textarea [(ngModel)]="selectedGroup.description" [ngModelOptions]="{standalone: true}" rows="2" class="form-control" placeholder="Ex.: indicadores competitivos do período"></textarea>
+            </label>
+          </section>
+
+          <article *ngIf="getSelectedIndicator() as selectedIndicator; else indicatorHint" class="indicator-card">
+            <div class="group-header">
+              <div>
+                <strong>{{ selectedIndicator.name || 'Novo indicador' }}</strong>
+                <p class="muted">Edite o item selecionado na lista.</p>
+              </div>
+              <button type="button" class="remove-btn" (click)="removeSelectedIndicator()">Remover indicador</button>
+            </div>
+
+            <div class="grid grid--indicator">
+              <label>
+                <span>Nome</span>
+                <input [(ngModel)]="selectedIndicator.name" [ngModelOptions]="{standalone: true}" class="form-control" placeholder="Ex.: Número de competições" />
+              </label>
+
+              <label>
+                <span>Código</span>
+                <input [(ngModel)]="selectedIndicator.code" [ngModelOptions]="{standalone: true}" class="form-control" placeholder="Ex.: competition_count" />
+              </label>
+
+              <label>
+                <span>Categoria</span>
+                <select [(ngModel)]="selectedIndicator.category" [ngModelOptions]="{standalone: true}" class="form-control">
+                  <option *ngFor="let option of categoryOptions" [ngValue]="option.value">{{ option.label }}</option>
+                </select>
+              </label>
+
+              <label>
+                <span>Tipo de valor</span>
+                <select [(ngModel)]="selectedIndicator.valueType" [ngModelOptions]="{standalone: true}" class="form-control">
+                  <option *ngFor="let option of valueTypeOptions" [ngValue]="option.value">{{ option.label }}</option>
+                </select>
+              </label>
+
+              <label>
+                <span>Formato de exibição</span>
+                <select [(ngModel)]="selectedIndicator.displayFormat" [ngModelOptions]="{standalone: true}" class="form-control">
+                  <option *ngFor="let option of displayFormatOptions" [ngValue]="option.value">{{ option.label }}</option>
+                </select>
+              </label>
+
+              <label>
+                <span>Unidade</span>
+                <input [(ngModel)]="selectedIndicator.unit" [ngModelOptions]="{standalone: true}" class="form-control" placeholder="Ex.: score, %, count" />
+              </label>
+
+              <label>
+                <span>Ordem</span>
+                <input [(ngModel)]="selectedIndicator.displayOrder" [ngModelOptions]="{standalone: true}" type="number" class="form-control" min="1" />
+              </label>
+
+              <label class="checkbox-field">
+                <input [(ngModel)]="selectedIndicator.allowPeriodAggregation" [ngModelOptions]="{standalone: true}" type="checkbox" />
+                <span>Permite agregação por período</span>
+              </label>
+
+              <label class="checkbox-field">
+                <input [(ngModel)]="selectedIndicator.isActive" [ngModelOptions]="{standalone: true}" type="checkbox" />
+                <span>Indicador ativo</span>
+              </label>
+            </div>
+
+            <label>
+              <span>Descrição</span>
+              <textarea [(ngModel)]="selectedIndicator.description" [ngModelOptions]="{standalone: true}" rows="2" class="form-control" placeholder="Explique o que este indicador mede"></textarea>
+            </label>
+
+            <label>
+              <span>Instrução de preenchimento</span>
+              <input [(ngModel)]="selectedIndicator.inputInstruction" [ngModelOptions]="{standalone: true}" class="form-control" placeholder="Ex.: use o formato 10:2" />
+            </label>
+          </article>
+
+          <ng-template #indicatorHint>
+            <div class="empty-editor">Selecione um indicador da lista para editar ou adicione um novo item.</div>
+          </ng-template>
+        </section>
+      </div>
+  </div>
+</div>

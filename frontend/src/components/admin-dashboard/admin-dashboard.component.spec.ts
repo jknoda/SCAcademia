@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { BehaviorSubject, of } from 'rxjs';
+import { BehaviorSubject, of, Subject } from 'rxjs';
 
 import { AdminDashboardComponent } from './admin-dashboard.component';
 import { ApiService } from '../../services/api.service';
@@ -360,5 +360,50 @@ describe('AdminDashboardComponent', () => {
     expect(apiSpy.updateAdminAlertPreferences).toHaveBeenCalled();
     expect(apiSpy.silenceAdminAlerts).toHaveBeenCalledWith(60);
     expect(component.alertPreferencesMessage).toContain('silenciados por 1 hora');
+  });
+
+  it('abre o hub do Epic 10 pela ação rápida administrativa', () => {
+    component.handleQuickAction({
+      key: 'athlete-progress',
+      label: 'Evolução dos Atletas',
+      description: 'Abrir os atalhos do Epic 10.',
+      icon: '📈',
+    } as any);
+
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['/admin/alunos'], {
+      queryParams: { highlight: 'athlete-progress' },
+    });
+  });
+
+  it('reflete o loading inicial com skeleton e remove quando os dados chegam', fakeAsync(() => {
+    const pendingDashboard$ = new Subject<AdminDashboardResponse>();
+    apiSpy.getAdminDashboard.and.returnValue(pendingDashboard$.asObservable());
+
+    fixture = TestBed.createComponent(AdminDashboardComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+
+    let skeleton = fixture.nativeElement.querySelector('.dashboard-skeleton');
+    expect(skeleton).not.toBeNull();
+
+    pendingDashboard$.next(dashboardResponse);
+    pendingDashboard$.complete();
+    tick();
+    fixture.detectChanges();
+
+    skeleton = fixture.nativeElement.querySelector('.dashboard-skeleton');
+    expect(skeleton).toBeNull();
+    expect(component.dashboardLoading).toBeFalse();
+  }));
+
+  it('reflete a flag de refresh sem manter o skeleton travado', () => {
+    component.dashboardRefreshing = true;
+    fixture.detectChanges();
+
+    const container = fixture.nativeElement.querySelector('.dashboard-container');
+    const refreshStatus = fixture.nativeElement.textContent;
+
+    expect(container.getAttribute('aria-busy')).toBe('true');
+    expect(refreshStatus).toContain('Atualizando indicadores');
   });
 });

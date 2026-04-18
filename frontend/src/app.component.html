@@ -1,3 +1,9 @@
 <div class="app-container">
-  <router-outlet></router-outlet>
+  <app-authenticated-shell *ngIf="useAuthenticatedShell; else publicLayout">
+    <router-outlet></router-outlet>
+  </app-authenticated-shell>
+
+  <ng-template #publicLayout>
+    <router-outlet></router-outlet>
+  </ng-template>
 </div>

@@ -191,6 +191,18 @@ export class StudentsListComponent implements OnInit {
     this.router.navigate(['/admin/alunos', studentId, 'ficha']);
   }
 
+  goToAthleteDashboard(studentId: string): void {
+    this.router.navigate(['/athlete-progress', studentId, 'dashboard'], {
+      queryParams: { returnTo: this.router.url || (this.isProfessor ? '/professores/meus-alunos' : '/admin/alunos') },
+    });
+  }
+
+  goToAthleteEvaluation(studentId: string): void {
+    this.router.navigate(['/athlete-progress', studentId, 'evaluation'], {
+      queryParams: { returnTo: this.router.url || (this.isProfessor ? '/professores/meus-alunos' : '/admin/alunos') },
+    });
+  }
+
   goToHealthScreening(studentId: string): void {
     this.router.navigate(['/health-screening', studentId], {
       queryParams: { returnTo: this.router.url || '/admin/alunos' },

@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subscription, interval } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
@@ -91,6 +91,12 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
       icon: '👥',
     },
     {
+      key: 'athlete-progress',
+      label: 'Evolução dos atletas',
+      description: 'Acessar os atalhos do acompanhamento esportivo dos atletas.',
+      icon: '📈',
+    },
+    {
       key: 'settings',
       label: 'Configurações',
       description: 'Acessar perfil da academia e parâmetros administrativos.',
@@ -131,7 +137,12 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     },
   ];
 
-  constructor(private auth: AuthService, private router: Router, private api: ApiService) {}
+  constructor(
+    private auth: AuthService,
+    private router: Router,
+    private api: ApiService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
     this.auth.currentUser$.subscribe((user: User | null) => {
@@ -159,6 +170,10 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     this.stopAlertPolling();
   }
 
+  get isDashboardBusy(): boolean {
+    return this.dashboardLoading || this.dashboardRefreshing;
+  }
+
   logout(): void {
     this.auth.logout();
     this.router.navigate(['/login']);
@@ -180,6 +195,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     }
 
     this.dashboardError = '';
+    this.cdr.markForCheck();
 
     this.api.getAdminDashboard().subscribe({
       next: (dashboard) => {
@@ -192,11 +208,13 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
         }
 
         this.queueCriticalAlertScroll();
+        this.cdr.markForCheck();
       },
       error: (error) => {
         this.dashboardLoading = false;
         this.dashboardRefreshing = false;
         this.dashboardError = this.getApiError(error, 'Erro ao carregar dashboard administrativo.');
+        this.cdr.markForCheck();
       },
     });
   }
@@ -231,6 +249,11 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
         break;
       case 'manage-users':
         this.goToStudents();
+        break;
+      case 'athlete-progress':
+        this.router.navigate(['/admin/alunos'], {
+          queryParams: { highlight: 'athlete-progress' },
+        });
         break;
       case 'settings':
         this.goToAcademyProfile();

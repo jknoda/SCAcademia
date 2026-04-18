@@ -1,6 +1,7 @@
 import { ChangeDetectorRef, Component, NgZone, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { finalize, timeout } from 'rxjs/operators';
 import { ApiService } from '../../services/api.service';
 import { compressImage } from '../../utils/image.utils';
 import { AcademyProfile, UpdateAcademyProfilePayload } from '../../types';
@@ -55,9 +56,11 @@ export class AcademyProfileComponent implements OnInit {
     this.setLoadingState(true);
     this.errorMessage = '';
 
-    this.api.getAdminAcademyProfile().subscribe({
+    this.api.getAdminAcademyProfile().pipe(
+      timeout(10000),
+      finalize(() => this.setLoadingState(false))
+    ).subscribe({
       next: (profile: AcademyProfile) => {
-        this.setLoadingState(false);
         this.form.patchValue({
           name: profile.name || '',
           fantasyName: profile.fantasyName || '',
@@ -76,10 +79,11 @@ export class AcademyProfileComponent implements OnInit {
           maxUsers: profile.maxUsers ?? '',
           storageLimitGb: profile.storageLimitGb ?? '',
         });
+        this.refreshView();
       },
       error: (error) => {
-        this.setLoadingState(false);
         this.errorMessage = error?.error?.error || 'Erro ao carregar perfil da academia.';
+        this.refreshView();
       },
     });
   }
@@ -132,7 +136,7 @@ export class AcademyProfileComponent implements OnInit {
       return;
     }
 
-    this.isSaving = true;
+    this.setSavingState(true);
     this.errorMessage = '';
     this.successMessage = '';
     this.serverErrors = {};
@@ -155,18 +159,19 @@ export class AcademyProfileComponent implements OnInit {
       addressState: (raw.addressState || '').toUpperCase(),
     };
 
-    this.api.updateAdminAcademyProfile(payload).subscribe({
+    this.api.updateAdminAcademyProfile(payload).pipe(
+      timeout(10000),
+      finalize(() => this.setSavingState(false))
+    ).subscribe({
       next: (response) => {
-        this.isSaving = false;
         this.successMessage = 'Dados da academia atualizados';
         this.form.patchValue({
           maxUsers: response.academy.maxUsers ?? '',
           storageLimitGb: response.academy.storageLimitGb ?? '',
         });
+        this.refreshView();
       },
       error: (error) => {
-        this.isSaving = false;
-
         if (error?.error?.details && Array.isArray(error.error.details)) {
           for (const detail of error.error.details) {
             this.serverErrors[detail.field] = detail.message;
@@ -174,12 +179,19 @@ export class AcademyProfileComponent implements OnInit {
         }
 
         this.errorMessage = error?.error?.error || 'Erro ao salvar dados da academia.';
+        this.refreshView();
       },
     });
   }
 
   backToDashboard(): void {
     this.router.navigate(['/admin/dashboard']);
+  }
+
+  goToEpic10(): void {
+    this.router.navigate(['/admin/alunos'], {
+      queryParams: { highlight: 'athlete-progress' },
+    });
   }
 
   getAcademyLogoPreview(): string {
@@ -245,6 +257,19 @@ export class AcademyProfileComponent implements OnInit {
   private setLoadingState(value: boolean): void {
     this.ngZone.run(() => {
       this.isLoading = value;
+      this.cdr.detectChanges();
+    });
+  }
+
+  private setSavingState(value: boolean): void {
+    this.ngZone.run(() => {
+      this.isSaving = value;
+      this.cdr.detectChanges();
+    });
+  }
+
+  private refreshView(): void {
+    this.ngZone.run(() => {
       this.cdr.detectChanges();
     });
   }

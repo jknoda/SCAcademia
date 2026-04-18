@@ -1,4 +1,4 @@
-<div class="profile-page">
+<div class="profile-page" [attr.aria-busy]="isBusy">
   <div class="profile-shell">
     <header class="profile-hero">
       <div class="profile-copy">
@@ -10,6 +10,9 @@
     </header>
 
     <div *ngIf="loading" class="profile-placeholder">Carregando ficha...</div>
+    <div *ngIf="loadingGuardianSearch" class="app-status-message">Buscando responsável...</div>
+    <div *ngIf="loadingLink && !loadingGuardianSearch" class="app-status-message">Atualizando vínculo do responsável...</div>
+    <div *ngIf="loadingCreateAndLink" class="app-status-message">Criando e vinculando responsável...</div>
     <div *ngIf="errorMessage" class="app-status-message error">{{ errorMessage }}</div>
     <div *ngIf="successMessage" class="app-status-message success">{{ successMessage }}</div>
     <div *ngIf="createdGuardianTemporaryPassword" class="app-status-message success temporary-password-alert">
@@ -100,6 +103,37 @@
         >
           {{ ficha.health.anamnesePreenchida ? 'Visualizar / Editar' : 'Preencher agora' }}
         </button>
+      </section>
+
+      <section class="profile-card">
+        <div class="section-heading">
+          <h3>Evolucao esportiva</h3>
+          <span class="mini-badge">Professor</span>
+        </div>
+
+        <p class="muted">
+          Registre os indicadores tecnicos, fisicos e comportamentais do aluno para acompanhar a evolução.
+        </p>
+
+        <div class="inline-actions">
+          <button
+            *ngIf="canManageProgress()"
+            class="app-btn app-btn-secondary"
+            type="button"
+            (click)="goToAthleteDashboard()"
+          >
+            Ver painel
+          </button>
+
+          <button
+            *ngIf="canManageProgress()"
+            class="app-btn app-btn-primary"
+            type="button"
+            (click)="goToAthleteEvaluation()"
+          >
+            Lançar avaliação
+          </button>
+        </div>
       </section>
 
       <section class="profile-card profile-card--wide">

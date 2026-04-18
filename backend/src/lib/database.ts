@@ -1,5 +1,6 @@
 import { createHash, randomUUID } from 'crypto';
 import { pool } from './db';
+import { ensureAthleteProgressSchema } from './athleteProgress';
 
 export interface Academy {
   id: string;
@@ -3122,6 +3123,8 @@ export const revokeAuthTokensByUser = async (userId: string, tokenType?: string)
 
 // Test helper: truncate all tables (only use in non-production environments)
 export const resetDatabase = async (): Promise<void> => {
+  await ensureAthleteProgressSchema();
+
   await pool.query(`
     CREATE TABLE IF NOT EXISTS backup_jobs (
       backup_job_id UUID PRIMARY KEY,
@@ -3148,6 +3151,8 @@ export const resetDatabase = async (): Promise<void> => {
     TRUNCATE TABLE
       backup_jobs,
       audit_logs, auth_tokens, consents, consent_templates,
+      athlete_metric_values, athlete_progress_snapshots, athlete_progress_alerts, athlete_assessments,
+      athlete_progress_metric_definitions, athlete_progress_profiles,
       health_records, judo_belt_history, judo_profile, student_guardians,
       session_attendance, session_comments, session_techniques,
       student_badges, student_progress, sync_queue, notifications,

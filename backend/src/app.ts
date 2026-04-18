@@ -14,6 +14,7 @@ import adminRoutes from './routes/admin';
 import healthScreeningRoutes from './routes/healthScreening';
 import consentRoutes from './routes/consent';
 import trainingsRoutes from './routes/trainings';
+import athleteProgressRoutes from './routes/athleteProgress';
 import { authMiddleware, requireRole } from './middleware/auth';
 
 dotenv.config();
@@ -126,6 +127,7 @@ app.use('/api/users', rateLimit({ windowMs: 60_000, max: 100, standardHeaders: t
 app.use('/api/admin', rateLimit({ windowMs: 60_000, max: 100, standardHeaders: true, legacyHeaders: false }), adminRoutes);
 app.use('/api/health-screening', rateLimit({ windowMs: 60_000, max: 60, standardHeaders: true, legacyHeaders: false }), healthScreeningRoutes);
 app.use('/api/consent', rateLimit({ windowMs: 60_000, max: 20, standardHeaders: true, legacyHeaders: false }), consentRoutes);
+app.use('/api/athlete-progress', rateLimit({ windowMs: 60_000, max: 120, standardHeaders: true, legacyHeaders: false }), athleteProgressRoutes);
 app.get(
   '/api/academies/:academyId/techniques',
   rateLimit({ windowMs: 60_000, max: 120, standardHeaders: true, legacyHeaders: false }),

@@ -160,6 +160,65 @@ export const deletionRequestSchema = Joi.object({
   reason: Joi.string().max(500).allow('').optional(),
 });
 
+export const athleteAssessmentSchema = Joi.object({
+  athleteId: Joi.string().uuid().required().messages({
+    'any.required': 'Atleta é obrigatório',
+  }),
+  assessmentDate: Joi.date().iso().required().messages({
+    'any.required': 'Data da avaliação é obrigatória',
+  }),
+  notes: Joi.string().max(5000).allow('').optional(),
+  metrics: Joi.array().items(
+    Joi.object({
+      metricCode: Joi.string().min(2).max(100).required(),
+      metricName: Joi.string().min(2).max(255).required(),
+      category: Joi.string().valid('technical', 'physical', 'tactical', 'competition', 'psychological', 'training').required(),
+      value: Joi.number().required(),
+      unit: Joi.string().min(1).max(30).required(),
+      groupCode: Joi.string().min(2).max(100).optional(),
+      description: Joi.string().max(1000).allow('').optional(),
+      inputInstruction: Joi.string().max(1000).allow('').optional(),
+      valueType: Joi.string().valid('score', 'integer', 'decimal', 'structured').optional(),
+      displayFormat: Joi.string().min(1).max(50).optional(),
+      allowPeriodAggregation: Joi.boolean().optional(),
+      displayOrder: Joi.number().integer().min(0).optional(),
+      displayValue: Joi.string().max(100).allow('').optional(),
+      secondaryValue: Joi.number().optional(),
+      structuredValue: Joi.object().unknown(true).optional(),
+    })
+  ).min(1).required().messages({
+    'array.min': 'Informe ao menos uma métrica',
+    'any.required': 'As métricas são obrigatórias',
+  }),
+});
+
+export const athleteIndicatorConfigurationSchema = Joi.object({
+  groups: Joi.array().items(
+    Joi.object({
+      code: Joi.string().min(2).max(100).required(),
+      name: Joi.string().min(2).max(255).required(),
+      description: Joi.string().max(1000).allow('').optional(),
+      displayOrder: Joi.number().integer().min(0).optional(),
+      isActive: Joi.boolean().optional(),
+      indicators: Joi.array().items(
+        Joi.object({
+          code: Joi.string().min(2).max(100).required(),
+          name: Joi.string().min(2).max(255).required(),
+          category: Joi.string().valid('technical', 'physical', 'tactical', 'competition', 'psychological', 'training').required(),
+          unit: Joi.string().min(1).max(30).required(),
+          valueType: Joi.string().valid('score', 'integer', 'decimal', 'structured').optional(),
+          displayFormat: Joi.string().min(1).max(50).optional(),
+          description: Joi.string().max(1000).allow('').optional(),
+          inputInstruction: Joi.string().max(1000).allow('').optional(),
+          allowPeriodAggregation: Joi.boolean().optional(),
+          displayOrder: Joi.number().integer().min(0).optional(),
+          isActive: Joi.boolean().optional(),
+        })
+      ).min(1).required(),
+    })
+  ).min(1).required(),
+});
+
 export const userRegistrationSchema = Joi.object({
   email: Joi.string().email().required().messages({
     'string.email': 'Email deve ser válido',

@@ -111,4 +111,12 @@ describe('StudentsListComponent', () => {
     expect(component.specialFilterTotal).toBe(1);
     expect(component.students[0].operationalStatus?.hasHealthScreening).toBe(false);
   });
+
+  it('abre a avaliação de evolução direto pela lista de alunos', () => {
+    component.goToAthleteEvaluation('student-1');
+
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['/athlete-progress', 'student-1', 'evaluation'], {
+      queryParams: { returnTo: '/admin/alunos' },
+    });
+  });
 });

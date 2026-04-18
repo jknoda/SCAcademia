@@ -1,0 +1,90 @@
+<div class="evaluation-page">
+  <div class="evaluation-shell">
+    <header class="evaluation-hero">
+      <div>
+        <p class="eyebrow">Evolução do atleta</p>
+        <h2>{{ isEditMode ? 'Atualizar avaliação do professor' : 'Registrar avaliação do professor' }}</h2>
+        <p>
+          Lance indicadores técnicos, físicos e comportamentais para acompanhar a evolução
+          {{ athleteName ? 'de ' + athleteName : 'do aluno' }}.
+        </p>
+      </div>
+      <div class="hero-actions">
+        <button type="button" class="app-btn app-btn-secondary" (click)="goToIndicatorConfiguration()">Configurar indicadores</button>
+        <button type="button" class="app-btn app-btn-secondary" (click)="goBack()">Voltar</button>
+      </div>
+    </header>
+
+    <div *ngIf="isFetching" class="app-status-message">Carregando histórico mais recente...</div>
+    <div *ngIf="errorMessage" class="app-status-message error">{{ errorMessage }}</div>
+    <div *ngIf="successMessage" class="app-status-message success">{{ successMessage }}</div>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="evaluation-form">
+      <section class="form-card">
+        <h3>Resumo da avaliação</h3>
+
+        <div class="form-grid form-grid--two">
+          <label>
+            <span>Data da avaliação</span>
+            <input type="date" formControlName="assessmentDate" class="form-control" />
+            <small class="field-error" *ngIf="getFieldError('assessmentDate')">{{ getFieldError('assessmentDate') }}</small>
+          </label>
+
+          <div class="summary-tip">
+            <span>Configuração ativa</span>
+            <strong>{{ indicatorGroups.length }} grupo(s) e {{ getIndicatorCount() }} indicador(es)</strong>
+          </div>
+        </div>
+
+        <label>
+          <span>Observação geral</span>
+          <textarea rows="3" formControlName="generalNotes" class="form-control" placeholder="Síntese da evolução percebida no período"></textarea>
+        </label>
+      </section>
+
+      <section class="form-card" *ngFor="let group of indicatorGroups">
+        <h3>{{ group.name }}</h3>
+        <p class="metric-help" *ngIf="group.description">{{ group.description }}</p>
+
+        <div class="metric-grid">
+          <label class="metric-card" *ngFor="let indicator of group.indicators">
+            <span class="metric-title">{{ indicator.name }}</span>
+            <small class="metric-help" *ngIf="indicator.description">{{ indicator.description }}</small>
+            <small class="metric-help" *ngIf="indicator.inputInstruction">{{ indicator.inputInstruction }}</small>
+
+            <select *ngIf="isScoreMetric(indicator)" [formControlName]="getMetricControlName(indicator)" class="form-control">
+              <option *ngFor="let score of scoreOptions" [ngValue]="score">{{ score }} / 5</option>
+            </select>
+
+            <input
+              *ngIf="isNumberMetric(indicator)"
+              [type]="getMetricInputType(indicator)"
+              [formControlName]="getMetricControlName(indicator)"
+              class="form-control"
+              min="0"
+            />
+
+            <input
+              *ngIf="!isScoreMetric(indicator) && !isNumberMetric(indicator)"
+              type="text"
+              [formControlName]="getMetricControlName(indicator)"
+              class="form-control"
+              [placeholder]="getMetricPlaceholder(indicator)"
+            />
+
+            <small class="field-error" *ngIf="getFieldError(getMetricControlName(indicator))">
+              {{ getFieldError(getMetricControlName(indicator)) }}
+            </small>
+          </label>
+        </div>
+      </section>
+
+      <div class="form-actions">
+        <button type="button" class="app-btn app-btn-secondary" (click)="goBack()">Cancelar</button>
+        <button type="submit" class="app-btn app-btn-primary" [disabled]="isLoading">
+          {{ isLoading ? 'Salvando...' : (isEditMode ? 'Atualizar avaliação' : 'Salvar avaliação') }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
