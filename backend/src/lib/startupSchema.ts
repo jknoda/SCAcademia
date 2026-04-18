@@ -1,4 +1,4 @@
-import { pool } from './db';
+import { DB_SCHEMA, pool } from './db';
 
 type SchemaCheckResult = {
   applied: boolean;
@@ -9,16 +9,17 @@ const ensureTurmasScheduleJsonColumn = async (): Promise<SchemaCheckResult> => {
   const checkRes = await pool.query(
     `SELECT 1
      FROM information_schema.columns
-     WHERE table_schema = 'public'
+     WHERE table_schema = $1
        AND table_name = 'turmas'
        AND column_name = 'schedule_json'
-     LIMIT 1`
+     LIMIT 1`,
+    [DB_SCHEMA]
   );
 
   if (checkRes.rows.length > 0) {
     return {
       applied: false,
-      details: 'Column public.turmas.schedule_json already present',
+      details: `Column ${DB_SCHEMA}.turmas.schedule_json already present`,
     };
   }
 
@@ -26,7 +27,7 @@ const ensureTurmasScheduleJsonColumn = async (): Promise<SchemaCheckResult> => {
 
   return {
     applied: true,
-    details: 'Column public.turmas.schedule_json created',
+    details: `Column ${DB_SCHEMA}.turmas.schedule_json created`,
   };
 };
 
@@ -34,16 +35,17 @@ const ensureAcademyLogoColumn = async (): Promise<SchemaCheckResult> => {
   const checkRes = await pool.query(
     `SELECT 1
      FROM information_schema.columns
-     WHERE table_schema = 'public'
+     WHERE table_schema = $1
        AND table_name = 'academies'
        AND column_name = 'logo_url'
-     LIMIT 1`
+     LIMIT 1`,
+    [DB_SCHEMA]
   );
 
   if (checkRes.rows.length > 0) {
     return {
       applied: false,
-      details: 'Column public.academies.logo_url already present',
+      details: `Column ${DB_SCHEMA}.academies.logo_url already present`,
     };
   }
 
@@ -51,7 +53,7 @@ const ensureAcademyLogoColumn = async (): Promise<SchemaCheckResult> => {
 
   return {
     applied: true,
-    details: 'Column public.academies.logo_url created',
+    details: `Column ${DB_SCHEMA}.academies.logo_url created`,
   };
 };
 
@@ -59,16 +61,17 @@ const ensureUserPhotoColumn = async (): Promise<SchemaCheckResult> => {
   const checkRes = await pool.query(
     `SELECT 1
      FROM information_schema.columns
-     WHERE table_schema = 'public'
+     WHERE table_schema = $1
        AND table_name = 'users'
        AND column_name = 'photo_url'
-     LIMIT 1`
+     LIMIT 1`,
+    [DB_SCHEMA]
   );
 
   if (checkRes.rows.length > 0) {
     return {
       applied: false,
-      details: 'Column public.users.photo_url already present',
+      details: `Column ${DB_SCHEMA}.users.photo_url already present`,
     };
   }
 
@@ -76,7 +79,7 @@ const ensureUserPhotoColumn = async (): Promise<SchemaCheckResult> => {
 
   return {
     applied: true,
-    details: 'Column public.users.photo_url created',
+    details: `Column ${DB_SCHEMA}.users.photo_url created`,
   };
 };
 
@@ -84,15 +87,16 @@ const ensureBackupJobsTable = async (): Promise<SchemaCheckResult> => {
   const checkRes = await pool.query(
     `SELECT 1
      FROM information_schema.tables
-     WHERE table_schema = 'public'
+     WHERE table_schema = $1
        AND table_name = 'backup_jobs'
-     LIMIT 1`
+     LIMIT 1`,
+    [DB_SCHEMA]
   );
 
   if (checkRes.rows.length > 0) {
     return {
       applied: false,
-      details: 'Table public.backup_jobs already present',
+      details: `Table ${DB_SCHEMA}.backup_jobs already present`,
     };
   }
 
@@ -124,7 +128,7 @@ const ensureBackupJobsTable = async (): Promise<SchemaCheckResult> => {
 
   return {
     applied: true,
-    details: 'Table public.backup_jobs created',
+    details: `Table ${DB_SCHEMA}.backup_jobs created`,
   };
 };
 

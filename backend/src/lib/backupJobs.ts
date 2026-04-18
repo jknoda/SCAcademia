@@ -8,7 +8,7 @@ import {
   updateBackupJob,
   listBackupJobs,
 } from './database';
-import { pool } from './db';
+import { DB_SCHEMA, pool } from './db';
 import { decryptBufferWithPassword, encryptBufferWithPassword } from './encryption';
 import { sendEmail } from './email';
 import { logAudit } from './audit';
@@ -106,10 +106,10 @@ const getTableColumns = async (tableName: string): Promise<string[]> => {
   const res = await pool.query(
     `SELECT column_name
      FROM information_schema.columns
-     WHERE table_schema = 'public'
-       AND table_name = $1
+     WHERE table_schema = $1
+       AND table_name = $2
      ORDER BY ordinal_position`,
-    [tableName]
+    [DB_SCHEMA, tableName]
   );
 
   return res.rows.map((row) => row.column_name as string);
@@ -119,8 +119,9 @@ const getExistingTables = async (): Promise<Set<string>> => {
   const res = await pool.query(
     `SELECT table_name
      FROM information_schema.tables
-     WHERE table_schema = 'public'
-       AND table_type = 'BASE TABLE'`
+     WHERE table_schema = $1
+       AND table_type = 'BASE TABLE'`,
+    [DB_SCHEMA]
   );
 
   return new Set(res.rows.map((row) => row.table_name as string));
