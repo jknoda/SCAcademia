@@ -22,7 +22,7 @@ dotenv.config();
 const app: Express = express();
 
 const allowedOrigins = [
-  process.env.FRONTEND_URL || '',
+  process.env.FRONTEND_URL || 'https://scacademia-8b057ab90bd6.herokuapp.com',
   'http://localhost:4200',
   'http://127.0.0.1:4200',
   'http://[::1]:4200',
