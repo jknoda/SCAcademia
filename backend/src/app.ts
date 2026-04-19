@@ -163,9 +163,14 @@ app.use((err: any, _req: Request, res: Response, next: NextFunction) => {
     return;
   }
 
+  const status = err?.status || 500;
+  const message = status >= 500
+    ? 'Ocorreu um erro inesperado ao processar sua solicitação. Tente novamente.'
+    : err?.message || 'Não foi possível concluir a solicitação.';
+
   console.error('Error:', err);
-  return res.status(err?.status || 500).json({
-    error: err?.message || 'Erro interno do servidor',
+  return res.status(status).json({
+    error: message,
   });
 });
 

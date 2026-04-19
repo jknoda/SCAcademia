@@ -53,9 +53,24 @@ export const createAcademyHandler = async (req: any, res: Response) => {
       message: 'Academia criada com sucesso',
       nextStep: 'admin-registration',
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Erro ao criar academia:', error);
-    res.status(500).json({ error: 'Erro ao criar academia' });
+
+    if (error?.code === '23505') {
+      return res.status(409).json({
+        error: 'Já existe uma academia cadastrada com os mesmos dados. Revise e tente novamente.',
+      });
+    }
+
+    if (error?.code === '23502') {
+      return res.status(400).json({
+        error: 'Não foi possível criar a academia porque há dados obrigatórios pendentes no cadastro. Revise os campos e tente novamente.',
+      });
+    }
+
+    return res.status(500).json({
+      error: 'Ocorreu um erro inesperado ao criar a academia. Tente novamente em instantes.',
+    });
   }
 };
 

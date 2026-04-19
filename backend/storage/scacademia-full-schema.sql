@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS academies (
   name VARCHAR(255) NOT NULL,
   fantasy_name TEXT,
   description TEXT,
-  document_id VARCHAR(20) UNIQUE NOT NULL,
+  document_id VARCHAR(20),
   contact_email VARCHAR(255) NOT NULL,
   contact_phone VARCHAR(20),
   logo_url TEXT,
@@ -37,6 +37,7 @@ CREATE TABLE IF NOT EXISTS academies (
   deleted_at TIMESTAMPTZ
 );
 
+CREATE UNIQUE INDEX IF NOT EXISTS idx_academies_document_id_unique ON academies(document_id) WHERE document_id IS NOT NULL;
 CREATE INDEX IF NOT EXISTS idx_academies_document_id ON academies(document_id);
 CREATE INDEX IF NOT EXISTS idx_academies_active ON academies(is_active) WHERE deleted_at IS NULL;
 

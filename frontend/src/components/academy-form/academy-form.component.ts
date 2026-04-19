@@ -26,12 +26,6 @@ export class AcademyFormComponent {
       phone: ['', [Validators.required, Validators.pattern(/^\d{10,15}$/)]],
       logoUrl: [''],
     });
-
-    this.academyForm.get('name')?.valueChanges.subscribe((nameVal: string) => {
-      if (!this.academyForm.get('fantasyName')?.value) {
-        this.academyForm.get('fantasyName')?.setValue(nameVal, { emitEvent: false });
-      }
-    });
   }
 
   onSubmit(): void {
@@ -54,12 +48,14 @@ export class AcademyFormComponent {
       },
       (error: any) => {
         this.setLoadingState(false);
-        if (error.error?.details) {
+
+        if (Array.isArray(error?.error?.details)) {
           error.error.details.forEach((detail: any) => {
             this.serverErrors[detail.field] = detail.message;
           });
         }
-        this.errorMessage = error.error?.error || 'Erro ao criar academia. Tente novamente.';
+
+        this.setErrorMessage(this.extractErrorMessage(error));
       }
     );
   }
@@ -113,6 +109,29 @@ export class AcademyFormComponent {
 
   clearLogo(): void {
     this.academyForm.get('logoUrl')?.setValue('');
+  }
+
+  private extractErrorMessage(error: any): string {
+    if (typeof error?.error?.error === 'string' && error.error.error.trim()) {
+      return error.error.error;
+    }
+
+    if (typeof error?.error === 'string' && error.error.trim()) {
+      return error.error;
+    }
+
+    if (typeof error?.message === 'string' && error.message.trim()) {
+      return 'Ocorreu um erro ao criar a academia. Tente novamente.';
+    }
+
+    return 'Ocorreu um erro ao criar a academia. Tente novamente.';
+  }
+
+  private setErrorMessage(message: string): void {
+    this.ngZone.run(() => {
+      this.errorMessage = message;
+      this.cdr.detectChanges();
+    });
   }
 
   private setLoadingState(value: boolean): void {

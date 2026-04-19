@@ -229,11 +229,13 @@ export const createAcademy = async (
   fantasyName?: string
 ): Promise<Academy> => {
   const id = randomUUID();
+  const normalizedFantasyName = fantasyName?.trim() ? fantasyName.trim() : null;
+
   const res = await pool.query(
     `INSERT INTO academies (academy_id, name, description, contact_email, contact_phone, logo_url, fantasy_name, created_at, updated_at)
      VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), NOW())
      RETURNING *`,
-    [id, name, location, email, phone, logoUrl || null, fantasyName || name]
+    [id, name, location, email, phone, logoUrl || null, normalizedFantasyName]
   );
   return rowToAcademy(res.rows[0]);
 };

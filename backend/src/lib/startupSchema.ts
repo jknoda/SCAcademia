@@ -83,6 +83,39 @@ const ensureUserPhotoColumn = async (): Promise<SchemaCheckResult> => {
   };
 };
 
+const ensureAcademyDocumentIdColumn = async (): Promise<SchemaCheckResult> => {
+  const checkRes = await pool.query(
+    `SELECT is_nullable
+     FROM information_schema.columns
+     WHERE table_schema = $1
+       AND table_name = 'academies'
+       AND column_name = 'document_id'
+     LIMIT 1`,
+    [DB_SCHEMA]
+  );
+
+  if (checkRes.rows.length === 0) {
+    await pool.query('ALTER TABLE academies ADD COLUMN IF NOT EXISTS document_id VARCHAR(20)');
+    return {
+      applied: true,
+      details: `Column ${DB_SCHEMA}.academies.document_id created`,
+    };
+  }
+
+  if (checkRes.rows[0]?.is_nullable === 'NO') {
+    await pool.query('ALTER TABLE academies ALTER COLUMN document_id DROP NOT NULL');
+    return {
+      applied: true,
+      details: `Column ${DB_SCHEMA}.academies.document_id changed to nullable`,
+    };
+  }
+
+  return {
+    applied: false,
+    details: `Column ${DB_SCHEMA}.academies.document_id already nullable`,
+  };
+};
+
 const ensureBackupJobsTable = async (): Promise<SchemaCheckResult> => {
   const checkRes = await pool.query(
     `SELECT 1
@@ -137,6 +170,7 @@ export const runStartupSchemaChecks = async (): Promise<void> => {
     ensureTurmasScheduleJsonColumn(),
     ensureAcademyLogoColumn(),
     ensureUserPhotoColumn(),
+    ensureAcademyDocumentIdColumn(),
     ensureBackupJobsTable(),
   ]);
 
