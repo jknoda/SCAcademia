@@ -22,11 +22,11 @@ dotenv.config();
 const app: Express = express();
 
 const allowedOrigins = [
-  process.env.FRONTEND_URL || 'http://localhost:4200',
+  process.env.FRONTEND_URL || '',
   'http://localhost:4200',
   'http://127.0.0.1:4200',
   'http://[::1]:4200',
-];
+].filter(Boolean);
 
 const corsOptions: cors.CorsOptions = {
   origin: (origin, callback) => {
@@ -35,7 +35,9 @@ const corsOptions: cors.CorsOptions = {
     }
 
     const isLocalhost = /^http:\/\/(localhost|127\.0\.0\.1|\[::1\]):\d+$/.test(origin);
-    if (isLocalhost || allowedOrigins.includes(origin)) {
+    const isHerokuApp = /^https:\/\/[a-z0-9-]+\.herokuapp\.com$/i.test(origin);
+
+    if (isLocalhost || isHerokuApp || allowedOrigins.includes(origin)) {
       return callback(null, true);
     }
 
