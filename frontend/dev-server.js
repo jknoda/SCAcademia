@@ -2,7 +2,6 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
-const esbuild = require('esbuild');
 
 const app = express();
 const PORT = Number(process.env.PORT || 4200);
@@ -12,8 +11,23 @@ const hasProductionBuild = fs.existsSync(path.join(distPath, 'index.html'));
 
 app.use(cors());
 
+const loadEsbuild = () => {
+  try {
+    return require('esbuild');
+  } catch (error) {
+    console.warn('⚠️ esbuild is not available at runtime; production build assets will be served if present.');
+    return null;
+  }
+};
+
 // Compile TypeScript to JavaScript on-demand for local fallback mode
 async function compileTypeScript(filePath) {
+  const esbuild = loadEsbuild();
+
+  if (!esbuild) {
+    return null;
+  }
+
   try {
     const result = await esbuild.build({
       entryPoints: [filePath],
