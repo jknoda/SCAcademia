@@ -112,6 +112,29 @@ describe('AcademyProfileComponent', () => {
     expect(component.isSaving).toBeFalse();
   });
 
+  it('permite salvar quando o documento for informado sem máscara', () => {
+    component.form.patchValue({
+      name: 'Academia Atualizada',
+      description: 'Descricao atualizada',
+      documentId: '12345678000190',
+      contactEmail: 'novo@academia.com',
+      contactPhone: '11999999999',
+      addressStreet: 'Rua B',
+      addressNumber: '22',
+      addressComplement: '',
+      addressNeighborhood: 'Bairro',
+      addressPostalCode: '01001000',
+      addressCity: 'Sao Paulo',
+      addressState: 'sp',
+    });
+
+    expect(component.form.valid).toBeTrue();
+
+    component.save();
+
+    expect(apiSpy.updateAdminAcademyProfile).toHaveBeenCalled();
+  });
+
   it('mapeia erros de campo do backend no save', () => {
     apiSpy.updateAdminAcademyProfile.and.returnValue(
       throwError(() => ({

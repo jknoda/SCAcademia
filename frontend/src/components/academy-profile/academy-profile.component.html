@@ -37,7 +37,7 @@
 
       <div class="form-group">
         <label for="documentId">CNPJ/CPF *</label>
-        <input id="documentId" type="text" formControlName="documentId" class="form-control" placeholder="00.000.000/0000-00" />
+        <input id="documentId" type="text" formControlName="documentId" class="form-control" placeholder="00.000.000/0000-00" (input)="onDocumentIdInput($event)" />
         <div class="error-message" *ngIf="getFieldError('documentId')">{{ getFieldError('documentId') }}</div>
       </div>
     </div>
@@ -57,7 +57,7 @@
 
       <div class="form-group">
         <label for="contactPhone">Telefone *</label>
-        <input id="contactPhone" type="text" formControlName="contactPhone" class="form-control" />
+        <input id="contactPhone" type="text" formControlName="contactPhone" class="form-control" (input)="onContactPhoneInput($event)" />
         <div class="error-message" *ngIf="getFieldError('contactPhone')">{{ getFieldError('contactPhone') }}</div>
       </div>
     </div>
@@ -139,7 +139,7 @@
 
     <div class="actions-row">
       <button type="button" class="btn-secondary" (click)="backToDashboard()">Voltar</button>
-      <button type="submit" [disabled]="isSaving || form.invalid" class="btn btn-primary">
+      <button type="submit" [disabled]="isSaving" class="btn btn-primary">
         {{ isSaving ? 'Salvando...' : 'Salvar Alterações' }}
       </button>
     </div>

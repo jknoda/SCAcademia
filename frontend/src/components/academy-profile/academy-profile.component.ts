@@ -6,6 +6,9 @@ import { ApiService } from '../../services/api.service';
 import { compressImage } from '../../utils/image.utils';
 import { AcademyProfile, UpdateAcademyProfilePayload } from '../../types';
 
+const academyDocumentRegex = /^((\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2})|(\d{3}\.\d{3}\.\d{3}-\d{2})|(\d{11})|(\d{14}))$/;
+const academyPhoneRegex = /^(?:\(?\d{2}\)?\s?)?\d{4,5}-?\d{4}$/;
+
 @Component({
   selector: 'app-academy-profile',
   standalone: false,
@@ -33,9 +36,9 @@ export class AcademyProfileComponent implements OnInit {
       fantasyName: [''],
       logoUrl: [''],
       description: [''],
-      documentId: ['', [Validators.required, Validators.pattern(/^(\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}|\d{3}\.\d{3}\.\d{3}-\d{2})$/)]],
+      documentId: ['', [Validators.required, Validators.pattern(academyDocumentRegex)]],
       contactEmail: ['', [Validators.required, Validators.email]],
-      contactPhone: ['', [Validators.required, Validators.minLength(10)]],
+      contactPhone: ['', [Validators.required, Validators.pattern(academyPhoneRegex)]],
       addressStreet: [''],
       addressNumber: [''],
       addressComplement: [''],
@@ -123,6 +126,52 @@ export class AcademyProfileComponent implements OnInit {
     });
   }
 
+  onDocumentIdInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const digits = (input.value || '').replace(/\D/g, '').slice(0, 14);
+
+    let formatted = digits;
+    if (digits.length <= 11) {
+      if (digits.length > 9) {
+        formatted = `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6, 9)}-${digits.slice(9)}`;
+      } else if (digits.length > 6) {
+        formatted = `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6)}`;
+      } else if (digits.length > 3) {
+        formatted = `${digits.slice(0, 3)}.${digits.slice(3)}`;
+      }
+    } else {
+      if (digits.length > 12) {
+        formatted = `${digits.slice(0, 2)}.${digits.slice(2, 5)}.${digits.slice(5, 8)}/${digits.slice(8, 12)}-${digits.slice(12)}`;
+      } else if (digits.length > 8) {
+        formatted = `${digits.slice(0, 2)}.${digits.slice(2, 5)}.${digits.slice(5, 8)}/${digits.slice(8)}`;
+      } else if (digits.length > 5) {
+        formatted = `${digits.slice(0, 2)}.${digits.slice(2, 5)}.${digits.slice(5)}`;
+      } else if (digits.length > 2) {
+        formatted = `${digits.slice(0, 2)}.${digits.slice(2)}`;
+      }
+    }
+
+    input.value = formatted;
+    this.form.get('documentId')?.setValue(formatted, { emitEvent: false });
+  }
+
+  onContactPhoneInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const digits = (input.value || '').replace(/\D/g, '').slice(0, 11);
+
+    let formatted = digits;
+    if (digits.length > 7) {
+      const prefixLength = digits.length > 10 ? 3 : 2;
+      const middleLength = digits.length > 10 ? 5 : 4;
+      formatted = `(${digits.slice(0, 2)}) ${digits.slice(2, 2 + middleLength)}-${digits.slice(2 + middleLength)}`;
+    } else if (digits.length > 2) {
+      formatted = `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
+    }
+
+    input.value = formatted;
+    this.form.get('contactPhone')?.setValue(formatted, { emitEvent: false });
+  }
+
   onAddressStateInput(event: Event): void {
     const input = event.target as HTMLInputElement;
     const value = (input.value || '').replace(/[^A-Za-z]/g, '').slice(0, 2).toUpperCase();
@@ -133,6 +182,8 @@ export class AcademyProfileComponent implements OnInit {
   save(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
+      this.errorMessage = 'Revise os campos obrigatórios destacados antes de salvar.';
+      this.refreshView();
       return;
     }
 
@@ -246,6 +297,7 @@ export class AcademyProfileComponent implements OnInit {
 
     if (field.errors['pattern']) {
       if (fieldName === 'documentId') return 'CNPJ/CPF inválido';
+      if (fieldName === 'contactPhone') return 'Telefone deve estar em formato válido';
       if (fieldName === 'addressPostalCode') return 'CEP deve estar no formato 00000-000';
       if (fieldName === 'addressState') return 'UF deve conter 2 letras';
       return 'Formato inválido';

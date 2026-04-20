@@ -131,6 +131,29 @@ describe('Academy Profile API', () => {
     expect(getRes.body.addressPostalCode).toBe(payload.addressPostalCode);
   });
 
+  it('AC4: Admin consegue atualizar perfil usando documento sem máscara', async () => {
+    const res = await request(app)
+      .put('/api/admin/academy-profile')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        name: 'Academia Perfil Atualizada',
+        description: 'Atualização com documento sem máscara',
+        documentId: '12345678000190',
+        contactEmail: 'perfil.digitos@academia.com',
+        contactPhone: '(11) 99888-7777',
+        addressStreet: 'Rua Principal',
+        addressNumber: '10',
+        addressComplement: '',
+        addressNeighborhood: 'Centro',
+        addressPostalCode: '01001000',
+        addressCity: 'São Paulo',
+        addressState: 'SP',
+      });
+
+    expect(res.status).toBe(200);
+    expect(res.body.message).toBe('Dados da academia atualizados');
+  });
+
   it('AC5: retorna 409 quando documentId já existe em outra academia', async () => {
     await pool.query(
       `INSERT INTO academies (

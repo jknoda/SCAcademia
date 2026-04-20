@@ -1,5 +1,8 @@
 import Joi from 'joi';
 
+export const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+export const phoneRegex = /^(?:\(?\d{2}\)?\s?)?\d{4,5}-?\d{4}$/;
+
 export const academyFormSchema = Joi.object({
   name: Joi.string().min(2).max(255).required().messages({
     'string.min': 'Nome deve ter ao menos 2 caracteres',
@@ -14,8 +17,8 @@ export const academyFormSchema = Joi.object({
     'string.email': 'Email deve ser válido',
     'any.required': 'Email é obrigatório',
   }),
-  phone: Joi.string().regex(/^\d{10,15}$/).required().messages({
-    'string.pattern.base': 'Telefone deve ter entre 10-15 dígitos',
+  phone: Joi.string().pattern(phoneRegex).required().messages({
+    'string.pattern.base': 'Telefone deve estar em um formato válido',
     'any.required': 'Telefone é obrigatório',
   }),
   fantasyName: Joi.string().max(255).allow('').optional(),
@@ -64,9 +67,6 @@ export const resetPasswordSchema = Joi.object({
     'any.required': 'Nova senha é obrigatória',
   }),
 });
-
-export const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-export const phoneRegex = /^\d{10,15}$/;
 
 const BLOOD_TYPES = ['O+', 'O-', 'A+', 'A-', 'B+', 'B-', 'AB+', 'AB-'];
 
@@ -254,7 +254,7 @@ export const userRegistrationSchema = Joi.object({
   }),
 });
 
-const documentIdRegex = /^(\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}|\d{3}\.\d{3}\.\d{3}-\d{2})$/;
+const documentIdRegex = /^((\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2})|(\d{3}\.\d{3}\.\d{3}-\d{2})|(\d{11})|(\d{14}))$/;
 const postalCodeRegex = /^\d{5}-?\d{3}$/;
 const stateRegex = /^[A-Z]{2}$/;
 const imageDataSchema = Joi.string().max(4000000).allow('').optional();
@@ -275,8 +275,8 @@ export const academyProfileUpdateSchema = Joi.object({
     'string.email': 'Email deve ser válido',
     'any.required': 'Email é obrigatório',
   }),
-  contactPhone: Joi.string().min(10).max(20).required().messages({
-    'string.min': 'Telefone deve ter ao menos 10 caracteres',
+  contactPhone: Joi.string().pattern(phoneRegex).required().messages({
+    'string.pattern.base': 'Telefone deve estar em um formato válido',
     'any.required': 'Telefone é obrigatório',
   }),
   addressStreet: Joi.string().max(255).allow('').optional(),
