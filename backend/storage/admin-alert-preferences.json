@@ -526,5 +526,21 @@
     "digestWindowMinutes": 60,
     "silencedUntil": null,
     "updatedAt": "2026-04-17T20:30:26.057Z"
+  },
+  {
+    "academyId": "e470e7ba-44ab-43c3-8971-18a0932edb64",
+    "channels": {
+      "inApp": true,
+      "push": true,
+      "email": true
+    },
+    "severity": {
+      "critical": true,
+      "preventive": true,
+      "informative": true
+    },
+    "digestWindowMinutes": 60,
+    "silencedUntil": null,
+    "updatedAt": "2026-04-29T14:03:39.311Z"
   }
 ]

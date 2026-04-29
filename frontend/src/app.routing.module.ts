@@ -33,6 +33,7 @@ import { ProfessorTechniquesComponent } from './components/professor-techniques/
 import { StudentsListComponent } from './components/students-list/students-list.component';
 import { StudentFormComponent } from './components/student-form/student-form.component';
 import { StudentProfileComponent } from './components/student-profile/student-profile.component';
+import { StudentAiChatComponent } from './components/student-ai-chat/student-ai-chat.component';
 import { AdminUsersListComponent } from './components/admin-users-list/admin-users-list.component';
 import { AdminBackupRecoveryComponent } from './components/admin-backup-recovery/admin-backup-recovery.component';
 import { AdminHealthMonitorComponent } from './components/admin-health-monitor/admin-health-monitor.component';
@@ -69,6 +70,7 @@ const routes: Routes = [
   { path: 'professor/turmas', component: ProfessorTurmasComponent, canActivate: [AuthGuard] },
   { path: 'professor/tecnicas', component: ProfessorTechniquesComponent, canActivate: [AuthGuard] },
   { path: 'aluno/meu-perfil', component: AdminProfileComponent, canActivate: [AuthGuard] },
+  { path: 'aluno/chat-ia', component: StudentAiChatComponent, canActivate: [AuthGuard] },
   { path: 'admin/consent-templates', component: ConsentTemplatesAdminComponent, canActivate: [AuthGuard, RoleGuard] },
   { path: 'admin/audit-logs', component: AuditLogComponent, canActivate: [AuthGuard, RoleGuard] },
   { path: 'admin/compliance-reports', component: ComplianceReportsSettingsComponent, canActivate: [AuthGuard, RoleGuard] },

@@ -494,6 +494,21 @@ export interface JWTResponse {
   user?: User;
 }
 
+export interface AiChatUserLookupResponse {
+  userId: string;
+}
+
+export interface AiChatReplyResponse {
+  aiText: string;
+}
+
+export interface AiChatMessage {
+  id: string;
+  author: 'user' | 'ai';
+  text: string;
+  createdAt: string;
+}
+
 export interface SetupState {
   step: number;
   academyId?: string;

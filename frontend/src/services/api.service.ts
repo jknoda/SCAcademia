@@ -122,6 +122,9 @@ import {
   RestoreTrainingResponse,
   UpdateProfessorTurmaPayload,
   UpdateProfessorTurmaResponse,
+  AiChatMessage,
+  AiChatReplyResponse,
+  AiChatUserLookupResponse,
 } from '../types';
 
 @Injectable({
@@ -129,6 +132,7 @@ import {
 })
 export class ApiService {
   private apiUrl = environment.apiUrl;
+  private aiApiUrl = `${environment.apiUrl}/ai-chat`;
 
   constructor(private http: HttpClient) {}
 
@@ -602,6 +606,30 @@ export class ApiService {
 
   getAccessToken(): string | null {
     return localStorage.getItem('accessToken');
+  }
+
+  lookupAiUserByEmail(email: string): Observable<AiChatUserLookupResponse> {
+    return this.http.post<AiChatUserLookupResponse>(
+      `${this.aiApiUrl}/users`,
+      { email },
+      { headers: this.getHeaders() }
+    );
+  }
+
+  initAiChat(userId: string): Observable<AiChatReplyResponse> {
+    return this.http.post<AiChatReplyResponse>(
+      `${this.aiApiUrl}/chat/init`,
+      { userId },
+      { headers: this.getHeaders() }
+    );
+  }
+
+  sendAiChatMessage(userId: string, text: string): Observable<AiChatReplyResponse> {
+    return this.http.post<AiChatReplyResponse>(
+      `${this.aiApiUrl}/chat`,
+      { userId, text },
+      { headers: this.getHeaders() }
+    );
   }
 
   clearTokens(): void {

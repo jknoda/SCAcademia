@@ -44,6 +44,7 @@ export class AuthenticatedShellComponent implements OnInit, OnDestroy {
     { key: 'professor-profile', label: 'Meu perfil', icon: '👤', route: '/professor/meu-perfil', roles: ['Professor'] },
     { key: 'student-profile', label: 'Meu perfil', icon: '👤', route: '/aluno/meu-perfil', roles: ['Aluno'] },
     { key: 'student-progress', label: 'Meu progresso', icon: '📈', route: '/athlete-progress/self/dashboard', roles: ['Aluno'] },
+    { key: 'student-ai-chat', label: 'Chat IA', icon: '🤖', route: '/aluno/chat-ia', roles: ['Aluno'] },
     { key: 'guardian-home', label: 'Área do responsável', icon: '🧭', route: '/home', roles: ['Responsavel'] },
   ];
 
@@ -147,6 +148,7 @@ export class AuthenticatedShellComponent implements OnInit, OnDestroy {
       turmas: 'Turmas',
       tecnicas: 'Técnicas',
       aluno: 'Aluno',
+      'chat-ia': 'Chat IA',
       'athlete-progress': 'Evolução',
       configuration: 'Indicadores',
       'health-screening': 'Anamnese',

@@ -224,6 +224,7 @@
     <section *ngIf="isAluno()" class="actions">
       <h3>Próximas Ações</h3>
       <div class="action-buttons">
+        <button class="action-btn primary" (click)="goToAiChat()">Conversar com IA</button>
         <button class="action-btn" (click)="goToMyProfile()">Editar meu cadastro</button>
         <button class="action-btn" (click)="goToMyHealthScreening()">Atualizar anamnese</button>
         <button class="action-btn" (click)="goToEpic10Entry()">Minha evolução</button>
@@ -238,6 +239,11 @@
         </div>
       </div>
       <div class="dashboard-grid dashboard-grid-secondary">
+        <div class="feature-card feature-card-ia">
+          <h4>Chat com IA</h4>
+          <p class="muted">Converse com a IA para entender melhor seu progresso, manter foco e tirar duvidas sobre sua jornada.</p>
+          <button class="action-btn primary" (click)="goToAiChat()">Abrir chat</button>
+        </div>
         <div class="feature-card">
           <h4>Meu Cadastro</h4>
           <p class="muted">Atualize seus dados pessoais e senha a qualquer momento.</p>

@@ -42,6 +42,7 @@ import { ProfessorTechniquesComponent } from './components/professor-techniques/
 import { StudentsListComponent } from './components/students-list/students-list.component';
 import { StudentFormComponent } from './components/student-form/student-form.component';
 import { StudentProfileComponent } from './components/student-profile/student-profile.component';
+import { StudentAiChatComponent } from './components/student-ai-chat/student-ai-chat.component';
 import { AdminUsersListComponent } from './components/admin-users-list/admin-users-list.component';
 import { AdminBackupRecoveryComponent } from './components/admin-backup-recovery/admin-backup-recovery.component';
 import { AdminHealthMonitorComponent } from './components/admin-health-monitor/admin-health-monitor.component';
@@ -93,6 +94,7 @@ import { AuthInterceptor } from './services/auth.interceptor';
     StudentsListComponent,
     StudentFormComponent,
     StudentProfileComponent,
+    StudentAiChatComponent,
     AuthenticatedShellComponent,
   ],
   imports: [

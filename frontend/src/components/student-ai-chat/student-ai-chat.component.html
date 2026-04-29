@@ -1,0 +1,84 @@
+<div class="ai-chat-page">
+  <section class="ai-chat-hero">
+    <div>
+      <p class="eyebrow">Assistente IA do aluno</p>
+      <h2>Converse com a IA sobre sua jornada na academia</h2>
+      <p class="hero-copy">
+        Use este espaco para interagir com a IA autenticada pelo seu login atual. A conversa inicia automaticamente assim que seu usuario for identificado.
+      </p>
+    </div>
+    <div class="hero-badge">
+      <span class="hero-badge-label">Logado como</span>
+      <strong>{{ currentUser?.email || 'usuario indisponivel' }}</strong>
+    </div>
+  </section>
+
+  <section class="ai-chat-shell">
+    <aside class="ai-chat-sidecard">
+      <h3>Como funciona</h3>
+      <ul>
+        <li>Seu email e usado para localizar seu `userId` na API de IA.</li>
+        <li>O mesmo token JWT do login atual autentica todas as chamadas.</li>
+        <li>A primeira resposta vem de `chat/init` e a conversa continua em `chat`.</li>
+      </ul>
+
+      <div class="status-panel" *ngIf="infoMessage && !errorMessage">
+        {{ infoMessage }}
+      </div>
+
+      <div class="status-panel error" *ngIf="errorMessage">
+        <p>{{ errorMessage }}</p>
+        <button class="secondary-btn" (click)="retryInitialization()" [disabled]="isInitializing || isSending">
+          Tentar novamente
+        </button>
+      </div>
+    </aside>
+
+    <div class="ai-chat-card">
+      <div class="ai-chat-header">
+        <div>
+          <p class="chat-title">Resposta da IA</p>
+          <p class="chat-subtitle">Conversa autenticada com seu perfil de aluno.</p>
+        </div>
+        <div class="chat-status" [class.busy]="isInitializing || isSending">
+          {{ isInitializing ? 'Conectando' : (isSending ? 'Respondendo' : 'Online') }}
+        </div>
+      </div>
+
+      <div #messagesViewport class="ai-chat-messages" [attr.aria-busy]="isInitializing || isSending">
+        <div class="empty-state" *ngIf="messages.length === 0 && !errorMessage">
+          <p>Aguardando a primeira mensagem da IA...</p>
+        </div>
+
+        <article
+          class="message-bubble"
+          *ngFor="let message of messages; trackBy: trackByMessageId"
+          [class.message-bubble-user]="message.author === 'user'"
+          [class.message-bubble-ai]="message.author === 'ai'"
+        >
+          <span class="message-author">{{ message.author === 'ai' ? 'Resposta da IA' : 'Voce' }}</span>
+          <p>{{ message.text }}</p>
+        </article>
+      </div>
+
+      <div class="composer">
+        <label class="composer-label" for="ai-chat-input">Digite sua mensagem</label>
+        <textarea
+          id="ai-chat-input"
+          [(ngModel)]="draftMessage"
+          [disabled]="!aiUserId || isInitializing || isSending"
+          (keydown.enter)="handleEnter($event)"
+          placeholder="Escreva aqui o que voce quer perguntar para a IA..."
+          rows="4"
+        ></textarea>
+
+        <div class="composer-actions">
+          <p class="composer-hint">Pressione Enter para enviar ou Shift + Enter para quebrar linha.</p>
+          <button class="send-btn" (click)="sendMessage()" [disabled]="!draftMessage.trim() || !aiUserId || isInitializing || isSending">
+            {{ isSending ? 'Enviando...' : 'Enviar para IA' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>

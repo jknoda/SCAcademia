@@ -285,6 +285,10 @@ export class HomeComponent implements OnInit, OnDestroy {
     });
   }
 
+  goToAiChat(): void {
+    this.router.navigate(['/aluno/chat-ia']);
+  }
+
   goToAthleteProgressDashboard(studentId?: string): void {
     const targetStudentId = studentId || (this.isAluno() ? this.currentUser?.id : this.selectedStudentId);
     if (!targetStudentId) {
